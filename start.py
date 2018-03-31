@@ -1,21 +1,27 @@
 
 from dotenv import load_dotenv, find_dotenv
+import signal
+import sys
 import shared as s
 
 # Load .env
 load_dotenv(find_dotenv())
 
-# Load global variables
+# Init thread
 s.init()
 
-# Start FaceRecognition
-#from surirobot.recognition_engine.recognition import FaceRecognition
-#thread_reco = FaceRecognition()
-#thread_reco.start()
+
+def signal_handler(signal, frame):
+        print('You pressed Ctrl+C!')
+        s.stop()
+        sys.exit(0)
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 # Init from DB
-#from surirobot.management.faceloader.loader import load_faces
-#load_faces()
+from surirobot.services.facerecognition.loader import load_faces
+load_faces()
 
 # Launch GUI
 from surirobot.core import app

@@ -3,11 +3,10 @@ import datetime
 from flask import Blueprint
 from flask_restful import reqparse, Api, Resource, fields, marshal_with, inputs
 
-from management import db
+from surirobot.management import db
 from .models import User, Picture, LogRecognize
 from .utils import save_file, delete_file
-
-from recognition_engine.utils import add_picture, remove_picture
+import shared as s
 
 mod_api = Blueprint('api', __name__)
 api = Api(mod_api)
@@ -111,7 +110,7 @@ class PictureApi(Resource):
     def delete(self, user_id, picture_id):
         picture = Picture.query.get(picture_id)
 
-        remove_picture(picture)
+        s.serv_fr.remove_picture(picture)
 
         delete_file(picture.path)
         db.session.delete(picture)
@@ -155,7 +154,7 @@ class PictureListApi(Resource):
         db.session.add(picture)
         db.session.commit()
 
-        add_picture(picture)
+        s.serv_fr.add_picture(picture)
 
         return picture, 201
 

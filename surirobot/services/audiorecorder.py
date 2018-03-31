@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, Event
 import sounddevice as sd
 import soundfile as sf
 import queue
@@ -9,6 +9,7 @@ import logging
 class AudioRecorder(Thread):
     def __init__(self, samplerate=44100, channels=1):
         Thread.__init__(self)
+        self._stop_event = Event()
 
         self.samplerate = samplerate
         self.channels = channels
@@ -19,7 +20,7 @@ class AudioRecorder(Thread):
         self.logger = logging.getLogger(__name__)
 
     def run(self):
-        while True:
+        while(not self._stop_event.is_set()):
             elm = self.q.get()
             self.logger.info('Now recording for {}'.format(elm['duration']))
 
@@ -46,3 +47,6 @@ class AudioRecorder(Thread):
         self.logger.info(
             'Adding a {} seconds record to queue'.format(elm['duration'])
         )
+
+    def stop(self):
+        self._stop_event.set()

@@ -1,7 +1,7 @@
 import logging
 
-from management.mod_api.models import User
-from recognition_engine.utils import add_picture
+from surirobot.management.mod_api.models import User
+import shared as s
 
 
 def load_faces():
@@ -20,4 +20,4 @@ def load_faces():
             name = user.firstname + ' ' + user.lastname
             logger.info("Load Face  ..... {}".format(name))
 
-            add_picture(picture)
+            s.serv_fr.add_picture(picture)

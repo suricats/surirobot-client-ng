@@ -1,5 +1,5 @@
 import datetime
-from management import db
+from surirobot.management import db
 
 
 class User(db.Model):

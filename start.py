@@ -9,19 +9,18 @@ load_dotenv(find_dotenv())
 s.init()
 
 # Start FaceRecognition
-from recognition_engine.recognition import FaceRecognition
-thread_reco = FaceRecognition()
-thread_reco.start()
+#from surirobot.recognition_engine.recognition import FaceRecognition
+#thread_reco = FaceRecognition()
+#thread_reco.start()
 
 # Init from DB
-#from management.faceloader.loader import load_faces
+#from surirobot.management.faceloader.loader import load_faces
 #load_faces()
 
 # Launch GUI
-from gui.ui import Gui
-gui = Gui()
-gui.start()
+from surirobot.core import app
+app.exec_()
 
 # Launch Flask
-from management import app
-app.run(debug=False)
+#from surirobot.management import app
+#app.run(debug=False)

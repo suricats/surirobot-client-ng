@@ -1,0 +1,7 @@
+python-dotenv
+face_recognition
+opencv-python
+pyqt5
+flask
+flask_restful
+flask_sqlalchemy

@@ -6,7 +6,7 @@ from flask_restful import reqparse, Api, Resource, fields, marshal_with, inputs
 from surirobot.management import db
 from .models import User, Picture, LogRecognize
 from .utils import save_file, delete_file
-import shared as s
+from surirobot.core import serv_fr
 
 mod_api = Blueprint('api', __name__)
 api = Api(mod_api)
@@ -110,7 +110,7 @@ class PictureApi(Resource):
     def delete(self, user_id, picture_id):
         picture = Picture.query.get(picture_id)
 
-        s.serv_fr.remove_picture(picture)
+        serv_fr.remove_picture(picture)
 
         delete_file(picture.path)
         db.session.delete(picture)
@@ -154,7 +154,7 @@ class PictureListApi(Resource):
         db.session.add(picture)
         db.session.commit()
 
-        s.serv_fr.add_picture(picture)
+        serv_fr.add_picture(picture)
 
         return picture, 201
 

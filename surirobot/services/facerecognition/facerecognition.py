@@ -1,20 +1,21 @@
-from threading import Thread, Event
+from PyQt5.QtCore import QThread, pyqtSignal
 import os
 import logging
 import time
 import face_recognition
-import shared as s
+from surirobot.core import window, serv_vc
 
 
-class FaceRecognition(Thread):
-    NB_IMG_PER_SECOND = 1
+class FaceRecognition(QThread):
+    NB_IMG_PER_SECOND = 4
 
     UNKNOWN_FACE_ID = -1
     UNKNOWN_FACE_NAME = 'Unknown'
 
+    person_changed = pyqtSignal(str)
+
     def __init__(self):
-        Thread.__init__(self)
-        self._stop_event = Event()
+        QThread.__init__(self)
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
@@ -36,9 +37,9 @@ class FaceRecognition(Thread):
 
         time.sleep(3)
 
-        while(not self._stop_event.is_set()):
+        while(True):
             time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
-            small_frame = s.serv_vc.get_frame()
+            small_frame = serv_vc.get_frame()
 
             # Find all the faces and face encodings in the current frame of video
             face_locations = face_recognition.face_locations(small_frame)
@@ -59,8 +60,8 @@ class FaceRecognition(Thread):
 
             self.addToBuffer(face_names)
 
-    def stop(self):
-        self._stop_event.set()
+    def __del__(self):
+        self.wait()
 
     def addToBuffer(self, faces):
         if faces:
@@ -73,16 +74,18 @@ class FaceRecognition(Thread):
 
             if self.buffer['id'] == self.UNKNOWN_FACE_ID:
                 if self.buffer['count'] == 30:
-                    self.emit_new_person(id)
+                    self.emit_person_changed(id)
             else:
                 if self.buffer['count'] == 5:
-                    self.emit_new_person(id)
+                    self.emit_person_changed(id)
         else:
             self.buffer['id'] = id
             self.buffer['count'] = 0
 
-    def emit_new_person(self, id):
-        print(self.id_to_name(id))
+    def emit_person_changed(self, id):
+        name = self.id_to_name(id)
+        print(name)
+        self.person_changed.emit(name)
 
     def add_picture(self, picture):
         if picture.user.id in self.data:

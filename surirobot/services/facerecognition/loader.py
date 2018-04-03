@@ -1,23 +1,29 @@
+from PyQt5.QtCore import QThread
 import logging
-
 from surirobot.management.mod_api.models import User
-import shared as s
+from surirobot.core import serv_fr
 
 
-def load_faces():
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
+class FaceLoader(QThread):
+    def __init__(self):
+        QThread.__init__(self)
 
-    logger.info("Start loading faces ....")
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
 
-    users = User.query.all()
+    def run(self):
+        self.logger.info("Start loading faces ....")
 
-    for user in users:
-        pictures = user.pictures
-        if pictures:
-            picture = pictures[0]
+        users = User.query.all()
 
-            name = user.firstname + ' ' + user.lastname
-            logger.info("Load Face  ..... {}".format(name))
+        for user in users:
+            pictures = user.pictures
+            if pictures:
+                picture = pictures[0]
 
-            s.serv_fr.add_picture(picture)
+                name = user.firstname + ' ' + user.lastname
+                self.logger.info("Load Face  ..... {}".format(name))
+                serv_fr.add_picture(picture)
+
+    def __del__(self):
+        self.wait()

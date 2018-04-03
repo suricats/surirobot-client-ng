@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette, QColor, QIcon
 
 from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QPushButton, QTextEdit
-from PyQt5.QtCore import Qt, QSize, QTimer
+from PyQt5.QtCore import Qt, QSize, QTimer, pyqtSlot
 
 
 class MainWindow(QDialog):
@@ -83,6 +83,7 @@ class MainWindow(QDialog):
         self.labelTextUp.setText(text)
         self.updateWidgets()
 
+    @pyqtSlot(str)
     def setTextMiddle(self, text):
         self.labelTextMiddle.setText(text)
         self.updateWidgets()

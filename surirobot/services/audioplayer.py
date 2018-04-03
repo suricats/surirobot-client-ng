@@ -1,22 +1,24 @@
-from threading import Thread, Event
+from PyQt5.QtCore import QThread
 import sounddevice as sd
 import soundfile as sf
 import queue
 import logging
 
 
-class AudioPlayer(Thread):
+class AudioPlayer(QThread):
     def __init__(self):
-        Thread.__init__(self)
-        self._stop_event = Event()
+        QThread.__init__(self)
 
         self.q = queue.Queue()
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
+    def __del__(self):
+        self.wait()
+
     def run(self):
-        while(not self._stop_event.is_set()):
+        while(True):
             elm = self.q.get()
             self.logger.info('Now playing {}'.format(elm['filename']))
             sd.play(elm['data'], elm['fs'], blocking=True)
@@ -27,6 +29,3 @@ class AudioPlayer(Thread):
         elm['data'], elm['fs'] = sf.read(filename, dtype='float32')
         self.q.put(elm)
         self.logger.info('Adding {} to play queue'.format(filename))
-
-    def stop(self):
-        self._stop_event.set()

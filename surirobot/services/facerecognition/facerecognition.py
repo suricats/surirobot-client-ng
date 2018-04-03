@@ -3,7 +3,7 @@ import os
 import logging
 import time
 import face_recognition
-from surirobot.core import window, serv_vc
+from surirobot.core import serv_vc
 
 
 class FaceRecognition(QThread):
@@ -28,6 +28,9 @@ class FaceRecognition(QThread):
             'id': self.UNKNOWN_FACE_ID,
             'count': 0,
         }
+
+    def __del__(self):
+        self.wait()
 
     def run(self):
         face_locations = []
@@ -59,9 +62,6 @@ class FaceRecognition(QThread):
                 face_names.append(id)
 
             self.addToBuffer(face_names)
-
-    def __del__(self):
-        self.wait()
 
     def addToBuffer(self, faces):
         if faces:

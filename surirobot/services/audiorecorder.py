@@ -1,4 +1,4 @@
-from threading import Thread, Event
+from PyQt5.QtCore import QThread
 import sounddevice as sd
 import soundfile as sf
 import queue
@@ -6,10 +6,9 @@ import uuid
 import logging
 
 
-class AudioRecorder(Thread):
+class AudioRecorder(QThread):
     def __init__(self, samplerate=44100, channels=1):
-        Thread.__init__(self)
-        self._stop_event = Event()
+        QThread.__init__(self)
 
         self.samplerate = samplerate
         self.channels = channels
@@ -19,8 +18,11 @@ class AudioRecorder(Thread):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
+    def __del__(self):
+        self.wait()
+
     def run(self):
-        while(not self._stop_event.is_set()):
+        while(True):
             elm = self.q.get()
             self.logger.info('Now recording for {}'.format(elm['duration']))
 
@@ -47,6 +49,3 @@ class AudioRecorder(Thread):
         self.logger.info(
             'Adding a {} seconds record to queue'.format(elm['duration'])
         )
-
-    def stop(self):
-        self._stop_event.set()

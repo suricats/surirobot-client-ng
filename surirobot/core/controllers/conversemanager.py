@@ -1,5 +1,4 @@
 from PyQt5.QtCore import QTimer
-import shared as s
 
 
 class converseManager():

@@ -5,3 +5,19 @@ from .gui.ui import MainWindow
 app = QApplication(sys.argv)
 window = MainWindow()
 window.smartShow()
+
+# Start VideoCapture
+from surirobot.services import VideoCapture
+serv_vc = VideoCapture()
+serv_vc.start()
+
+# Start FaceRecognition
+from surirobot.services.facerecognition import FaceRecognition
+serv_fr = FaceRecognition()
+serv_fr.start()
+serv_fr.person_changed.connect(window.setTextMiddle)
+
+# Load faces from DB
+from surirobot.services.facerecognition.loader import FaceLoader
+face_loader = FaceLoader()
+face_loader.start()

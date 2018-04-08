@@ -1,24 +1,30 @@
 from .base import ApiCaller
-from PyQt5.QtCore import QByteArray, QJsonDocument, QVariant, QFile, QIODevice
+from .filedownloader import FileDownloader
+from PyQt5.QtCore import QByteArray, QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
 import uuid
+from surirobot.core import serv_ap
+from surirobot.core.common import State
 
 
 class ConverseApiCaller(ApiCaller):
+    download = pyqtSignal(str)
+    play_sound = pyqtSignal(str)
+    new_intent = pyqtSignal(int, 'QByteArray')
+
     def __init__(self, url='https://www.google.fr'):
         ApiCaller.__init__(self, url)
 
         self.intentMode = False
-        ### fileDownloader = new FileDownloader();
-        ### musicPlayer = MusicPlayer::getInstance();
-        ### QObject::connect(fileDownloader, SIGNAL(newFile(QByteArray)), this, SLOT(downloadFinished(QByteArray)));
-        ### QObject::connect(this, SIGNAL(download(QString)), fileDownloader, SLOT(sendRequest(QString)));
-        ### QObject::connect(this, SIGNAL(playSound(QString)), musicPlayer, SLOT(playSound(QString)));
-        ### QObject::connect(this, SIGNAL(interruptSound()), musicPlayer, SLOT(interruptRequest()));
+        self.fileDownloader = FileDownloader()
+        self.fileDownloader.newFile.connect(self.downloadFinished)
+        self.download.connect(self.fileDownloader.sendRequest)
+        self.play_sound.connect(serv_ap.play)
 
     def __del__(self):
         self.stop()
 
+    @pyqtSlot('QNetworkReply')
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = QByteArray(reply.readAll())
@@ -30,32 +36,31 @@ class ConverseApiCaller(ApiCaller):
             intent = jsonObject["intent"].toString()
             if (intent == "say-yes"):
                 print("OUI INTENT")
-                ### emit newIntent(State::STATE_CONFIRMATION_YES, intent.toUtf8())
+                self.new_intent.emit(State.STATE_CONFIRMATION_YES, intent)
             if (intent == "say-no"):
                 print("OUI INTENT")
-                ### emit newIntent(State::STATE_CONFIRMATION_NO, intent.toUtf8())
+                self.new_intent.emit(State.STATE_CONFIRMATION_NO, intent)
         else:
             message = jsonObject["answerText"].toString()
             url = jsonObject["answerAudioLink"].toString()
             if (not message.isEmpty()):
                 print("Received from Converse API : " + message.toStdString())
-                ### emit newReply(message);
-                pass
+                self.new_reply.emit(message)
             else:
-                ### emit newReply("Je ne me sens pas bien... [ERROR Conv : Field message needed but doesn't exist.]");
-                pass
+                self.new_reply.emit("Je ne me sens pas bien... [ERROR Conv : Field message needed but doesn't exist.]")
             if(not url.isEmpty()):
                 print("Downloading the sound : " + url.toStdString())
-                ### emit download(url)
+                self.download.emit(url)
 
         reply.deleteLater()
 
+    @pyqtSlot(str)
     def sendRequest(self, filepath):
         multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
         # Language
         textPart = QHttpPart()
         textPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"language\""))
-        textPart.setBody(DEFAULT_LANGUAGE)
+        textPart.setBody(self.DEFAULT_LANGUAGE)
         # Audio
         audioPart = QHttpPart()
         audioPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"audio\"; filename=\"audio.wav\""))
@@ -82,13 +87,12 @@ class ConverseApiCaller(ApiCaller):
     def start(self):
         ApiCaller.start()
         self.fileDownloader.start()
-        self.musicPlayer.start()
 
     def stop(self):
         self.fileDownloader.stop()
-        self.musicPlayer.currentThread.quit()
         ApiCaller.stop()
 
+    @pyqtSlot('QByteArray')
     def downloadFinished(self, data):
         print("Download finished.")
         filename = self.TMP_DIR + uuid.uuid4() + ".wav"
@@ -102,5 +106,4 @@ class ConverseApiCaller(ApiCaller):
 
         # Play the audio
         # Restart the audioplayer
-        ### emit interruptSound()
-        ### emit playSound(filename)
+        self.play_sound.emit(filename)

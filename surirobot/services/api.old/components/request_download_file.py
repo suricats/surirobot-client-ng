@@ -1,16 +1,13 @@
-from .base import ApiCaller
+from .request_base import BaseRequest
 from PyQt5.QtNetwork import QNetworkRequest
 from PyQt5.QtCore import QUrl, pyqtSignal, pyqtSlot
 
 
-class FileDownloader(ApiCaller):
+class FileDownloader(BaseRequest):
     new_file = pyqtSignal('QByteArray')
 
     def __init__(self):
-        ApiCaller.__init__(self)
-
-    def __del__(self):
-        self.stop()
+        BaseRequest.__init__(self)
 
     @pyqtSlot('QNetworkReply')
     def receiveReply(self, reply):

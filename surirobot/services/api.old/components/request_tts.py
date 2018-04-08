@@ -1,31 +1,40 @@
-from .apicall import ApiCaller
-from .downloader import FileDownloader
 import os
 import uuid
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QFile, QIODevice, QJsonDocument
-from PyQt5.QtNetwork import QNetworkReply
+import logging
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QFile, QIODevice, QJsonDocument, QObject
+from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest, QVariant, QNetworkAccessManager
 from surirobot.core import ui, serv_ap
 
 
-class TtsApi(ApiCaller):
+class TtsApi(QObject):
     download = pyqtSignal(str)
     no_voice = pyqtSignal(str)
 
-    def __init__(self):
-        ApiCaller.__init__(self, os.environ.get('API_TTS_URL'))
+    def __init__(self, to_say):
+        self.to_say = to_say
 
-        self.file_downloader = FileDownloader()
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
 
-        self.download.connect(self.file_downloader.sendRequest)
-        self.file_downloader.new_file.connect(self.download_finished)
-        self.no_voice.connect(ui.setTextUp)
+        self.url = os.environ.get('API_TTS_URL')
+        self.networkManager = QNetworkAccessManager(self)
 
-    def __del__(self):
-        self.wait()
+        self.networkManager.finished.connect(self.receive_reply)
 
-    def run(self):
-        pass
+    @pyqtSlot()
+    def sendRequest(self):
+        self.isBusy = True
+        json = {
+            'text': self.to_say,
+            'language': 'fr-FR'
+        }
 
+        jsonDocument = QJsonDocument(json)
+        request = QNetworkRequest(self.url)
+        request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
+        self.networkManager.post(request, jsonDocument.toJson)
+
+    @pyqtSlot('QNetworkReply')
     def receive_reply(self, reply):
         self.isBusy = False
         if (reply.error() != QNetworkReply.NoError):

@@ -79,6 +79,7 @@ class MainWindow(QDialog):
         self.labelTextUp.setFont(f)
         self.updateWidgets()
 
+    @pyqtSlot(str)
     def setTextUp(self, text):
         self.labelTextUp.setText(text)
         self.updateWidgets()
@@ -88,6 +89,7 @@ class MainWindow(QDialog):
         self.labelTextMiddle.setText(text)
         self.updateWidgets()
 
+    @pyqtSlot(str)
     def setTextDown(self, text):
         self.labelTextDown.setText(text)
         self.updateWidgets()

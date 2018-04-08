@@ -1,27 +1,29 @@
 from .base import ApiCaller
 from .filedownloader import FileDownloader
-from PyQt5.QtCore import QJsonDocument, QVariant, QFile, QIODevice
+from PyQt5.QtCore import QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal
 from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
 import uuid
+from surirobot.core import serv_ap
 
 
 class TtsApiCaller(ApiCaller):
+    download = pyqtSignal(str)
+    play_sound = pyqtSignal(str)
+
     def __init__(self, text):
         ApiCaller.__init__(self, text)
 
         self.fileDownloader = FileDownloader()
-        ### self.musicPlayer = MusicPlayer::getInstance();
-        ### QObject::connect(fileDownloader, SIGNAL(newFile(QByteArray)), this, SLOT(downloadFinished(QByteArray)));
-        ### QObject::connect(this, SIGNAL(download(QString)), fileDownloader, SLOT(sendRequest(QString)));
-        ### QObject::connect(this, SIGNAL(playSound(QString)), musicPlayer, SLOT(playSound(QString)));
-        ### QObject::connect(this, SIGNAL(interruptSound()), musicPlayer, SLOT(interruptRequest()));
+        self.fileDownloader.new_file.connect(self.downloadFinished)
+        self.download.connect(self.fileDownloader.sendRequest)
+        self.play_sound.connect(serv_ap.play)
 
     def __del__(self):
         self.stop()
 
+    @pyqtSlot('QNetworkReply')
     def receiveReply(self, reply):
         self.isBusy = False
-        # audioPlayer.stop()
         if (reply.error() != QNetworkReply.NoError):
             print("Error  " + reply.error() + " : " + reply.readAll().toStdString())
             self.networkManager.clearAccessCache()
@@ -29,12 +31,13 @@ class TtsApiCaller(ApiCaller):
             jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
             url = jsonObject["downloadLink"].toString("")
             if (url.isEmpty()):
-                self.newReply("Je ne me sens pas bien... [ERROR TTS : Fields needed don't exist.]")
+                self.new_reply.emit("Je ne me sens pas bien... [ERROR TTS : Fields needed don't exist.]")
             else:
                 print("Downloading the sound : " + url.toStdString())
-                ### emit download(url)
+                self.download.emit(url)
         reply.deleteLater()
 
+    @pyqtSlot(str)
     def sendRequest(self, text):
         self.isBusy = True
         # Json request
@@ -53,13 +56,12 @@ class TtsApiCaller(ApiCaller):
     def start(self):
         ApiCaller.start()
         self.fileDownloader.start()
-        self.musicPlayer.start()
 
     def stop(self):
         self.fileDownloader.stop()
-        self.musicPlayer.currentThread.quit()
         ApiCaller.stop()
 
+    @pyqtSlot('QByteArray')
     def downloadFinished(self, data):
         print("Download finished.")
         # generate filename
@@ -73,5 +75,4 @@ class TtsApiCaller(ApiCaller):
         file.close()
 
         # Play the audio
-        ### emit interruptSound();
-        ### emit playSound(QString::fromStdString(filename));
+        self.play_sound.emit(filename)

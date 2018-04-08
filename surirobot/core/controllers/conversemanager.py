@@ -1,7 +1,11 @@
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, pyqtSlot, pyqtSignal, QObject
+from surirobot.core.api.nlp import NlpApiCaller
+from surirobot.core.api.tts import TtsApiCaller
+from surirobot.core.api.converse import ConverseApiCaller
+from surirobot.core import ui
 
 
-class converseManager():
+class converseManager(QObject):
     NLP_URL = 'https://nlp.api.surirobot.net/getanswer'
     CONVERSE_URL = 'https://converse.api.surirobot.net/converse'
     TTS_URL = 'https://text-to-speech.api.surirobot.net/speak'
@@ -18,35 +22,31 @@ class converseManager():
     def __init__(self):
         self.debugTimer = QTimer()
         self.debugTimer.setInterval(self.NLP_INTERVAL_REQUEST * 1000)
+
         ### audioRecorder = new SpeechRecording;
-        ### nlpWorker = new NLPAPICaller(NLP_URL);
-        ### converseWorker = new ConverseAPICaller(CONVERSE_URL);
-        ### speechWorker = new TTSAPICaller(TTS_URL);
+        self.nlpWorker = NlpApiCaller(self.NLP_URL)
+        self.converseWorker = ConverseApiCaller(self.CONVERSE_URL)
+        self.speechWorker = TtsApiCaller(self.TTS_URL)
         ### QObject::connect(audioRecorder, SIGNAL(newSoundCreated(QString)), converseWorker, SLOT(sendRequest(QString)));
+
         self.nlpDebug = False
-        self.ui = None
 
-    def connectToUI(self, ui):
-        self.ui = ui
+    def connectToUI(self):
+        self.converseWorker.new_reply.connect(ui.setTextUp)
+        self.nlpWorker.new_reply.connect(ui.setTextUp)
 
-        ### QObject::connect(converseWorker, SIGNAL(newReply(QString)), ui, SLOT(setTextUpSignal(QString)));
-        ### QObject::connect(nlpWorker, SIGNAL(newReply(QString)), ui, SLOT(setTextUpSignal(QString)));
         ### QObject::connect(ui->MicButton, SIGNAL(released()), audioRecorder, SLOT(recordPSeconds()));
-
-        #### QObject::connect(debugTimer, SIGNAL(timeout()), ui, SLOT(sendEditText()));
+        ### QObject::connect(debugTimer, SIGNAL(timeout()), ui, SLOT(sendEditText()));
 
     def startConverse(self):
-        ### converseWorker.start()
-        ### audioRecorder.start()
-        pass
+        self.converseWorker.start()
+        ### self.audioRecorder.start()
 
     def startNLP(self):
-        ### nlpWorker.start()
-        pass
+        self.nlpWorker.start()
 
     def startTTS(self):
-        ### speechWorker.start()
-        pass
+        self.speechWorker.start()
 
     def startAll(self):
         self.startConverse()
@@ -54,12 +54,11 @@ class converseManager():
         self.startTTS()
 
     def stop(self):
-        ### nlpWorker.stop()
-        ### converseWorker.stop()
-        ### debugTimer.stop()
-        ### speechWorker.stop()
+        self.nlpWorker.stop()
+        self.converseWorker.stop()
+        self.debugTimer.stop()
+        self.speechWorker.stop()
         ### audioRecorder.currentThread.quit()
-        pass
 
     def debugNLP(self, set):
         if (self.nlpDebug == set):

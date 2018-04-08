@@ -1,5 +1,5 @@
 from .base import ApiCaller
-from PyQt5.QtCore import QJsonDocument, QVariant
+from PyQt5.QtCore import QJsonDocument, QVariant, pyqtSlot, pyqtSignal
 from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
 
 
@@ -10,6 +10,7 @@ class NlpApiCaller(ApiCaller):
     def __del__(self):
         self.stop()
 
+    @pyqtSlot('QNetworkReply')
     def receiveReply(self, reply):
         self.isBusy = False
         if (reply.error() != QNetworkReply.NoError):
@@ -23,12 +24,12 @@ class NlpApiCaller(ApiCaller):
                 queryValue = messagesJson[0].toObject()["content"]
                 if ((not queryValue.isNull()) and (not queryValue.isUndefined())):
                     message = queryValue.toString()
-                    ### emit newReply(message)
+                    self.new_reply.emit(message)
             else:
-                ### emit newReply(QString("Can't find message."));
-                pass
+                self.new_reply.emit("Can't find message.")
         reply.deleteLater()
 
+    @pyqtSlot(str)
     def sendRequest(self, text):
         if (text != ""):
             # Create the json request

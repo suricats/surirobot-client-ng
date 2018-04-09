@@ -3,7 +3,7 @@ from .filedownloader import FileDownloader
 from PyQt5.QtCore import QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal
 from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
 import uuid
-from surirobot.core import serv_ap
+from surirobot.services import serv_ap
 
 
 class TtsApiCaller(ApiCaller):
@@ -54,12 +54,12 @@ class TtsApiCaller(ApiCaller):
         self.networkManager.post(request, data)
 
     def start(self):
-        ApiCaller.start()
+        ApiCaller.start(self)
         self.fileDownloader.start()
 
     def stop(self):
         self.fileDownloader.stop()
-        ApiCaller.stop()
+        ApiCaller.stop(self)
 
     @pyqtSlot('QByteArray')
     def downloadFinished(self, data):

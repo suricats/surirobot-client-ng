@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QThread
 import logging
 from surirobot.management.mod_api.models import User
-from surirobot.core import serv_fr
+from surirobot.services import serv_fr
 
 
 class FaceLoader(QThread):

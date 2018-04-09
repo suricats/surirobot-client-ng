@@ -1,24 +1,27 @@
-from PyQt5.QtCore import QObject, QTimer, QEvent, Qt
+from PyQt5.QtCore import QObject, QTimer, QEvent, Qt, pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
+from surirobot.services import serv_ar
 
 
 class KeyPressEventHandler(QObject):
+    startRecord = pyqtSignal()
+    stopRecord = pyqtSignal()
+
     def __init__(self):
+        QObject.__init__(self)
         self.onScenario = False
         self.audioRecording = False
-
-        ### cm = converseManager::getInstance()
-        ### sr = cm->getAudioRecorder()
 
         self.expirationTimer = QTimer()
         self.expirationTimer.setInterval(500)
         self.expirationTimer.setSingleShot(True)
 
-        ### QObject.connect(expirationTimer,SIGNAL(timeout()),sr,SLOT(saveBuffer()));
-        ### QObject.connect(sr,SIGNAL(isRecording(bool)),this,SLOT(manageRecord(bool)));
-        ### QObject.connect(this,SIGNAL(startRecord()),sr,SLOT(recordInBuffer()));
+        self.expirationTimer.timeout.connect(serv_ar.stop_record)
+        #serv_ar.started_record.connect(self.manageRecord)
+        self.startRecord.connect(serv_ar.start_record)
 
     # Communication between 2 different threads
+    @pyqtSlot(bool)
     def manageRecord(self, val):
         self.audioRecording = val
 
@@ -32,9 +35,8 @@ class KeyPressEventHandler(QObject):
                 # Expiration timer is set to prevent keyboard error
                 if(self.expirationTimer.isActive()):
                     self.expirationTimer.stop()
-                if(not self.audioRecording):
-                    ### emit startRecord()
-                    pass
+                if(not serv_ar.is_recording()):
+                    self.startRecord.emit()
                 return True
             else:
                 return QObject.eventFilter(obj, event)

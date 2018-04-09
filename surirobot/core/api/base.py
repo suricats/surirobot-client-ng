@@ -10,9 +10,10 @@ class ApiCaller(QObject):
     new_reply = pyqtSignal(str)
 
     def __init__(self, url='https://www.google.fr'):
+        QObject.__init__(self)
         self.url = url
-        self.networkManager = QNetworkAccessManager(self)
-        self.networkManager.finished.connect(self.receiveReply)
+        # self.networkManager = QNetworkAccessManager(self)
+        # self.networkManager.finished.connect(self.receiveReply)
         self.currentThread = QThread()
         self.moveToThread(self.currentThread)
 
@@ -20,7 +21,6 @@ class ApiCaller(QObject):
         self.currentThread.quit()
 
     @pyqtSlot('QNetworkReply')
-    @abstractmethod
     def receiveReply(self, reply):
         pass
 

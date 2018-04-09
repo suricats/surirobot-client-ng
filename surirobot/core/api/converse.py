@@ -95,7 +95,7 @@ class ConverseApiCaller(ApiCaller):
     @pyqtSlot('QByteArray')
     def downloadFinished(self, data):
         print("Download finished.")
-        filename = self.TMP_DIR + uuid.uuid4() + ".wav"
+        filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"
         file = QFile(filename)
         if (not file.open(QIODevice.WriteOnly)):
             print("Could not create file : " + filename)

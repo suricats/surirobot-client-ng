@@ -39,7 +39,7 @@ class KeyPressEventHandler(QObject):
                     self.startRecord.emit()
                 return True
             else:
-                return QObject.eventFilter(obj, event)
+                return QObject.eventFilter(self, obj, event)
 
         # Key released
         elif(event.type() == QEvent.KeyRelease):
@@ -47,4 +47,4 @@ class KeyPressEventHandler(QObject):
             if((keyR.key() == Qt.Key_C) and (not self.expirationTimer.isActive())):
                 self.expirationTimer.start()
                 return True
-        return QObject.eventFilter(obj, event)
+        return QObject.eventFilter(self, obj, event)

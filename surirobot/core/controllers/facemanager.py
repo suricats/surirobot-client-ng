@@ -7,12 +7,6 @@ from surirobot.services import serv_fr
 
 
 class FaceManager(QObject):
-    __instance__ = None
-
-    def __new__(cls):
-        if cls.__instance__ is None:
-            cls.__instance__ = object.__new__(cls)
-        return cls.__instance__
 
     def __init__(self):
         self.emotional_worker = EmotionalAPICaller(EMOTIONAL_URL)

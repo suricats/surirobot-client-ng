@@ -20,8 +20,7 @@ class ConverseApiCaller(ApiCaller):
         self.fileDownloader.new_file.connect(self.downloadFinished)
         self.download.connect(self.fileDownloader.sendRequest)
         self.play_sound.connect(serv_ap.play)
-        self.networkManager = QNetworkAccessManager(self)
-        self.networkManager.finished.connect(self.receiveReply)
+
     def __del__(self):
         self.stop()
 

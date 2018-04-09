@@ -1,7 +1,7 @@
 from .base import ApiCaller
 from .filedownloader import FileDownloader
-from PyQt5.QtCore import QByteArray, QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal
-from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
+from PyQt5.QtCore import QByteArray, QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal, QUrl
+from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest,QNetworkAccessManager
 import uuid
 from surirobot.services import serv_ap
 from surirobot.core.common import State
@@ -20,16 +20,17 @@ class ConverseApiCaller(ApiCaller):
         self.fileDownloader.new_file.connect(self.downloadFinished)
         self.download.connect(self.fileDownloader.sendRequest)
         self.play_sound.connect(serv_ap.play)
-
+        self.networkManager = QNetworkAccessManager(self)
+        self.networkManager.finished.connect(self.receiveReply)
     def __del__(self):
         self.stop()
 
-    @pyqtSlot('QNetworkReply')
+    @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = QByteArray(reply.readAll())
         if (reply.error() != QNetworkReply.NoError):
-            print("Error  " + reply.error() + " : " + buffer.toStdString())
+            print("Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
             self.networkManager.clearAccessCache()
         jsonObject = QJsonDocument.fromJson(buffer).object()
         if self.intentMode:
@@ -43,13 +44,13 @@ class ConverseApiCaller(ApiCaller):
         else:
             message = jsonObject["answerText"].toString()
             url = jsonObject["answerAudioLink"].toString()
-            if (not message.isEmpty()):
-                print("Received from Converse API : " + message.toStdString())
+            if (message):
+                print("Received from Converse API : " + message)
                 self.new_reply.emit(message)
             else:
                 self.new_reply.emit("Je ne me sens pas bien... [ERROR Conv : Field message needed but doesn't exist.]")
-            if(not url.isEmpty()):
-                print("Downloading the sound : " + url.toStdString())
+            if(not url):
+                print("Downloading the sound : " + url)
                 self.download.emit(url)
 
         reply.deleteLater()
@@ -60,7 +61,7 @@ class ConverseApiCaller(ApiCaller):
         # Language
         textPart = QHttpPart()
         textPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"language\""))
-        textPart.setBody(self.DEFAULT_LANGUAGE)
+        textPart.setBody(QByteArray().append(self.DEFAULT_LANGUAGE))
         # Audio
         audioPart = QHttpPart()
         audioPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"audio\"; filename=\"audio.wav\""))
@@ -73,13 +74,13 @@ class ConverseApiCaller(ApiCaller):
 
         # Id
         idPart = QHttpPart()
-        textPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"userId\""))
-        textPart.setBody("1")
+        idPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"userId\""))
+        idPart.setBody(QByteArray().append("1"))
         multiPart.append(audioPart)
         multiPart.append(textPart)
         multiPart.append(idPart)
-        request = QNetworkRequest(self.url)
-        print("Sended to Converse API : " + "File - " + file.fileName().toStdString() + " - " + str(file.size() / 1000) + "Ko")
+        request = QNetworkRequest(QUrl(self.url))
+        print("Sended to Converse API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + "Ko")
         self.isBusy = True
         reply = self.networkManager.post(request, multiPart)
         multiPart.setParent(reply)

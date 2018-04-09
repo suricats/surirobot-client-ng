@@ -12,8 +12,7 @@ class ApiCaller(QObject):
     def __init__(self, url='https://www.google.fr'):
         QObject.__init__(self)
         self.url = url
-        # self.networkManager = QNetworkAccessManager(self)
-        # self.networkManager.finished.connect(self.receiveReply)
+        
         self.currentThread = QThread()
         self.moveToThread(self.currentThread)
 

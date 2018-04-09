@@ -37,7 +37,6 @@ class GeneralManager(QObject):
 
     def configureHandlers(self):
         ui.installEventFilter(self.eKeyPress)
-        print('yoloswag')
 
     @pyqtSlot()
     def deleteAll(self):

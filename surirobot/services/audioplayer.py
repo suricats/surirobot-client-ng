@@ -23,6 +23,7 @@ class AudioPlayer(QThread):
     def run(self):
         while(True):
             url = self.q.get()
+            self.logger.info('Now playing from {}'.format(url))
             sound = QMediaContent(url)
             self.player.setMedia(sound)
             self.player.play()

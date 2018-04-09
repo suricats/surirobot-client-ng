@@ -49,7 +49,7 @@ class ConverseApiCaller(ApiCaller):
                 self.new_reply.emit(message)
             else:
                 self.new_reply.emit("Je ne me sens pas bien... [ERROR Conv : Field message needed but doesn't exist.]")
-            if(not url):
+            if(url):
                 print("Downloading the sound : " + url)
                 self.download.emit(url)
 

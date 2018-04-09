@@ -10,7 +10,7 @@ class NlpApiCaller(ApiCaller):
     def __del__(self):
         self.stop()
 
-    @pyqtSlot('QNetworkReply')
+    @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         self.isBusy = False
         if (reply.error() != QNetworkReply.NoError):

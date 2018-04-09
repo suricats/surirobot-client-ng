@@ -3,7 +3,7 @@ import os
 import logging
 import time
 import face_recognition
-from surirobot.core import serv_vc
+from surirobot.services import serv_vc
 
 
 class FaceRecognition(QThread):

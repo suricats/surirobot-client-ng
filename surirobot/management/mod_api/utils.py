@@ -1,7 +1,7 @@
 import os
 import uuid
 
-base_dir = './pictures'
+base_dir = './data/pictures'
 
 
 def save_file(file):

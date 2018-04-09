@@ -6,7 +6,7 @@ from flask_restful import reqparse, Api, Resource, fields, marshal_with, inputs
 from surirobot.management import db
 from .models import User, Picture, LogRecognize
 from .utils import save_file, delete_file
-from surirobot.core import serv_fr
+from surirobot.services import serv_fr
 
 mod_api = Blueprint('api', __name__)
 api = Api(mod_api)

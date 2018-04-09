@@ -3,7 +3,7 @@ from .filedownloader import FileDownloader
 from PyQt5.QtCore import QByteArray, QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
 import uuid
-from surirobot.core import serv_ap
+from surirobot.services import serv_ap
 from surirobot.core.common import State
 
 
@@ -17,7 +17,7 @@ class ConverseApiCaller(ApiCaller):
 
         self.intentMode = False
         self.fileDownloader = FileDownloader()
-        self.fileDownloader.newFile.connect(self.downloadFinished)
+        self.fileDownloader.new_file.connect(self.downloadFinished)
         self.download.connect(self.fileDownloader.sendRequest)
         self.play_sound.connect(serv_ap.play)
 
@@ -85,12 +85,12 @@ class ConverseApiCaller(ApiCaller):
         multiPart.setParent(reply)
 
     def start(self):
-        ApiCaller.start()
+        ApiCaller.start(self)
         self.fileDownloader.start()
 
     def stop(self):
         self.fileDownloader.stop()
-        ApiCaller.stop()
+        ApiCaller.stop(self)
 
     @pyqtSlot('QByteArray')
     def downloadFinished(self, data):

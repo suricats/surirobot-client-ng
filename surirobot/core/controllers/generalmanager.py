@@ -37,14 +37,13 @@ class GeneralManager(QObject):
 
     def configureHandlers(self):
         ui.installEventFilter(self.eKeyPress)
+        print('yoloswag')
 
     @pyqtSlot()
     def deleteAll(self):
         # Stop the controllers
         ### fm->stop();
         man_conv.stop()
-        ### faceManager::deleteInstance();
-        ### converseManager::deleteInstance();
         self.deleteTemporaryFiles()
 
     def deleteTemporaryFiles(self):

@@ -26,14 +26,22 @@ class ScenarioManager(QObject):
     def loadFile(self, filepath=None):
         newSc = Scenario()
         newSc.triggers = [{"name": "sound.new"}]
-        newSc.actions = [{"name": "converse",
-        "filepath": "trigger.sound.new.filepath"}]
-    def suscribeToTrigger(self,sc):
+        newSc.actions = [{"name": "converse", "filepath": "trigger.sound.new.filepath"}]
+        self.suscribeToTrigger(newSc)
+
+    def suscribeToTrigger(self, sc):
         for trigger in sc.trigger:
             for key, value in self.triggers:
                 if trigger["name"] == key:
-                    self.subscriber[key] = sc
+                    self.subscriber[key].append(sc)
 
+    @pyqtSlot(str)
+    def update(self,name):
+        for sc in self.subscriber[val]:
+            r = self.ch=
+
+    def checkForTrigger(self, sc):
+        print('fucka ')
     def newPersonTrigger(self):
         print('sucka')
 

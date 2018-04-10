@@ -36,10 +36,16 @@ class ScenarioManager(QObject):
                     self.subscriber[key].append(sc)
 
     @pyqtSlot(str)
-    def update(self,name):
-        for sc in self.subscriber[val]:
-            r = self.ch=
+    def update(self, name):
+        for sc in self.subscriber[name]:
+            r = self.checkForTrigger(sc)
+            if r['active']:
+                for action in sc.actions:
+                    nav = self.retrieveData(action)
+                    sc.output.append()
 
+    def retrieveData(self,action):
+        print('motherfucka')
     def checkForTrigger(self, sc):
         print('fucka ')
     def newPersonTrigger(self):

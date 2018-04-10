@@ -1,6 +1,7 @@
 
 
 class Scenario():
-    triggers = []
-    actions = []
-    output = []
+    def __init__(self):
+        self.triggers = {}
+        self.actions = {}
+        self.output = {}

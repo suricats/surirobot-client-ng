@@ -1,59 +1,71 @@
-from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal
-import sounddevice as sd
-import soundfile as sf
+from PyQt5.QtCore import QThread, QObject, pyqtSlot, pyqtSignal, QUrl
+from PyQt5.QtMultimedia import QAudioRecorder, QAudioEncoderSettings, QMultimedia, QMediaRecorder
 import queue
 import uuid
 import logging
+import os
 
 
-class AudioRecorder(QThread):
+class AudioRecorder(QObject):
     started_record = pyqtSignal()
     end_record = pyqtSignal(str)
+    stop_qt_recorder = pyqtSignal()
 
-    def __init__(self, samplerate=44100, channels=1):
-        QThread.__init__(self)
+    def __init__(self, samplerate=44100, channels=1, codec="audio/wave"):
+        QObject.__init__(self)
 
-        self.samplerate = samplerate
-        self.channels = channels
+        self.settings = QAudioEncoderSettings()
+        self.settings.setCodec(codec)
+        self.settings.setSampleRate(samplerate)
+        self.settings.setChannelCount(channels)
+        self.settings.setQuality(QMultimedia.HighQuality)
 
-        self.list = queue.Queue()
+        self.recorder = QAudioRecorder()
+        self.recorder.setEncodingSettings(self.settings)
+
+        self.stop_qt_recorder.connect(self.recorder.stop)
+        self.recorder.stateChanged.connect(self.recorder_state)
+        self.current_file = ""
+
+        self.q = queue.Queue()
         self.recording = False
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-    def __del__(self):
-        self.wait()
-
     def run(self):
         while(True):
-            elm = self.list.get()
+            url = self.q.get()
+            qurl = QUrl(os.getcwd() + '/' + url)
+
+            self.recorder.setOutputLocation(qurl)
+            self.recorder.record()
+
             self.recording = True
             self.logger.info('Now starting record')
 
-            q = queue.Queue()
-
-            def save_to_file(indata, frames, time, status):
-                q.put(indata.copy())
-
-            with sf.SoundFile(elm['filename'], mode='x', samplerate=self.samplerate, channels=self.channels) as file:
-                with sd.InputStream(samplerate=self.samplerate, channels=self.channels, callback=save_to_file):
-                    self.started_record.emit()
-                    while self.recording:
-                        file.write(q.get())
-
-            self.end_record.emit(elm['filename'])
-
     @pyqtSlot()
     def start_record(self):
-        elm = {
-            'filename': 'tmp/{}.wav'.format(uuid.uuid4())
-        }
-        self.list.put(elm)
+        url = 'tmp/{}.wav'.format(uuid.uuid4())
+        qurl = QUrl(os.getcwd() + '/' + url)
+        self.current_file = url
+        self.recorder.setOutputLocation(qurl)
+        self.recorder.record()
+
+        self.recording = True
+        self.logger.info('Now starting record')
 
     @pyqtSlot()
     def stop_record(self):
+        self.logger.info("Stopping record")
         self.recording = False
+        self.stop_qt_recorder.emit()
+
+    @pyqtSlot('QMediaRecorder::State')
+    def recorder_state(self, state):
+        if state == QMediaRecorder.StoppedState:
+            self.end_record.emit(self.current_file)
+            pass
 
     def is_recording(self):
         return self.recording

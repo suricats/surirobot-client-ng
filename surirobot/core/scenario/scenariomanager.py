@@ -30,7 +30,7 @@ class ScenarioManager(QObject):
     def loadFile(self, filepath=None):
         newSc = Scenario()
         newSc.triggers = [{"name": "sound.new"}]
-        newSc.actions = [{"name": "converse", "filepath": "trigger.sound.new.filepath"}]
+        newSc.actions = [{"name": "converse", "filepath": {"source": "trigger", "name": "soud.new", "variable": "filepath"}}]
         self.suscribeToTrigger(newSc)
 
     def initActions(self, sc):

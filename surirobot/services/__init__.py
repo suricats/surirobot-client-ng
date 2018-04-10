@@ -19,9 +19,9 @@ face_loader.start(QThread.LowestPriority)
 # Start AudioPlayer
 from surirobot.services.audioplayer import AudioPlayer
 serv_ap = AudioPlayer()
-serv_ap.start()
+serv_ap.start(QThread.HighestPriority)
 
 # Start AudioRecorder
 from surirobot.services.audiorecorder import AudioRecorder
 serv_ar = AudioRecorder()
-#serv_ar.start()
+serv_ar.start()

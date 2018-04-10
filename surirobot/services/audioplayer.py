@@ -1,18 +1,15 @@
-from PyQt5.QtCore import QThread, pyqtSlot, QUrl
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-import logging
-import os
+from PyQt5.QtCore import QThread, pyqtSlot
+import sounddevice as sd
+import soundfile as sf
 import queue
+import logging
 
 
 class AudioPlayer(QThread):
     def __init__(self):
         QThread.__init__(self)
 
-        self.base_dir = os.getcwd()
         self.q = queue.Queue()
-        self.player = QMediaPlayer()
-        self.player.setVolume(100)
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
@@ -22,13 +19,14 @@ class AudioPlayer(QThread):
 
     def run(self):
         while(True):
-            url = self.q.get()
-            self.logger.info('Now playing from {}'.format(url))
-            sound = QMediaContent(url)
-            self.player.setMedia(sound)
-            self.player.play()
+            elm = self.q.get()
+            self.logger.info('Now playing {}'.format(elm['filename']))
+            sd.play(elm['data'], elm['fs'], blocking=True)
 
     @pyqtSlot(str)
     def play(self, filename):
-        url = QUrl.fromLocalFile(self.base_dir + '/' + filename)
-        self.q.put(url)
+        elm = {}
+        elm['filename'] = filename
+        elm['data'], elm['fs'] = sf.read(filename, dtype='float32')
+        self.q.put(elm)
+        self.logger.info('Adding {} to play queue'.format(filename))

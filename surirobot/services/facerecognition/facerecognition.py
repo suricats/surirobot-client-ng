@@ -9,9 +9,19 @@ from surirobot.services import serv_vc
 class FaceRecognition(QThread):
     NB_IMG_PER_SECOND = 2
 
-    UNKNOWN_FACE_ID = -1
-    UNKNOWN_FACE_NAME = 'Unknown'
+    MODULE_NAME = 'face'
 
+    # STATE
+    NOBODY = -2
+    UNKNOWN = -1
+    KNOWN = 0
+
+    NOBODY_NAME = 'Nobody'
+    UNKNOWN_NAME = 'Unknown'
+
+    state_changed = pyqtSignal(str, int, dict)
+
+    # deprecated signal -> will be removed
     person_changed = pyqtSignal(str)
 
     def __init__(self):
@@ -25,7 +35,7 @@ class FaceRecognition(QThread):
         self.linker = []
 
         self.buffer = {
-            'id': self.UNKNOWN_FACE_ID,
+            'id': self.UNKNOWN,
             'count': 0,
         }
 
@@ -53,7 +63,7 @@ class FaceRecognition(QThread):
             for face_encoding in face_encodings:
                 # See if the face is a match for the known face(s)
                 match = face_recognition.compare_faces(self.faces, face_encoding, tolerance)
-                id = self.UNKNOWN_FACE_ID
+                id = self.UNKNOWN
 
                 for key, value in enumerate(match):
                     if value:
@@ -67,12 +77,12 @@ class FaceRecognition(QThread):
         if faces:
             id = faces[0]
         else:
-            id = self.UNKNOWN_FACE_ID
+            id = self.UNKNOWN
 
         if id == self.buffer['id']:
             self.buffer['count'] = self.buffer['count'] + 1
 
-            if self.buffer['id'] == self.UNKNOWN_FACE_ID:
+            if self.buffer['id'] == self.UNKNOWN:
                 if self.buffer['count'] == 30:
                     self.emit_person_changed(id)
             else:
@@ -81,6 +91,14 @@ class FaceRecognition(QThread):
         else:
             self.buffer['id'] = id
             self.buffer['count'] = 0
+
+    def emit_state_changed(self, state, id):
+        self.state_changed.emit(self.MODULE_NAME, state, {
+            'id': id,
+            'firstname': self.id_to_firstname(id),
+            'lastname': self.id_to_lastname(id),
+            'name': self.id_to_name(id)
+        })
 
     def emit_person_changed(self, id):
         name = self.id_to_name(id)
@@ -110,7 +128,25 @@ class FaceRecognition(QThread):
         del self.linker[key]
 
     def id_to_name(self, id):
-        if id == self.UNKNOWN_FACE_ID:
-            return self.UNKNOWN_FACE_NAME
+        if id == self.UNKNOWN:
+            return self.UNKNOWN_NAME
+        if id == self.NOBODY:
+            return self.NOBODY_NAME
 
         return self.data[id]['name']
+
+    def id_to_firstname(self, id):
+        if id == self.UNKNOWN_:
+            return self.UNKNOWN_NAME
+        if id == self.NOBODY:
+            return self.NOBODY_NAME
+
+        return self.data[id]['firstname']
+
+    def id_to_lastname(self, id):
+        if id == self.UNKNOWN:
+            return self.UNKNOWN_NAME
+        if id == self.NOBODY:
+            return self.NOBODY_NAME
+
+        return self.data[id]['lastname']

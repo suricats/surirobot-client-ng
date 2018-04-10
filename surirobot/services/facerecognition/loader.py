@@ -22,8 +22,9 @@ class FaceLoader(QThread):
                 picture = pictures[0]
 
                 name = user.firstname + ' ' + user.lastname
-                self.logger.info("Load Face  ..... {}".format(name))
+                #self.logger.info("Load Face {}".format(name))
                 serv_fr.add_picture(picture)
+        self.logger.info('Loaded all the faces from DB')
 
     def __del__(self):
         self.wait()

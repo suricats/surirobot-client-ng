@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal, QUrl
+from PyQt5.QtCore import QThread, QObject, pyqtSlot, pyqtSignal, QUrl
 from PyQt5.QtMultimedia import QAudioRecorder, QAudioEncoderSettings, QMultimedia, QMediaRecorder
 import queue
 import uuid
@@ -6,13 +6,13 @@ import logging
 import os
 
 
-class AudioRecorder(QThread):
+class AudioRecorder(QObject):
     started_record = pyqtSignal()
     end_record = pyqtSignal(str)
     stop_qt_recorder = pyqtSignal()
 
     def __init__(self, samplerate=44100, channels=1, codec="audio/wave"):
-        QThread.__init__(self)
+        QObject.__init__(self)
 
         self.settings = QAudioEncoderSettings()
         self.settings.setCodec(codec)
@@ -46,7 +46,14 @@ class AudioRecorder(QThread):
 
     @pyqtSlot()
     def start_record(self):
-        self.q.put('tmp/{}.wav'.format(uuid.uuid4()))
+        url = 'tmp/{}.wav'.format(uuid.uuid4())
+        qurl = QUrl(os.getcwd() + '/' + url)
+        self.current_file = url
+        self.recorder.setOutputLocation(qurl)
+        self.recorder.record()
+
+        self.recording = True
+        self.logger.info('Now starting record')
 
     @pyqtSlot()
     def stop_record(self):

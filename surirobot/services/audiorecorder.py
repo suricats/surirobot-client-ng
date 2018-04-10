@@ -48,6 +48,7 @@ class AudioRecorder(QObject):
     def start_record(self):
         url = 'tmp/{}.wav'.format(uuid.uuid4())
         qurl = QUrl(os.getcwd() + '/' + url)
+        self.logger.info('FILEPATH: ' + qurl.toString())
         self.current_file = url
         self.recorder.setOutputLocation(qurl)
         self.recorder.record()

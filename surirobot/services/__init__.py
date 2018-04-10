@@ -21,4 +21,4 @@ serv_ap.start()
 # Start AudioRecorder
 from surirobot.services.audiorecorder import AudioRecorder
 serv_ar = AudioRecorder()
-serv_ar.start()
+#serv_ar.start()

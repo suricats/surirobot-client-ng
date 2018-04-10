@@ -3,6 +3,7 @@ import sounddevice as sd
 import soundfile as sf
 import queue
 import logging
+import os
 
 
 class AudioPlayer(QThread):
@@ -21,7 +22,8 @@ class AudioPlayer(QThread):
         while(True):
             elm = self.q.get()
             self.logger.info('Now playing {}'.format(elm['filename']))
-            sd.play(elm['data'], elm['fs'], blocking=True)
+            # sd.play(elm['data'], elm['fs'], blocking=True)
+            os.system('play ' + elm['filename'])
 
     @pyqtSlot(str)
     def play(self, filename):

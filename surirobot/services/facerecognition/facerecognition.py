@@ -7,7 +7,7 @@ from surirobot.services import serv_vc
 
 
 class FaceRecognition(QThread):
-    NB_IMG_PER_SECOND = 4
+    NB_IMG_PER_SECOND = 2
 
     UNKNOWN_FACE_ID = -1
     UNKNOWN_FACE_NAME = 'Unknown'
@@ -47,7 +47,7 @@ class FaceRecognition(QThread):
             # Find all the faces and face encodings in the current frame of video
             face_locations = face_recognition.face_locations(small_frame)
             # num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)
-            face_encodings = face_recognition.face_encodings(small_frame, face_locations, 10)
+            face_encodings = face_recognition.face_encodings(small_frame, face_locations, 2)
 
             face_names = []
             for face_encoding in face_encodings:

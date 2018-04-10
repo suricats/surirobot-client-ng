@@ -1,3 +1,6 @@
+from PyQt5.QtCore import QThread
+
+
 # Start VideoCapture
 from surirobot.services.videocapture import VideoCapture
 serv_vc = VideoCapture()
@@ -11,7 +14,7 @@ serv_fr.start()
 # Load faces from DB
 from surirobot.services.facerecognition.loader import FaceLoader
 face_loader = FaceLoader()
-face_loader.start()
+face_loader.start(QThread.LowestPriority)
 
 # Start AudioPlayer
 from surirobot.services.audioplayer import AudioPlayer

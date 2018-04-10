@@ -5,3 +5,4 @@ class Action():
         self.input = []
         self.output = []
         self.call
+        self.name = ""

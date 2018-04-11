@@ -41,7 +41,7 @@ class FaceRecognition(QThread):
         self.counter_known.timeout.connect(self.timer_known_timeout)
 
         self.state_id = self.NOBODY
-        self.pretendent_id = 0
+        self.pretendent_id = self.NOBODY
 
         self.buffer = {
             'id': self.UNKNOWN,
@@ -57,6 +57,8 @@ class FaceRecognition(QThread):
         tolerance = float(os.environ.get('FACERECO_TOLERANCE', '0.54'))
 
         time.sleep(3)
+
+        self.emit_person_changed(self.NOBODY)
 
         while(True):
             time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
@@ -85,7 +87,7 @@ class FaceRecognition(QThread):
         self.counter_known.increment()
 
         if id == self.NOBODY:
-            self.pretendent_id = 0
+            self.pretendent_id = self.NOBODY
             self.counter_unknown.stop()
             self.counter_known.stop()
 
@@ -94,7 +96,7 @@ class FaceRecognition(QThread):
                     self.counter_nobody.start()
 
         elif id == self.UNKNOWN:
-            self.pretendent_id = 0
+            self.pretendent_id = self.NOBODY
             self.counter_nobody.stop()
             self.counter_known.stop()
 
@@ -144,9 +146,9 @@ class FaceRecognition(QThread):
 
     @pyqtSlot()
     def timer_known_timeout(self):
-        print('emit known')
+        print('emit known ' + str(self.pretendent_id))
         self.state_id = self.pretendent_id
-        self.pretendent_id = 0
+        self.pretendent_id = self.NOBODY
         self.emit_person_changed(self.state_id)
         #self.emit_state_changed(self.KNOWN, self.state_id)
 

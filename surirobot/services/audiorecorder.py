@@ -4,11 +4,14 @@ import soundfile as sf
 import queue
 import uuid
 import logging
+from surirobot.core import ui
 
 
 class AudioRecorder(QThread):
     started_record = pyqtSignal()
     end_record = pyqtSignal(str)
+
+    update_suri_image = pyqtSignal(int)
 
     def __init__(self, samplerate=44100, channels=1):
         QThread.__init__(self)
@@ -21,6 +24,8 @@ class AudioRecorder(QThread):
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
+
+        self.update_suri_image.connect(ui.setImage)
 
     def __del__(self):
         self.wait()
@@ -46,14 +51,13 @@ class AudioRecorder(QThread):
 
     @pyqtSlot()
     def start_record(self):
-        elm = {
-            'filename': 'tmp/{}.wav'.format(uuid.uuid4())
-        }
-        self.list.put(elm)
+        self.list.put({'filename': 'tmp/{}.wav'.format(uuid.uuid4())})
+        self.update_suri_image.emit(ui.SURI_LISTENING)
 
     @pyqtSlot()
     def stop_record(self):
         self.recording = False
+        self.update_suri_image.emit(ui.SURI_BASIC)
 
     def is_recording(self):
         return self.recording

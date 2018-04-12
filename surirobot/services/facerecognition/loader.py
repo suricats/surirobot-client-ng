@@ -48,21 +48,31 @@ class FaceLoader(QThread):
         self.logger.info('Loaded all the faces from DB')
 
     def add_user(self, firstname, lastname, email, picture_path):
+        print('yolo')
         user = User(firstname=firstname, lastname=lastname, email=email)
-        print(user.id)
-        new_path = Dir.PICTURES + uuid.uuid4() + '.jpg'
+        db.session.add(user)
+        db.session.commit()
+
+        print('added user')
+        new_path = Dir.PICTURES + format(uuid.uuid4()) + '.jpg'
         shutil.copy(picture_path, new_path)
-        picture = Picture(path=new_path, user_id=user.id)
-        #db.session.add(user)
-        #db.session.add(picture)
-        #db.session.commit()
+        print(user.id)
+        picture = Picture(path=new_path, user=user)
+        print('sale pute')
+        db.session.add(picture)
+        db.session.commit()
+        print('added picture')
+
         self.q.put(picture)
 
     @pyqtSlot()
     def take_picture(self):
-        fistname = user + str(randint(0, 1000))
+        firstname = 'user' + str(randint(0, 1000))
         picture = serv_vc.get_frame()
-        file_path = Dir.TMP + uuid.uuid4() + '.jpeg'
+        print('yolo')
+        file_path = Dir.TMP + format(uuid.uuid4()) + '.jpeg'
+        print(file_path)
         cv2.imwrite(file_path, picture)
+        print('writed')
         self.new_user.emit(firstname)
         self.add_user(firstname, '', '', file_path)

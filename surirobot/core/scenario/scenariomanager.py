@@ -133,10 +133,16 @@ class ScenarioManager(QObject):
 
     def newPersonTrigger(self):
         print('sucka')
-
+    def knowPersonTrigger(self, input):
+        if self.services.get("face", None):
+            # TODO: Implement regex parameters
+            if self.services["face"]["state"] == State.STATE_
+        else:
+            return False
     def newSoundTrigger(self, input):
-        if self.services["sound"]["state"] == State.STATE_SOUND_NEW:
-            return True
+        if self.services.get("sound", None):
+            if self.services["sound"]["state"] == State.STATE_SOUND_NEW:
+                return True
         return False
 
     def newConverseTrigger(self, input):

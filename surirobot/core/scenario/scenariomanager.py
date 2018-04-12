@@ -27,8 +27,18 @@ class ScenarioManager(QObject):
         self.logger = logging.getLogger(__name__)
 
         serv_ar.updateState.connect(self.update)
+        self.generateTriggers()
+        self.generateActions()
+
+        self.loadFile()
 
     def generateTriggers(self):
+        self.triggers["sound"] = {}
+        self.triggers["converse"] = {}
+        self.triggers["face"] = {}
+        self.triggers["emotion"] = {}
+        self.triggers["storage"] = {}
+
         self.triggers["sound"]["new"] = self.newSoundTrigger
         self.triggers["converse"]["new"] = self.newConverseTrigger
 
@@ -44,7 +54,7 @@ class ScenarioManager(QObject):
         {"name": "callScenarios", "id": {"type": "input", "variable": [2]}}]
         newSc1.id = 1
         self.scenarios[newSc1.id] = newSc1
-        self.scope.push(newSc1)
+        self.scope.append(newSc1)
         newSc2 = Scenario()
         newSc2.triggers = [{"service": "converse", "name": "new"}]
         # With this implementation a parameter named "name" is forbidden
@@ -52,11 +62,6 @@ class ScenarioManager(QObject):
         {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
         newSc2.id = 2
         self.scenarios[newSc2.id] = newSc2
-
-    def initActions(self, sc):
-        for action in sc.actions:
-            # Retrieve call function
-            action.call = self.actions[action.name]
 
     def suscribeToTrigger(self, sc):
         for trigger in sc.trigger:
@@ -66,16 +71,15 @@ class ScenarioManager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
-        self.logger.info('Scenario update')
         self.services[name] = {}
         self.services[name]["state"] = state
         self.services[name].update(data)
-        self.logger.info(self.services)
         self.checkScope()
 
     def retrieveData(self, action):
         input = {}
-        for name, value in action.iteritems():
+        self.logger.info('retrieveData' + str(action))
+        for name, value in action.items():
             if name != "name":
                 if value["type"] == "service":
                     input[name] = self.services[value["name"]][value["variable"]]
@@ -92,12 +96,16 @@ class ScenarioManager(QObject):
             if not triggerActive:
                 active = False
                 break
+        self.logger.info('checkForTrigger' + str(active))
         return active
 
     def checkScope(self):
+        self.logger.info('checkScope')
         for sc in self.scope:
             if self.checkForTrigger(sc):
                 self.updateState(sc)
+                self.logger.info('MAMENE TRIGGERED')
+                self.logger.info(sc.actions)
                 for action in sc.actions:
                     input = self.retrieveData(action)
                     func = self.actions[action["name"]]
@@ -144,10 +152,12 @@ class ScenarioManager(QObject):
         serv_ap.play(input["filepath"])
 
     def converse(self, input):
+        print('Converse Action')
         api_converse.sendRequest(input["filepath"])
 
     def callScenarios(self, input):
-        idTable = input["id"]["variable"]
+        print('callScenarios Action' + str(input))
+        idTable = input["id"]
         self.scope = []
         for id in idTable:
-            self.scope.push(self.scenarios[id])
+            self.scope.append(self.scenarios[id])

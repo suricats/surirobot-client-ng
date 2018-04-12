@@ -3,6 +3,7 @@ import os
 import logging
 import time
 import face_recognition
+from surirobot.core import ui
 from surirobot.services import serv_vc
 from .counter import Counter
 from surirobot.core.common import State
@@ -29,6 +30,8 @@ class FaceRecognition(QThread):
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
+
+        self.person_changed.connect(ui.setTextUp)
 
         self.data = {}
         self.faces = []

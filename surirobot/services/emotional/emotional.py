@@ -3,15 +3,16 @@ import logging
 import time
 import os
 import cv2
-import base64
+import uuid
 from surirobot.services import serv_vc
 from surirobot.core.api.emotional import EmotionalAPICaller
+from surirobot.core.common import Dir
 
 
 class EmotionalRecognition(QThread):
     updateState = pyqtSignal(str, int, dict)
 
-    send_request = pyqtSignal(bytes)
+    send_request = pyqtSignal(str)
 
     NB_IMG_PER_SECOND = 0.1
     MODULE_NAME = 'emotion'
@@ -37,9 +38,9 @@ class EmotionalRecognition(QThread):
         while(True):
             time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
             frame = serv_vc.get_frame()
-            retval, buffer = cv2.imencode('.jpeg', frame)
-            image_base64 = base64.b64encode(buffer)
-            self.send_request.emit(image_base64)
+            file_path = Dir.TMP + format(uuid.uuid4()) + '.jpeg'
+            cv2.imwrite(file_path, frame)
+            self.send_request.emit(file_path)
 
     @pyqtSlot(int, dict)
     def emit_emotion_changed(self, state, data):

@@ -43,7 +43,7 @@ class ConverseApiCaller(ApiCaller):
         reply.deleteLater()
 
     @pyqtSlot(str)
-    def sendRequest(self, filepath):
+    def sendRequest(self, filepath, id=1):
         multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
         # Language
         textPart = QHttpPart()
@@ -62,7 +62,7 @@ class ConverseApiCaller(ApiCaller):
         # Id
         idPart = QHttpPart()
         idPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"userId\""))
-        idPart.setBody(QByteArray().append("1"))
+        idPart.setBody(QByteArray().append(str(id)))
         multiPart.append(audioPart)
         multiPart.append(textPart)
         multiPart.append(idPart)

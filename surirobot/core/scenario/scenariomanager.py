@@ -1,11 +1,13 @@
 from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal
 from surirobot.services import serv_ap, serv_fr, serv_ar
 from surirobot.core.api import api_converse, api_nlp, api_tts
+from surirobot.core import ui
 
 from surirobot.core.scenario.scenario import Scenario
 from surirobot.core.scenario.action import Action
 from surirobot.core.common import State
 import logging
+
 
 class ScenarioManager(QObject):
     __instance__ = None
@@ -28,6 +30,7 @@ class ScenarioManager(QObject):
 
         serv_ar.updateState.connect(self.update)
         api_converse.updateState.connect(self.update)
+        serv_fr.updateState.connect(self.update)
         self.generateTriggers()
         self.generateActions()
 
@@ -153,6 +156,9 @@ class ScenarioManager(QObject):
 
     def playSound(self, input):
         serv_ap.play(input["filepath"])
+
+    def displayText(self, input):
+        ui.setTextUp(input.get("text", ""))
 
     def converse(self, input):
         print('Converse Action')

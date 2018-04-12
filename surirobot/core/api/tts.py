@@ -16,7 +16,6 @@ class TtsApiCaller(ApiCaller):
         self.fileDownloader = FileDownloader()
         self.fileDownloader.new_file.connect(self.downloadFinished)
         self.download.connect(self.fileDownloader.sendRequest)
-        self.fileDownloader.new_file.connect(self.downloadFinished)
         self.play_sound.connect(serv_ap.play)
 
     def __del__(self):

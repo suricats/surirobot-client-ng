@@ -1,6 +1,6 @@
 from .base import ApiCaller
-from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QJsonDocument, QUrl, QVariant
+from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest,QNetworkAccessManager
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QJsonDocument, QUrl, QVariant, QFile, QIODevice
 from surirobot.core.common import State
 
 
@@ -22,27 +22,35 @@ class EmotionalAPICaller(ApiCaller):
         else:
             jsonObject = QJsonDocument.fromJson(reply.readAll())
 
-            tmpAr = jsonObject["facial"].toArray()
-            if tmpAr:
+            emotion = jsonObject["data"]
+            print(emotion)
+            if emotion:
                 self.received_reply.emit(
-                    State.STATE_EMOTION_NEW, {'emotion': tmpAr}
+                    State.STATE_EMOTION_NEW, {'emotion': [emotion]}
                 )
             else:
                 self.received_reply.emit(
                     State.STATE_EMOTION_NO, {'emotion': []}
                 )
-
         self.isBusy = False
         reply.deleteLater()
 
-    @pyqtSlot(bytes)
+    @pyqtSlot(str)
     def sendRequest(self, text):
         self.isBusy = True
-        jsonObject = {'pictures': str(text)}
 
-        jsonData = QJsonDocument(jsonObject)
-        data = jsonData.toJson()
+        multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
+        # Picture
+        picturePart = QHttpPart()
+        picturePart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"picture\"; filename=\"picture.jpeg\""))
+        picturePart.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("image/jpeg"))
+        file = QFile(text)
+        file.open(QIODevice.ReadOnly)
+        picturePart.setBodyDevice(file)
+        multiPart.append(picturePart)
+
         request = QNetworkRequest(QUrl(self.url))
 
         request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
-        self.networkManager.post(request, data)
+        self.networkManager.post(request, multiPart)
+        print('yolo')

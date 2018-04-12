@@ -69,10 +69,7 @@ class FaceLoader(QThread):
     def take_picture(self):
         firstname = 'user' + str(randint(0, 1000))
         picture = serv_vc.get_frame()
-        print('yolo')
         file_path = Dir.TMP + format(uuid.uuid4()) + '.jpeg'
-        print(file_path)
         cv2.imwrite(file_path, picture)
-        print('writed')
         self.new_user.emit(firstname)
         self.add_user(firstname, '', '', file_path)

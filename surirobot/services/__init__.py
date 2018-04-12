@@ -27,6 +27,6 @@ serv_ar = AudioRecorder()
 serv_ar.start()
 
 # Start EmotionalRecognition
-#from surirobot.services.emotional import EmotionalRecognition
-#serv_emo = EmotionalRecognition()
+from surirobot.services.emotional import EmotionalRecognition
+serv_emo = EmotionalRecognition()
 #serv_emo.start()

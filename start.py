@@ -5,13 +5,6 @@ import sys
 # Load .env
 load_dotenv(find_dotenv())
 
-# Init thread
-# s.init()
-
-# Init from DB
-# from surirobot.services.facerecognition.loader import load_faces
-# load_faces()
-
 # Launch GUI
 from surirobot.core import app
 import surirobot.services

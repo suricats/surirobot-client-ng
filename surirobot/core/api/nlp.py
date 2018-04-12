@@ -1,5 +1,5 @@
 from .base import ApiCaller
-from PyQt5.QtCore import QJsonDocument, QVariant, pyqtSlot, pyqtSignal
+from PyQt5.QtCore import QJsonDocument, QVariant, pyqtSlot, pyqtSignal, QUrl
 from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
 
 
@@ -40,7 +40,7 @@ class NlpApiCaller(ApiCaller):
 
             jsonData = QJsonDocument(jsonObject)
             data = jsonData.toJson()
-            request = QNetworkRequest(self.url)
+            request = QNetworkRequest(QUrl(self.url))
             print("Sended to NLP API : " + data.toStdString())
             # request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, True);
             request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"));

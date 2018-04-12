@@ -1,16 +1,19 @@
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal
 import logging
 import queue
 import uuid
 import shutil
 from surirobot.management import db
 from surirobot.management.mod_api.models import User, Picture
-from surirobot.services import serv_fr
+from surirobot.services import serv_fr, serv_vc
 from surirobot.core.common import Dir
-
+from random import randint
+import cv2
 
 
 class FaceLoader(QThread):
+    new_user = pyqtSignal(str)
+
     def __init__(self):
         QThread.__init__(self)
 
@@ -54,3 +57,12 @@ class FaceLoader(QThread):
         #db.session.add(picture)
         #db.session.commit()
         self.q.put(picture)
+
+    @pyqtSlot()
+    def take_picture(self):
+        fistname = user + str(randint(0, 1000))
+        picture = serv_vc.get_frame()
+        file_path = Dir.TMP + uuid.uuid4() + '.jpeg'
+        cv2.imwrite(file_path, picture)
+        self.new_user.emit(firstname)
+        self.add_user(firstname, '', '', file_path)

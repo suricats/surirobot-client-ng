@@ -17,6 +17,7 @@ from surirobot.core import app
 import surirobot.services
 import surirobot.core.controllers
 import surirobot.core.api
+import surirobot.core.scenario
 app.exec_()
 
 # Launch Flask

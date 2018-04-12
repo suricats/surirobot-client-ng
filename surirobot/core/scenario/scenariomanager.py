@@ -4,7 +4,6 @@ from surirobot.core.api import api_converse, api_nlp, api_tts
 
 from surirobot.core.scenario.scenario import Scenario
 from surirobot.core.scenario.action import Action
-from surirobot.core.scenario.result import Result
 from surirobot.core.common import State
 import logging
 
@@ -27,7 +26,7 @@ class ScenarioManager(QObject):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-        self.update.connect(serv_ar.updateState)
+        serv_ar.updateState.connect(self.update)
 
     def generateTriggers(self):
         self.triggers["sound"]["new"] = self.newSoundTrigger
@@ -67,9 +66,10 @@ class ScenarioManager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
+        self.logger.info('Scenario update')
         self.services[name] = {}
         self.services[name]["state"] = state
-        self.services[name].extend(data)
+        self.services[name].update(data)
         self.logger.info(self.services)
         self.checkScope()
 

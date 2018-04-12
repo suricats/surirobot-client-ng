@@ -1,3 +1,13 @@
+import os
+
+
+class Dir():
+    BASE = os.getcwd()
+    TMP = BASE + '/tmp/'
+    DATA = BASE + '/data/'
+    PICTURES = DATA + 'pictures/'
+
+
 class State():
     STATE_IDLE = 0
     STATE_DETECTED = 1

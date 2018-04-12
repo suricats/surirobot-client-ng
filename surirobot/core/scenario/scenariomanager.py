@@ -27,6 +27,7 @@ class ScenarioManager(QObject):
         self.logger = logging.getLogger(__name__)
 
         serv_ar.updateState.connect(self.update)
+        api_converse.updateState.connect(self.update)
         self.generateTriggers()
         self.generateActions()
 
@@ -49,14 +50,14 @@ class ScenarioManager(QObject):
 
     def loadFile(self, filepath=None):
         newSc1 = Scenario()
-        newSc1.triggers = [{"service": "sound", "name": "new"}]
+        newSc1.triggers = [{"service": "sound", "name": "new", "parameters": {}}]
         newSc1.actions = [{"name": "converse", "filepath": {"type": "service", "name": "sound", "variable": "filepath"}},
         {"name": "callScenarios", "id": {"type": "input", "variable": [2]}}]
         newSc1.id = 1
         self.scenarios[newSc1.id] = newSc1
         self.scope.append(newSc1)
         newSc2 = Scenario()
-        newSc2.triggers = [{"service": "converse", "name": "new"}]
+        newSc2.triggers = [{"service": "converse", "name": "new", "parameters": {}}]
         # With this implementation a parameter named "name" is forbidden
         newSc2.actions = [{"name": "playSound", "filepath": {"type": "service", "name": "converse", "variable": "audiopath"}},
         {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
@@ -71,6 +72,7 @@ class ScenarioManager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
+        print('update : ' + str(self.scope))
         self.services[name] = {}
         self.services[name]["state"] = state
         self.services[name].update(data)
@@ -131,15 +133,16 @@ class ScenarioManager(QObject):
         return False
 
     def newConverseTrigger(self, input):
+        print('converseTrigger' + str(input))
         newCondition = False
         intentCondition = False
-        if input["new"]:
+        if input["parameters"].get("new", None):
             if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
                 newCondition = True
         else:
             if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
                 newCondition = True
-        if input["intent"]:
+        if input["parameters"].get("intent", None):
             if self.services["converse"]["intent"] == input["intent"]:
                 intentCondition = True
         else:

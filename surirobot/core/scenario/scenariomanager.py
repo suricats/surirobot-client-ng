@@ -214,7 +214,7 @@ class ScenarioManager(QObject):
     def checkScope(self):
         self.scopeChanged = False
         for sc in self.scope:
-            print('Scenario : ' + str(sc))
+            print('Scenario : ' + str(sc.id))
             if self.scopeChanged:
                 self.scopeChanged = False
                 break
@@ -254,7 +254,7 @@ class ScenarioManager(QObject):
     def nobodyTrigger(self, input):
         if self.services.get("face", None):
             # TODO: Implement regex parameters
-            if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
+            if self.services["face"]["state"] == State.STATE_FACE_NOBODY:
                 return True
         return False
 
@@ -296,8 +296,6 @@ class ScenarioManager(QObject):
                     newCondition = True
             if input["parameters"].get("intent", None):
                 if self.services["converse"].get("intent", None):
-                    print('real :' + str(self.services["converse"]["intent"]))
-                    print('condit :' + str(input["parameters"]["intent"]))
                     if self.services["converse"]["intent"] == input["parameters"]["intent"]:
                         intentCondition = True
             else:

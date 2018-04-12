@@ -8,7 +8,7 @@ from surirobot.core.scenario.action import Action
 from surirobot.core.common import State, Dir
 import logging
 import json
-
+import re
 
 class ScenarioManager(QObject):
     __instance__ = None
@@ -80,7 +80,7 @@ class ScenarioManager(QObject):
 
         newSc3 = Scenario()
         newSc3.triggers = [{"service": "face", "name": "know", "parameters": {}}]
-        newSc3.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Oh salut toi !"}, "variables": [{"firstname": {"type": "service", "name": "face", "variable": "firstname"}}, {"lastname": {"type": "service", "name": "face", "variable": "lastname"}} ]},
+        newSc3.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Oh salut {@firstname} {@lastname} !"}, "variables": [{"firstname": {"type": "service", "name": "face", "variable": "firstname"}}, {"lastname": {"type": "service", "name": "face", "variable": "lastname"}} ]},
         {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
         newSc3.id = 3
         self.scenarios[newSc3.id] = newSc2
@@ -111,19 +111,20 @@ class ScenarioManager(QObject):
         input = {}
         for name, value in action.items():
             if name != "name":
-                if value["type"] == "service":
-                    input[name] = self.services[value["name"]][value["variable"]]
-                elif type(value) is list:
+                if type(value) is list:
                     input[name] = []
-                    for n, v in input[name]:
-                        typeV = v.get("type", None)
-                        if typeV:
-                            if type == "service":
-                                input[name][n] = self.services[v["name"]][v["variable"]]
-                            else:
-                                input[name][n] = v["variable"]
+                    for v in value:
+                        if type(v) is dict:
+                            for keyElement, valueElement in v.items():
+                                if valueElement["type"] == "service":
+                                    input[name].append({"name": keyElement, "value" : self.services[valueElement["name"]][valueElement["variable"]]})
+                                else:
+                                    input[name].append(valueElement["variable"])
+
                         else:
-                            input[name][n] = v
+                            input[name].append(v)
+                elif value["type"] and value["type"] == "service":
+                    input[name] = self.services[value["name"]][value["variable"]]
                 else:
                     input[name] = value["variable"]
         return input
@@ -230,7 +231,20 @@ class ScenarioManager(QObject):
         serv_ap.play(input["filepath"])
 
     def displayText(self, input):
-        ui.setTextUp(input.get("text", ""))
+        print('MAMAN' + str(input))
+        text = input.get("text", "")
+        list = re.compile("[\{\}]").split(text)
+        print('\n list :' + str(list))
+        for index, string in enumerate(list):
+            if string.startswith("@"):
+                string = string.split("@")[1]
+                for element in input["variables"]:
+                    print('\n element : ' + str(element) )
+                    if element["name"] == string:
+                        list[index] = element["value"]
+        text = ""
+        text = text.join(list)
+        ui.setTextUp(text)
 
     def converse(self, input):
         api_converse.sendRequest(input["filepath"])

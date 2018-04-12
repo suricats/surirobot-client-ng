@@ -115,34 +115,17 @@ class FaceRecognition(QThread):
                     self.pretendent_id = id
                     self.counter_known.start()
 
-
-
-
-
-        #if id == self.buffer['id']:
-        #    self.buffer['count'] = self.buffer['count'] + 1
-
-        #    if self.buffer['id'] == self.UNKNOWN:
-        #        if self.buffer['count'] == 30:
-        #            self.emit_person_changed(id)
-        #    else:
-        #        if self.buffer['count'] == 5:
-        #            self.emit_person_changed(id)
-        #else:
-        #    self.buffer['id'] = id
-        #    self.buffer['count'] = 0
-
     @pyqtSlot()
     def timer_nobody_timeout(self):
         self.state_id = self.NOBODY
         self.emit_person_changed(self.state_id)
-        #self.emit_state_changed(self.NOBODY, self.NOBODY)
+        self.emit_state_changed(self.NOBODY, self.NOBODY)
 
     @pyqtSlot()
     def timer_unknown_timeout(self):
         self.state_id = self.UNKNOWN
         self.emit_person_changed(self.state_id)
-        #self.emit_state_changed(self.UNKNOWN, self.UNKNOWN)
+        self.emit_state_changed(self.UNKNOWN, self.UNKNOWN)
 
     @pyqtSlot()
     def timer_known_timeout(self):
@@ -150,7 +133,7 @@ class FaceRecognition(QThread):
         self.state_id = self.pretendent_id
         self.pretendent_id = self.NOBODY
         self.emit_person_changed(self.state_id)
-        #self.emit_state_changed(self.KNOWN, self.state_id)
+        self.emit_state_changed(self.KNOWN, self.state_id)
 
     def emit_state_changed(self, state, id):
         self.state_changed.emit(self.MODULE_NAME, state, {
@@ -196,7 +179,7 @@ class FaceRecognition(QThread):
         return self.data[id]['name']
 
     def id_to_firstname(self, id):
-        if id == self.UNKNOWN_:
+        if id == self.UNKNOWN:
             return self.UNKNOWN_NAME
         if id == self.NOBODY:
             return self.NOBODY_NAME

@@ -1,6 +1,6 @@
 from .base import ApiCaller
 from .filedownloader import FileDownloader
-from PyQt5.QtCore import QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal
+from PyQt5.QtCore import QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal, QUrl
 from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
 import uuid
 from surirobot.services import serv_ap
@@ -16,6 +16,7 @@ class TtsApiCaller(ApiCaller):
         self.fileDownloader = FileDownloader()
         self.fileDownloader.new_file.connect(self.downloadFinished)
         self.download.connect(self.fileDownloader.sendRequest)
+        self.fileDownloader.new_file.connect(self.downloadFinished)
         self.play_sound.connect(serv_ap.play)
 
     def __del__(self):
@@ -30,10 +31,11 @@ class TtsApiCaller(ApiCaller):
         else:
             jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
             url = jsonObject["downloadLink"].toString("")
-            if (url.isEmpty()):
-                self.new_reply.emit("Je ne me sens pas bien... [ERROR TTS : Fields needed don't exist.]")
+            if (not url):
+                print('TTS - Error')
+                # self.new_reply.emit("Je ne me sens pas bien... [ERROR TTS : Fields needed don't exist.]")
             else:
-                print("Downloading the sound : " + url.toString())
+                print("Downloading the sound : " + url)
                 self.download.emit(url)
         reply.deleteLater()
 
@@ -48,7 +50,7 @@ class TtsApiCaller(ApiCaller):
 
         jsonData = QJsonDocument(jsonObject)
         data = jsonData.toJson()
-        request = QNetworkRequest(self.url)
+        request = QNetworkRequest(QUrl(self.url))
 
         request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
         self.networkManager.post(request, data)
@@ -65,7 +67,7 @@ class TtsApiCaller(ApiCaller):
     def downloadFinished(self, data):
         print("Download finished.")
         # generate filename
-        filename = self.TMP_DIR + uuid.uuid4() + ".wav"
+        filename = self.TMP_DIR + format(uuid.uuid4()) + ".wav"
         file = QFile(filename)
         if (not file.open(QIODevice.WriteOnly)):
             print("Could not create file : " + filename)

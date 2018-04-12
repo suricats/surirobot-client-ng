@@ -86,7 +86,7 @@ class ScenarioManager(QObject):
         newSc3 = Scenario()
         newSc3.triggers = [{"service": "face", "name": "know", "parameters": {}}]
         newSc3.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Oh salut {@firstname} {@lastname} !"}, "variables": [{"firstname": {"type": "service", "name": "face", "variable": "firstname"}}, {"lastname": {"type": "service", "name": "face", "variable": "lastname"}} ]},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1]}},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}},
         {"name": "speak", "text": {"type": "service", "name": "storage", "variable": "@text"}}]
         newSc3.id = 3
         self.scenarios[newSc3.id] = newSc3

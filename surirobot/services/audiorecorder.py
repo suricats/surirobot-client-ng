@@ -6,12 +6,14 @@ import uuid
 import logging
 from surirobot.core import ui
 
+from surirobot.core.scenario.state import State
 
 class AudioRecorder(QThread):
     started_record = pyqtSignal()
     end_record = pyqtSignal(str)
 
     update_suri_image = pyqtSignal(int)
+    updateState = pyqtSignal(str, int, dict)
 
     def __init__(self, samplerate=44100, channels=1):
         QThread.__init__(self)
@@ -47,7 +49,8 @@ class AudioRecorder(QThread):
                     while self.recording:
                         file.write(q.get())
 
-            self.end_record.emit(elm['filename'])
+            # self.end_record.emit(elm['filename'])
+            self.updateState.emit("sound", 1, {"filepath": elm['filename']})
 
     @pyqtSlot()
     def start_record(self):

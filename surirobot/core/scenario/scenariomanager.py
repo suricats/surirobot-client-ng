@@ -1,12 +1,14 @@
 from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal
 from surirobot.services import serv_ap, serv_fr, serv_ar
 from surirobot.core.api import api_converse, api_nlp, api_tts
+from surirobot.core import ui
 
 from surirobot.core.scenario.scenario import Scenario
 from surirobot.core.scenario.action import Action
 from surirobot.core.common import State, Dir
 import logging
 import json
+
 
 class ScenarioManager(QObject):
     __instance__ = None
@@ -29,6 +31,7 @@ class ScenarioManager(QObject):
 
         serv_ar.updateState.connect(self.update)
         api_converse.updateState.connect(self.update)
+        serv_fr.updateState.connect(self.update)
         self.generateTriggers()
         self.generateActions()
 
@@ -48,6 +51,7 @@ class ScenarioManager(QObject):
         self.actions["playSound"] = self.playSound
         self.actions["converse"] = self.converse
         self.actions["callScenarios"] = self.callScenarios
+        self.actions["displayText"] = self.displayText
 
     def loadFile(self, filepath=None):
         newSc1 = Scenario()
@@ -61,6 +65,7 @@ class ScenarioManager(QObject):
         newSc2.triggers = [{"service": "converse", "name": "new", "parameters": {}}]
         # With this implementation a parameter named "name" is forbidden
         newSc2.actions = [{"name": "playSound", "filepath": {"type": "service", "name": "converse", "variable": "audiopath"}},
+        {"name": "displayText", "text": {"type": "service", "name": "converse", "variable": "reply"}},
         {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
         newSc2.id = 2
         self.scenarios[newSc2.id] = newSc2
@@ -77,7 +82,7 @@ class ScenarioManager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
-        print('update : ' + str(self.scope))
+        print('Update of scenarios')
         self.services[name] = {}
         self.services[name]["state"] = state
         self.services[name].update(data)
@@ -85,7 +90,6 @@ class ScenarioManager(QObject):
 
     def retrieveData(self, action):
         input = {}
-        self.logger.info('retrieveData' + str(action))
         for name, value in action.items():
             if name != "name":
                 if value["type"] == "service":
@@ -103,16 +107,13 @@ class ScenarioManager(QObject):
             if not triggerActive:
                 active = False
                 break
-        self.logger.info('checkForTrigger' + str(active))
         return active
 
     def checkScope(self):
-        self.logger.info('checkScope')
         for sc in self.scope:
             if self.checkForTrigger(sc):
                 self.updateState(sc)
-                self.logger.info('MAMENE TRIGGERED')
-                self.logger.info(sc.actions)
+                print('\nScenario ' + str(sc.id) + " has been activated\n")
                 for action in sc.actions:
                     input = self.retrieveData(action)
                     func = self.actions[action["name"]]
@@ -121,11 +122,12 @@ class ScenarioManager(QObject):
 
     def updateState(self, sc):
         for trigger in sc.triggers:
-            if trigger["service"] == "sound" and trigger["name"] == "new" and self.services["sound"]["state"] == State.STATE_SOUND_NEW:
-                self.services["sound"]["state"] == State.STATE_SOUND_AVAILABLE
-            if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
-                self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE
-
+            if self.services.get("sound", None):
+                if trigger["service"] == "sound" and trigger["name"] == "new" and self.services["sound"]["state"] == State.STATE_SOUND_NEW:
+                    self.services["sound"]["state"] = State.STATE_SOUND_AVAILABLE
+            if self.services.get("converse", None):
+                if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
+                    self.services["converse"]["state"] = State.STATE_CONVERSE_AVAILABLE
 
     # Triggers
 
@@ -138,20 +140,20 @@ class ScenarioManager(QObject):
         return False
 
     def newConverseTrigger(self, input):
-        print('converseTrigger' + str(input))
         newCondition = False
         intentCondition = False
-        if input["parameters"].get("new", None):
-            if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
-                newCondition = True
-        else:
-            if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
-                newCondition = True
-        if input["parameters"].get("intent", None):
-            if self.services["converse"]["intent"] == input["intent"]:
+        if self.services.get("converse", None):
+            if input["parameters"].get("new", None):
+                if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
+                    newCondition = True
+            else:
+                if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
+                    newCondition = True
+            if input["parameters"].get("intent", None):
+                if self.services["converse"]["intent"] == input["intent"]:
+                    intentCondition = True
+            else:
                 intentCondition = True
-        else:
-            intentCondition = True
         return newCondition and intentCondition
 
     # Actions
@@ -159,12 +161,13 @@ class ScenarioManager(QObject):
     def playSound(self, input):
         serv_ap.play(input["filepath"])
 
+    def displayText(self, input):
+        ui.setTextUp(input.get("text", ""))
+
     def converse(self, input):
-        print('Converse Action')
         api_converse.sendRequest(input["filepath"])
 
     def callScenarios(self, input):
-        print('callScenarios Action' + str(input))
         idTable = input["id"]
         self.scope = []
         for id in idTable:

@@ -8,16 +8,24 @@ class MainWindow(QDialog):
     NORMAL_IMAGE = 'res/SuriRobot1.png'
     MICRO_IMAGE = 'res/mic.png'
     BASIC_IMAGE = 'res/illustrations/activities/basic.jpg'
+    LISTENING_IMAGE = 'res/illustrations/activities/listening2.jpg'
+
+    SURI_BASIC = 0
+    SURI_LISTENING = 1
 
     def __init__(self):
         QDialog.__init__(self)
 
         # Image
+        self.image_map = [
+            self.load_image(self.BASIC_IMAGE),
+            self.load_image(self.LISTENING_IMAGE)
+        ]
+
         self.imgWidget = QWidget(self)
         self.labelImage = QLabel(self.imgWidget)
         self.labelImage.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        image = QImage()
-        image.load(self.BASIC_IMAGE)
+        image = self.image_map[self.SURI_BASIC]
         self.labelImage.setPixmap(QPixmap.fromImage(image))
         self.imgWidget.resize(image.height(), image.width())
 
@@ -42,21 +50,6 @@ class MainWindow(QDialog):
         self.labelTextDown.setFont(f)
         self.labelTextDown.setText("N/A")
 
-        # Microphone button
-        self.MicButton = QPushButton(self)
-        self.MicButton.setIcon(QIcon(self.MICRO_IMAGE))
-        self.MicButton.setIconSize(QSize(65, 65))
-        paltt = self.MicButton.palette()
-        paltt.setColor(QPalette.Button, QColor(Qt.white))
-        self.MicButton.setAutoFillBackground(True)
-        self.MicButton.setPalette(paltt)
-        self.MicButton.update()
-
-        # Manuel button
-        self.Manuel = QPushButton(self)
-        self.Manuel.setText("Manuel")
-        ### connect(self.Manuel, SIGNAL(clicked()), this, SLOT(createManualWindow()))
-
         # Background color
         pal = QPalette()
 
@@ -65,14 +58,19 @@ class MainWindow(QDialog):
         self.setAutoFillBackground(True)
         self.setPalette(pal)
 
+    def load_image(self, image_path):
+        image = QImage()
+        image.load(image_path)
+        return image
+
     def smartShow(self):
         self.showFullScreen()
         self.updateWidgets()
         # Timer display fixer
         displayFixer = QTimer(self)
-        displayFixer.setInterval(3000)
-        #displayFixer->setSingleShot(True)
-        ### QObject::connect(displayFixer, SIGNAL(timeout()), this, SLOT(updateSlot()));
+        displayFixer.setInterval(1000)
+        displayFixer.setSingleShot(True)
+        displayFixer.timeout.connect(self.updateWidgets)
         displayFixer.start()
 
     def setTextUpFont(self, f):
@@ -94,7 +92,9 @@ class MainWindow(QDialog):
         self.labelTextDown.setText(text)
         self.updateWidgets()
 
-    def setImage(self, image):
+    @pyqtSlot(int)
+    def setImage(self, image_id):
+        image = self.image_map[image_id]
         self.labelImage.setPixmap(QPixmap.fromImage(image))
         self.imgWidget.resize(image.height(), image.width())
         self.updateWidgets()
@@ -112,6 +112,7 @@ class MainWindow(QDialog):
         ###emit sendEditTextSignal(self.editText.toPlainText())
         pass
 
+    @pyqtSlot()
     def updateWidgets(self):
         self.labelTextUp.adjustSize()
         self.labelTextMiddle.adjustSize()
@@ -135,12 +136,6 @@ class MainWindow(QDialog):
             self.width() / 2 - self.imgWidget.width() / 2,
             self.height() / 3 - self.imgWidget.height() / 2
         )
-
-
-
-
-    def updateSlot(self):
-        self.updateWidgets()
 
     # SIGNALS
 

@@ -5,7 +5,7 @@ from surirobot.core.api import api_converse, api_nlp, api_tts
 from surirobot.core.scenario.scenario import Scenario
 from surirobot.core.scenario.action import Action
 from surirobot.core.scenario.result import Result
-from surirobot.core.scenario.state import State
+from surirobot.core.common import State
 import logging
 
 class ScenarioManager(QObject):

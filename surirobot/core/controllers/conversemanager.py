@@ -26,7 +26,6 @@ class ConverseManager(QObject):
         self.converseWorker.new_reply.connect(ui.setTextUp)
         self.nlpWorker.new_reply.connect(ui.setTextUp)
 
-        ### ui.MicButton.released.connect(serv_ar.start_record)
         self.debugTimer.timeout.connect(ui.sendEditText)
 
         self.nlpDebug = False

@@ -29,7 +29,7 @@ class ScenarioManager(QObject):
         self.scenarios = {}
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
-
+        self.scopeChanged = False
         serv_ar.updateState.connect(self.update)
         api_converse.updateState.connect(self.update)
         serv_fr.updateState.connect(self.update)
@@ -70,7 +70,7 @@ class ScenarioManager(QObject):
         newSc1 = Scenario()
         newSc1.triggers = [{"service": "sound", "name": "new", "parameters": {}}]
         newSc1.actions = [{"name": "converse", "filepath": {"type": "service", "name": "sound", "variable": "filepath"}, "id": {"type": "service", "name": "face", "variable":"id"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [2]}}]
+        {"name": "callScenarios", "id": {"type": "input", "variable": [2,1]}}]
         newSc1.id = 1
         self.scenarios[newSc1.id] = newSc1
         #Wait for converse
@@ -86,7 +86,7 @@ class ScenarioManager(QObject):
         newSc3 = Scenario()
         newSc3.triggers = [{"service": "face", "name": "know", "parameters": {}}]
         newSc3.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Oh salut {@firstname} {@lastname} !"}, "variables": [{"firstname": {"type": "service", "name": "face", "variable": "firstname"}}, {"lastname": {"type": "service", "name": "face", "variable": "lastname"}} ]},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4,9]}},
         {"name": "speak", "text": {"type": "service", "name": "storage", "variable": "@text"}}]
         newSc3.id = 3
         self.scenarios[newSc3.id] = newSc3
@@ -96,7 +96,7 @@ class ScenarioManager(QObject):
         newSc4.triggers = [{"service": "face", "name": "unknow", "parameters": {}}]
         newSc4.actions = [{"name": "displayText", "text": {"type" : "input", "variable": "Bonjour, je ne t'ai jamais vu ! Veux tu que je t'ajoute ?"}},
         {"name": "speak", "text": {"type": "service", "name": "storage", "variable": "@text"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [5]}}]
+        {"name": "callScenarios", "id": {"type": "input", "variable": [5,9]}}]
         newSc4.id = 4
         self.scenarios[newSc4.id] = newSc4
 
@@ -112,7 +112,7 @@ class ScenarioManager(QObject):
         newSc6 = Scenario()
         newSc6.triggers = [{"service": "converse", "name": "new", "parameters": {"intent":  "say-yes"}}]
         # With this implementation a parameter named "name" is forbidden
-        newSc6.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Préparez-vous !"}},
+        newSc6.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Hop ! Enregistrée !"}},
         {"name": "speak", "text": {"type": "service", "name":"storage", "variable": "@text"}},
         {"name": "wait", "time": {"type": "input", "variable": 4}},
         {"name": "takePicture"},
@@ -141,6 +141,16 @@ class ScenarioManager(QObject):
         {"name": "callScenarios", "id": {"type": "input", "variable": [5]}}]
         newSc8.id = 8
         self.scenarios[newSc8.id] = newSc8
+
+        # Nobody on the camera
+        newSc9 = Scenario()
+        newSc9.triggers = [{"service": "face", "name": "nobody", "parameters": {}}]
+        # With this implementation a parameter named "name" is forbidden
+        newSc9.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Au revoir."}},
+        {"name": "speak", "text": {"type": "service", "name":"storage", "variable": "@text"}},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
+        newSc9.id = 9
+        self.scenarios[newSc9.id] = newSc9
         # First scope
         self.scope.append(newSc1)
         self.scope.append(newSc3)
@@ -158,7 +168,11 @@ class ScenarioManager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
-        print('Update of scenarios')
+        print('Update of scenarios from ' + name)
+        list = []
+        for sc in self.scope:
+            list.append(sc.id)
+        print('\nScope : ' + str(list))
         self.services[name] = {}
         self.services[name]["state"] = state
         self.services[name].update(data)
@@ -173,13 +187,14 @@ class ScenarioManager(QObject):
                     for v in value:
                         if type(v) is dict:
                             for keyElement, valueElement in v.items():
-                                if valueElement["type"] == "service":
+                                if valueElement["type"] == "service" and self.services[valueElement["name"]].get(valueElement["variable"], None):
                                     input[name].append({"name": keyElement, "value" : self.services[valueElement["name"]][valueElement["variable"]]})
                                 else:
                                     input[name].append(valueElement["variable"])
                         else:
                             input[name].append(v)
-                elif value["type"] and value["type"] == "service":
+                elif value["type"] and value["type"] == "service" and self.services[value["name"]].get(value["variable"], None):
+                    print(self.services[value["name"]])
                     input[name] = self.services[value["name"]][value["variable"]]
                 else:
                     input[name] = value["variable"]
@@ -197,7 +212,11 @@ class ScenarioManager(QObject):
         return active
 
     def checkScope(self):
+        self.scopeChanged = False
         for sc in self.scope:
+            if self.scopeChanged:
+                self.scopeChanged = False
+                break
             if self.checkForTrigger(sc):
                 self.updateState(sc)
                 print('\nScenario ' + str(sc.id) + " has been activated\n")
@@ -286,8 +305,9 @@ class ScenarioManager(QObject):
 
     # Actions
     def waitFor(self, input):
-        if input.get("time", None):
-            time.sleep(input["time"])
+        print('wait')
+        # if input.get("time", None):
+        #    time.sleep(input["time"])
 
     def takePicture(self, input):
         face_loader.take_picture()
@@ -296,14 +316,16 @@ class ScenarioManager(QObject):
         serv_ap.play(input["filepath"])
 
     def displayText(self, input):
+        print('displayText')
         text = input.get("text", "")
         list = re.compile("[\{\}]").split(text)
         for index, string in enumerate(list):
             if string.startswith("@"):
                 string = string.split("@")[1]
                 for element in input["variables"]:
-                    if element["name"] == string:
-                        list[index] = element["value"]
+                    if type(element) is dict:
+                        if element["name"] == string:
+                            list[index] = element["value"]
         text = ""
         text = text.join(list)
         ui.setTextMiddle(text)
@@ -323,4 +345,8 @@ class ScenarioManager(QObject):
         self.scope = []
         for id in idTable:
             self.scope.append(self.scenarios[id])
-        print('Scope has changed.' + str(self.scope))
+            self.scopeChanged = True
+        list = []
+        for sc in self.scope:
+            list.append(sc.id)
+        print('Scope has changed : ' + str(list))

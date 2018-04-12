@@ -18,7 +18,8 @@ class ScenarioManager(QObject):
         QObject.__init__(self)
         self.subscriber = {}
         self.triggers = {}
-        self.actions  = {}
+        self.actions = {}
+        self.services = {}
 
     def generateTriggers(self):
         self.triggers["sound.new"] = self.newSoundTrigger
@@ -44,14 +45,11 @@ class ScenarioManager(QObject):
                 if trigger["name"] == key:
                     self.subscriber[key].append(sc)
 
-    @pyqtSlot(str)
-    def update(self, name):
-        for sc in self.subscriber[name]:
-            r = self.checkForTrigger(sc)
-            if r.active:
-                for action in sc.actions:
-                    nav = self.retrieveData(action)
-                    sc.output.append(action.call(nav))
+    @pyqtSlot(str, int, dict)
+    def update(self, name, state, data):
+        self.services[name] = {}
+        self.services[name]['state'] = state
+        self.services[name].extend(data)
 
     def retrieveData(self, action):
         print('motherfucka')

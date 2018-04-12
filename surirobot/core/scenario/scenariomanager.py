@@ -1,16 +1,16 @@
 from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal
-from surirobot.services import serv_ap, serv_fr
+from surirobot.services import serv_ap, serv_fr, serv_ar
+from surirobot.core.api import api_converse, api_nlp, api_tts
 
 from surirobot.core.scenario.scenario import Scenario
 from surirobot.core.scenario.action import Action
 from surirobot.core.scenario.result import Result
+from surirobot.core.scenario.state import State
+import logging
 
 class ScenarioManager(QObject):
     __instance__ = None
-    STATE_SOUND_NEW = 1
-    STATE_SOUND_AVAILABLE = 2
-    STATE_CONVERSE_NEW = 1
-    STATE_CONVERSE_AVAILABLE = 2
+
 
     def __new__(cls):
         if cls.__instance__ is None:
@@ -24,6 +24,10 @@ class ScenarioManager(QObject):
         self.services = {}
         self.scope = []
         self.scenarios = {}
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
+
+        self.update.connect(serv_ar.updateState)
 
     def generateTriggers(self):
         self.triggers["sound"]["new"] = self.newSoundTrigger
@@ -44,6 +48,7 @@ class ScenarioManager(QObject):
         self.scope.push(newSc1)
         newSc2 = Scenario()
         newSc2.triggers = [{"service": "converse", "name": "new"}]
+        # With this implementation a parameter named "name" is forbidden
         newSc2.actions = [{"name": "playSound", "filepath": {"type": "service", "name": "converse", "variable": "audiopath"}},
         {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
         newSc2.id = 2
@@ -65,10 +70,18 @@ class ScenarioManager(QObject):
         self.services[name] = {}
         self.services[name]["state"] = state
         self.services[name].extend(data)
+        self.logger.info(self.services)
         self.checkScope()
 
     def retrieveData(self, action):
-        print('motherfucka')
+        input = {}
+        for name, value in action.iteritems():
+            if name != "name":
+                if value["type"] == "service":
+                    input[name] = self.services[value["name"]][value["variable"]]
+                else:
+                    input[name] = value["variable"]
+        return input
 
     def checkForTrigger(self, sc):
         active = True
@@ -93,8 +106,11 @@ class ScenarioManager(QObject):
 
     def updateState(self, sc):
         for trigger in sc.triggers:
-            if trigger["service"] == "sound" and trigger["name"] == "new" and self.services["sound"]["state"] == self.STATE_SOUND_NEW:
-                self.services["sound"]["state"] == self.STATE_SOUND_AVAILABLE
+            if trigger["service"] == "sound" and trigger["name"] == "new" and self.services["sound"]["state"] == State.STATE_SOUND_NEW:
+                self.services["sound"]["state"] == State.STATE_SOUND_AVAILABLE
+            if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
+                self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE
+
 
     # Triggers
 
@@ -102,7 +118,7 @@ class ScenarioManager(QObject):
         print('sucka')
 
     def newSoundTrigger(self, input):
-        if self.services["sound"]["state"] == self.STATE_SOUND_NEW:
+        if self.services["sound"]["state"] == State.STATE_SOUND_NEW:
             return True
         return False
 
@@ -110,10 +126,10 @@ class ScenarioManager(QObject):
         newCondition = False
         intentCondition = False
         if input["new"]:
-            if self.services["converse"]["state"] == self.STATE_CONVERSE_NEW:
+            if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
                 newCondition = True
         else:
-            if self.services["converse"]["state"] == self.STATE_CONVERSE_NEW or self.services["converse"]["state"] == self.STATE_CONVERSE_AVAILABLE:
+            if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
                 newCondition = True
         if input["intent"]:
             if self.services["converse"]["intent"] == input["intent"]:
@@ -128,7 +144,10 @@ class ScenarioManager(QObject):
         serv_ap.play(input["filepath"])
 
     def converse(self, input):
-        print('conva')
+        api_converse.sendRequest(input["filepath"])
 
     def callScenarios(self, input):
-        print('scena')
+        idTable = input["id"]["variable"]
+        self.scope = []
+        for id in idTable:
+            self.scope.push(self.scenarios[id])

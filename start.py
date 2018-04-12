@@ -16,6 +16,7 @@ load_dotenv(find_dotenv())
 from surirobot.core import app
 import surirobot.services
 import surirobot.core.controllers
+import surirobot.core.api
 app.exec_()
 
 # Launch Flask

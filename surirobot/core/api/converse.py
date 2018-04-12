@@ -11,6 +11,7 @@ class ConverseApiCaller(ApiCaller):
     download = pyqtSignal(str)
     play_sound = pyqtSignal(str)
     new_intent = pyqtSignal(int, 'QByteArray')
+    updateState = pyqtSignal(str, int, dict)
 
     def __init__(self, url='https://www.google.fr'):
         ApiCaller.__init__(self, url)
@@ -20,6 +21,9 @@ class ConverseApiCaller(ApiCaller):
         self.fileDownloader.new_file.connect(self.downloadFinished)
         self.download.connect(self.fileDownloader.sendRequest)
         self.play_sound.connect(serv_ap.play)
+
+        self.intent = ""
+        self.message = ""
 
     def __del__(self):
         self.stop()
@@ -32,26 +36,10 @@ class ConverseApiCaller(ApiCaller):
             print("Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
             self.networkManager.clearAccessCache()
         jsonObject = QJsonDocument.fromJson(buffer).object()
-        if self.intentMode:
-            intent = jsonObject["intent"].toString()
-            if (intent == "say-yes"):
-                print("OUI INTENT")
-                self.new_intent.emit(State.STATE_CONFIRMATION_YES, intent)
-            if (intent == "say-no"):
-                print("OUI INTENT")
-                self.new_intent.emit(State.STATE_CONFIRMATION_NO, intent)
-        else:
-            message = jsonObject["answerText"].toString()
-            url = jsonObject["answerAudioLink"].toString()
-            if (message):
-                print("Received from Converse API : " + message)
-                self.new_reply.emit(message)
-            else:
-                self.new_reply.emit("Je ne me sens pas bien... [ERROR Conv : Field message needed but doesn't exist.]")
-            if(url):
-                print("Downloading the sound : " + url)
-                self.download.emit(url)
-
+        self.intent = jsonObject["intent"].toString()
+        self.message = jsonObject["answerText"].toString()
+        url = jsonObject["answerAudioLink"].toString()
+        self.download.emit(url)
         reply.deleteLater()
 
     @pyqtSlot(str)
@@ -103,7 +91,7 @@ class ConverseApiCaller(ApiCaller):
         file.write(data)
         print("Sound file generated at : " + filename)
         file.close()
-
+        self.updateState.emit("converse", State.STATE_CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": filename})
         # Play the audio
         # Restart the audioplayer
-        self.play_sound.emit(filename)
+        # self.play_sound.emit(filename)

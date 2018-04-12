@@ -5,6 +5,7 @@ import time
 import face_recognition
 from surirobot.services import serv_vc
 from .counter import Counter
+from surirobot.core.common import State
 
 
 class FaceRecognition(QThread):
@@ -59,6 +60,7 @@ class FaceRecognition(QThread):
         time.sleep(3)
 
         self.emit_person_changed(self.NOBODY)
+        self.emit_state_changed(self.NOBODY, self.NOBODY)
 
         while(True):
             time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
@@ -119,13 +121,13 @@ class FaceRecognition(QThread):
     def timer_nobody_timeout(self):
         self.state_id = self.NOBODY
         self.emit_person_changed(self.state_id)
-        self.emit_state_changed(self.NOBODY, self.NOBODY)
+        self.emit_state_changed(State.STATE_FACE_NOBODY, self.NOBODY)
 
     @pyqtSlot()
     def timer_unknown_timeout(self):
         self.state_id = self.UNKNOWN
         self.emit_person_changed(self.state_id)
-        self.emit_state_changed(self.UNKNOWN, self.UNKNOWN)
+        self.emit_state_changed(State.STATE_FACE_UNKNOWN, self.UNKNOWN)
 
     @pyqtSlot()
     def timer_known_timeout(self):
@@ -133,15 +135,19 @@ class FaceRecognition(QThread):
         self.state_id = self.pretendent_id
         self.pretendent_id = self.NOBODY
         self.emit_person_changed(self.state_id)
-        self.emit_state_changed(self.KNOWN, self.state_id)
+        self.emit_state_changed(State.STATE_FACE_KNOWN, self.state_id)
 
     def emit_state_changed(self, state, id):
-        self.updateState.emit(self.MODULE_NAME, state, {
-            'id': id,
-            'firstname': self.id_to_firstname(id),
-            'lastname': self.id_to_lastname(id),
-            'name': self.id_to_name(id)
-        })
+        if id == self.NOBODY or id == self.UNKNOWN:
+            data = {}
+        else:
+            data = {
+                'id': id,
+                'firstname': self.id_to_firstname(id),
+                'lastname': self.id_to_lastname(id),
+                'name': self.id_to_name(id)
+            }
+        self.updateState.emit(self.MODULE_NAME, state, data)
 
     def emit_person_changed(self, id):
         name = self.id_to_name(id)

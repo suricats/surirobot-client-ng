@@ -4,8 +4,9 @@ from surirobot.core.api import api_converse, api_nlp, api_tts
 
 from surirobot.core.scenario.scenario import Scenario
 from surirobot.core.scenario.action import Action
-from surirobot.core.common import State
+from surirobot.core.common import State, Dir
 import logging
+import json
 
 class ScenarioManager(QObject):
     __instance__ = None
@@ -63,6 +64,10 @@ class ScenarioManager(QObject):
         {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
         newSc2.id = 2
         self.scenarios[newSc2.id] = newSc2
+
+    # WIP
+    def loadScenarioFromJson(self, file_path):
+        self.scenarios = json.load(open(Dir.SCENARIOS + 'yolo.json'))
 
     def suscribeToTrigger(self, sc):
         for trigger in sc.trigger:

@@ -104,7 +104,7 @@ class ScenarioManager(QObject):
         newSc5 = Scenario()
         newSc5.triggers = [{"service": "sound", "name": "new", "parameters": {}}]
         newSc5.actions = [{"name": "converse", "filepath": {"type": "service", "name": "sound", "variable": "filepath"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [6,7,8]}}]
+        {"name": "callScenarios", "id": {"type": "input", "variable": [6,7,8,9]}}]
         newSc5.id = 5
         self.scenarios[newSc5.id] = newSc5
 
@@ -214,6 +214,7 @@ class ScenarioManager(QObject):
     def checkScope(self):
         self.scopeChanged = False
         for sc in self.scope:
+            print('Scenario : ' + str(sc))
             if self.scopeChanged:
                 self.scopeChanged = False
                 break
@@ -288,15 +289,15 @@ class ScenarioManager(QObject):
         intentCondition = False
         if self.services.get("converse", None):
             if input["parameters"].get("new", None):
-                if self.services["converse"].get("intent", None):
-                    if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
-                        newCondition = True
+                if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
+                    newCondition = True
             else:
-                if self.services["converse"].get("intent", None):
-                    if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
-                        newCondition = True
+                if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
+                    newCondition = True
             if input["parameters"].get("intent", None):
                 if self.services["converse"].get("intent", None):
+                    print('real :' + str(self.services["converse"]["intent"]))
+                    print('condit :' + str(input["parameters"]["intent"]))
                     if self.services["converse"]["intent"] == input["parameters"]["intent"]:
                         intentCondition = True
             else:

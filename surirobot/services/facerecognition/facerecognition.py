@@ -8,7 +8,7 @@ from .counter import Counter
 
 
 class FaceRecognition(QThread):
-    state_changed = pyqtSignal(str, int, dict)
+    updateState = pyqtSignal(str, int, dict)
     # deprecated signal -> will be removed
     person_changed = pyqtSignal(str)
 
@@ -136,7 +136,7 @@ class FaceRecognition(QThread):
         self.emit_state_changed(self.KNOWN, self.state_id)
 
     def emit_state_changed(self, state, id):
-        self.state_changed.emit(self.MODULE_NAME, state, {
+        self.updateState.emit(self.MODULE_NAME, state, {
             'id': id,
             'firstname': self.id_to_firstname(id),
             'lastname': self.id_to_lastname(id),

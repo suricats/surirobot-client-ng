@@ -45,7 +45,15 @@ class ScenarioManager(QObject):
         self.triggers["storage"] = {}
 
         self.triggers["sound"]["new"] = self.newSoundTrigger
+
         self.triggers["converse"]["new"] = self.newConverseTrigger
+
+        self.triggers["face"]["unknow"] = self.newPersonTrigger
+        self.triggers["face"]["know"] = self.knowPersonTrigger
+        self.triggers["face"]["nobody"] = self.nobodyTrigger
+
+        self.triggers["emotion"]["new"] = self.newEmotionTrigger
+        self.triggers["emotion"]["no"] = self.noEmotionTrigger
 
     def generateActions(self):
         self.actions["playSound"] = self.playSound
@@ -60,7 +68,7 @@ class ScenarioManager(QObject):
         {"name": "callScenarios", "id": {"type": "input", "variable": [2]}}]
         newSc1.id = 1
         self.scenarios[newSc1.id] = newSc1
-        self.scope.append(newSc1)
+
         newSc2 = Scenario()
         newSc2.triggers = [{"service": "converse", "name": "new", "parameters": {}}]
         # With this implementation a parameter named "name" is forbidden
@@ -69,6 +77,17 @@ class ScenarioManager(QObject):
         {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
         newSc2.id = 2
         self.scenarios[newSc2.id] = newSc2
+
+        newSc3 = Scenario()
+        newSc3.triggers = [{"service": "face", "name": "know", "parameters": {}}]
+        newSc3.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Oh salut toi !"}, "variables": [{"firstname": {"type": "service", "name": "face", "variable": "firstname"}}, {"lastname": {"type": "service", "name": "face", "variable": "lastname"}} ]},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
+        newSc3.id = 3
+        self.scenarios[newSc3.id] = newSc2
+
+        # First scope
+        self.scope.append(newSc1)
+        self.scope.append(newSc3)
 
     # WIP
     def loadScenarioFromJson(self, file_path):
@@ -94,6 +113,17 @@ class ScenarioManager(QObject):
             if name != "name":
                 if value["type"] == "service":
                     input[name] = self.services[value["name"]][value["variable"]]
+                elif type(value) is list:
+                    input[name] = []
+                    for n, v in input[name]:
+                        typeV = v.get("type", None)
+                        if typeV:
+                            if type == "service":
+                                input[name][n] = self.services[v["name"]][v["variable"]]
+                            else:
+                                input[name][n] = v["variable"]
+                        else:
+                            input[name][n] = v
                 else:
                     input[name] = value["variable"]
         return input
@@ -132,16 +162,48 @@ class ScenarioManager(QObject):
     # Triggers
 
     def newPersonTrigger(self):
-        print('sucka')
+        if self.services.get("face", None):
+            if self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
+                return True
+        return False
+
     def knowPersonTrigger(self, input):
         if self.services.get("face", None):
             # TODO: Implement regex parameters
-            if self.services["face"]["state"] == State.STATE_
-        else:
-            return False
+            if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
+                return True
+        return False
+
+    def nobodyTrigger(self, input):
+        if self.services.get("face", None):
+            # TODO: Implement regex parameters
+            if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
+                return True
+        return False
+
+    def newEmotionTrigger(self, input):
+        if self.services.get("emotion", None):
+            # TODO: add emotion filter
+            if self.services["emotion"]["state"] == State.STATE_EMOTION_NEW:
+                return True
+        return False
+
+    def noEmotionTrigger(self, input):
+        if self.services.get("emotion", None):
+            # TODO: add emotion filter
+            if self.services["emotion"]["state"] == State.STATE_EMOTION_NO:
+                return True
+        return False
+
     def newSoundTrigger(self, input):
         if self.services.get("sound", None):
             if self.services["sound"]["state"] == State.STATE_SOUND_NEW:
+                return True
+        return False
+
+    def availableSoundTrigger(self, input):
+        if self.services.get("sound", None):
+            if self.services["sound"]["state"] == State.STATE_SOUND_AVAILABLE or self.services["sound"]["state"] == State.STATE_SOUND_NEW:
                 return True
         return False
 

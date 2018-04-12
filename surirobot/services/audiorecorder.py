@@ -6,7 +6,7 @@ import uuid
 import logging
 from surirobot.core import ui
 
-from surirobot.core.scenario.state import State
+from surirobot.core.common import State
 
 class AudioRecorder(QThread):
     started_record = pyqtSignal()
@@ -50,6 +50,7 @@ class AudioRecorder(QThread):
                         file.write(q.get())
 
             # self.end_record.emit(elm['filename'])
+            self.logger.info('Calling scenario manager...')
             self.updateState.emit("sound", 1, {"filepath": elm['filename']})
 
     @pyqtSlot()

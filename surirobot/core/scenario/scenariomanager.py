@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal
-from surirobot.services import serv_ap, serv_fr, serv_ar
+from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader
 from surirobot.core.api import api_converse, api_nlp, api_tts
 from surirobot.core import ui
 
@@ -9,6 +9,7 @@ from surirobot.core.common import State, Dir
 import logging
 import json
 import re
+import time
 
 class ScenarioManager(QObject):
     __instance__ = None
@@ -109,11 +110,11 @@ class ScenarioManager(QObject):
 
         # Wait for converse : yes
         newSc6 = Scenario()
-        newSc6.triggers = [{"service": "converse", "name": "new", "parameters": {"intent":  "yes"}}]
+        newSc6.triggers = [{"service": "converse", "name": "new", "parameters": {"intent":  "say-yes"}}]
         # With this implementation a parameter named "name" is forbidden
         newSc6.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Préparez-vous !"}},
-        {"name": "playSound", "filepath": {"type": "service", "name":"storage", "variable": "@text"}},
-        {"name": "wait", "time": {"type": "input", "variable": 4000}},
+        {"name": "speak", "text": {"type": "service", "name":"storage", "variable": "@text"}},
+        {"name": "wait", "time": {"type": "input", "variable": 4}},
         {"name": "takePicture"},
         {"name": "displayText", "text": {"type": "input", "variable": "Photo enregistrée"}},
         {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
@@ -122,21 +123,22 @@ class ScenarioManager(QObject):
 
         # Wait for converse : no
         newSc7 = Scenario()
-        newSc7.triggers = [{"service": "converse", "name": "new", "parameters": {"intent":  "no"}}]
+        newSc7.triggers = [{"service": "converse", "name": "new", "parameters": {"intent":  "say-no"}}]
         # With this implementation a parameter named "name" is forbidden
         newSc7.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Très bien."}},
-        {"name": "playSound", "filepath": {"type": "service", "name":"storage", "variable": "@text"}},
-        {"name": "wait", "time": {"type": "input", "variable": 2000}},
+        {"name": "speak", "text": {"type": "service", "name":"storage", "variable": "@text"}},
+        {"name": "wait", "time": {"type": "input", "variable": 2}},
         {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
         newSc7.id = 7
         self.scenarios[newSc7.id] = newSc7
 
+        # Don't understand
         newSc8 = Scenario()
         newSc8.triggers = [{"service": "converse", "name": "new", "parameters": {}}]
         # With this implementation a parameter named "name" is forbidden
         newSc8.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Je n'ai pas compris. Répondez par OUI ou NON."}},
-        {"name": "playSound", "filepath": {"type": "service", "name":"storage", "variable": "@text"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [6,7,8]}}]
+        {"name": "speak", "text": {"type": "service", "name":"storage", "variable": "@text"}},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [5]}}]
         newSc8.id = 8
         self.scenarios[newSc8.id] = newSc8
         # First scope
@@ -175,7 +177,6 @@ class ScenarioManager(QObject):
                                     input[name].append({"name": keyElement, "value" : self.services[valueElement["name"]][valueElement["variable"]]})
                                 else:
                                     input[name].append(valueElement["variable"])
-
                         else:
                             input[name].append(v)
                 elif value["type"] and value["type"] == "service":
@@ -217,7 +218,7 @@ class ScenarioManager(QObject):
 
     # Triggers
 
-    def newPersonTrigger(self):
+    def newPersonTrigger(self, input):
         if self.services.get("face", None):
             if self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
                 return True
@@ -268,24 +269,28 @@ class ScenarioManager(QObject):
         intentCondition = False
         if self.services.get("converse", None):
             if input["parameters"].get("new", None):
-                if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
-                    newCondition = True
+                if self.services["converse"].get("intent", None):
+                    if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
+                        newCondition = True
             else:
-                if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
-                    newCondition = True
+                if self.services["converse"].get("intent", None):
+                    if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
+                        newCondition = True
             if input["parameters"].get("intent", None):
-                if self.services["converse"]["intent"] == input["intent"]:
-                    intentCondition = True
+                if self.services["converse"].get("intent", None):
+                    if self.services["converse"]["intent"] == input["parameters"]["intent"]:
+                        intentCondition = True
             else:
                 intentCondition = True
         return newCondition and intentCondition
 
     # Actions
     def waitFor(self, input):
-        print('wait')
+        if input.get("time", None):
+            time.sleep(input["time"])
 
     def takePicture(self, input):
-        print('takePicture')
+        face_loader.take_picture()
 
     def playSound(self, input):
         serv_ap.play(input["filepath"])
@@ -308,7 +313,7 @@ class ScenarioManager(QObject):
         api_tts.sendRequest(input["text"])
 
     def converse(self, input):
-        if(input["id"]):
+        if input.get("id", None):
             api_converse.sendRequest(input["filepath"], input["id"])
         else:
             api_converse.sendRequest(input["filepath"])
@@ -318,3 +323,4 @@ class ScenarioManager(QObject):
         self.scope = []
         for id in idTable:
             self.scope.append(self.scenarios[id])
+        print('Scope has changed.' + str(self.scope))

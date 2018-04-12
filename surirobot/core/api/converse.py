@@ -62,6 +62,7 @@ class ConverseApiCaller(ApiCaller):
         # Id
         idPart = QHttpPart()
         idPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"userId\""))
+        print('\n face id : ' + str(id) + ' \n')
         idPart.setBody(QByteArray().append(str(id)))
         multiPart.append(audioPart)
         multiPart.append(textPart)

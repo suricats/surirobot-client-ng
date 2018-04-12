@@ -1,5 +1,5 @@
 from .base import ApiCaller
-from PyQt5.QtNetwork import QNetworkRequest
+from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 from PyQt5.QtCore import QUrl, pyqtSlot, pyqtSignal
 
 
@@ -38,16 +38,9 @@ class EmotionalAPICaller(ApiCaller):
         QObject::connect(requestTimer, SIGNAL(timeout()), this, SLOT(sendRequest()));
     }
 
-    EmotionalAPICaller::~EmotionalAPICaller() {
-        captureTimer->stop();
-        requestTimer->stop();
-        stop();
-        delete captureTimer;
-    }
-
-    void EmotionalAPICaller::receiveReply(QNetworkReply* reply) {
-        if (reply->error() != QNetworkReply::NoError) {
-            std::cerr << "Error " << reply->error() << std::endl;
+    def receiveReply(self, reply):
+        if (reply.error() != QNetworkReply.NoError):
+            print("Error " + reply.error())
             std::cerr << reply->readAll().toStdString() << std::endl;
             networkManager->clearAccessCache();
         } else {

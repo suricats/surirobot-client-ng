@@ -25,7 +25,7 @@ class TtsApiCaller(ApiCaller):
     def receiveReply(self, reply):
         self.isBusy = False
         if (reply.error() != QNetworkReply.NoError):
-            print("Error  " + reply.error() + " : " + reply.readAll().toString())
+            print("Error  " + reply.error() + " : " + reply.readAll())
             self.networkManager.clearAccessCache()
         else:
             jsonObject = QJsonDocument.fromJson(reply.readAll()).object()

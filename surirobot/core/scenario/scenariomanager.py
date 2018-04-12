@@ -61,35 +61,88 @@ class ScenarioManager(QObject):
         self.actions["callScenarios"] = self.callScenarios
         self.actions["displayText"] = self.displayText
         self.actions["speak"] = self.speak
+        self.actions["wait"] = self.waitFor
+        self.actions["takePicture"] = self.takePicture
 
     def loadFile(self, filepath=None):
+        # Wait for audio
         newSc1 = Scenario()
         newSc1.triggers = [{"service": "sound", "name": "new", "parameters": {}}]
-        newSc1.actions = [{"name": "converse", "filepath": {"type": "service", "name": "sound", "variable": "filepath"}},
+        newSc1.actions = [{"name": "converse", "filepath": {"type": "service", "name": "sound", "variable": "filepath"}, "id": {"type": "service", "name": "face", "variable":"id"}},
         {"name": "callScenarios", "id": {"type": "input", "variable": [2]}}]
         newSc1.id = 1
         self.scenarios[newSc1.id] = newSc1
-
+        #Wait for converse
         newSc2 = Scenario()
         newSc2.triggers = [{"service": "converse", "name": "new", "parameters": {}}]
         # With this implementation a parameter named "name" is forbidden
         newSc2.actions = [{"name": "playSound", "filepath": {"type": "service", "name": "converse", "variable": "audiopath"}},
         {"name": "displayText", "text": {"type": "service", "name": "converse", "variable": "reply"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
         newSc2.id = 2
         self.scenarios[newSc2.id] = newSc2
-
+        # Recognize a known person
         newSc3 = Scenario()
         newSc3.triggers = [{"service": "face", "name": "know", "parameters": {}}]
         newSc3.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Oh salut {@firstname} {@lastname} !"}, "variables": [{"firstname": {"type": "service", "name": "face", "variable": "firstname"}}, {"lastname": {"type": "service", "name": "face", "variable": "lastname"}} ]},
         {"name": "callScenarios", "id": {"type": "input", "variable": [1]}},
-        {"name": "speak", "text": {"type": "service", "name": "storage", "variable": "text"}}]
+        {"name": "speak", "text": {"type": "service", "name": "storage", "variable": "@text"}}]
         newSc3.id = 3
-        self.scenarios[newSc3.id] = newSc2
+        self.scenarios[newSc3.id] = newSc3
 
+        #Detect a unknown person
+        newSc4 = Scenario()
+        newSc4.triggers = [{"service": "face", "name": "unknow", "parameters": {}}]
+        newSc4.actions = [{"name": "displayText", "text": {"type" : "input", "variable": "Bonjour, je ne t'ai jamais vu ! Veux tu que je t'ajoute ?"}},
+        {"name": "speak", "text": {"type": "service", "name": "storage", "variable": "@text"}},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [5]}}]
+        newSc4.id = 4
+        self.scenarios[newSc4.id] = newSc4
+
+        # Wait for audio
+        newSc5 = Scenario()
+        newSc5.triggers = [{"service": "sound", "name": "new", "parameters": {}}]
+        newSc5.actions = [{"name": "converse", "filepath": {"type": "service", "name": "sound", "variable": "filepath"}},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [6,7,8]}}]
+        newSc5.id = 5
+        self.scenarios[newSc5.id] = newSc5
+
+        # Wait for converse : yes
+        newSc6 = Scenario()
+        newSc6.triggers = [{"service": "converse", "name": "new", "parameters": {"intent":  "yes"}}]
+        # With this implementation a parameter named "name" is forbidden
+        newSc6.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Préparez-vous !"}},
+        {"name": "playSound", "filepath": {"type": "service", "name":"storage", "variable": "@text"}},
+        {"name": "wait", "time": {"type": "input", "variable": 4000}},
+        {"name": "takePicture"},
+        {"name": "displayText", "text": {"type": "input", "variable": "Photo enregistrée"}},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
+        newSc6.id = 6
+        self.scenarios[newSc6.id] = newSc6
+
+        # Wait for converse : no
+        newSc7 = Scenario()
+        newSc7.triggers = [{"service": "converse", "name": "new", "parameters": {"intent":  "no"}}]
+        # With this implementation a parameter named "name" is forbidden
+        newSc7.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Très bien."}},
+        {"name": "playSound", "filepath": {"type": "service", "name":"storage", "variable": "@text"}},
+        {"name": "wait", "time": {"type": "input", "variable": 2000}},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
+        newSc7.id = 7
+        self.scenarios[newSc7.id] = newSc7
+
+        newSc8 = Scenario()
+        newSc8.triggers = [{"service": "converse", "name": "new", "parameters": {}}]
+        # With this implementation a parameter named "name" is forbidden
+        newSc8.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Je n'ai pas compris. Répondez par OUI ou NON."}},
+        {"name": "playSound", "filepath": {"type": "service", "name":"storage", "variable": "@text"}},
+        {"name": "callScenarios", "id": {"type": "input", "variable": [6,7,8]}}]
+        newSc8.id = 8
+        self.scenarios[newSc8.id] = newSc8
         # First scope
         self.scope.append(newSc1)
         self.scope.append(newSc3)
+        self.scope.append(newSc4)
 
     # WIP
     def loadScenarioFromJson(self, file_path):
@@ -228,6 +281,11 @@ class ScenarioManager(QObject):
         return newCondition and intentCondition
 
     # Actions
+    def waitFor(self, input):
+        print('wait')
+
+    def takePicture(self, input):
+        print('takePicture')
 
     def playSound(self, input):
         serv_ap.play(input["filepath"])
@@ -243,14 +301,17 @@ class ScenarioManager(QObject):
                         list[index] = element["value"]
         text = ""
         text = text.join(list)
-        ui.setTextUp(text)
-        self.services["storage"]["text"] = text
+        ui.setTextMiddle(text)
+        self.services["storage"]["@text"] = text
 
     def speak(self, input):
         api_tts.sendRequest(input["text"])
 
     def converse(self, input):
-        api_converse.sendRequest(input["filepath"])
+        if(input["id"]):
+            api_converse.sendRequest(input["filepath"], input["id"])
+        else:
+            api_converse.sendRequest(input["filepath"])
 
     def callScenarios(self, input):
         idTable = input["id"]

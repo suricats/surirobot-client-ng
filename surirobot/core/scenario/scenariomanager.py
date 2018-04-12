@@ -23,7 +23,7 @@ class ScenarioManager(QObject):
         QObject.__init__(self)
         self.triggers = {}
         self.actions = {}
-        self.services = {}
+        self.services = {"face": {}, "emotion": {}, "converse": {}, "sound": {}, "storage": {}}
         self.scope = []
         self.scenarios = {}
         logging.basicConfig(level=logging.INFO)
@@ -60,6 +60,7 @@ class ScenarioManager(QObject):
         self.actions["converse"] = self.converse
         self.actions["callScenarios"] = self.callScenarios
         self.actions["displayText"] = self.displayText
+        self.actions["speak"] = self.speak
 
     def loadFile(self, filepath=None):
         newSc1 = Scenario()
@@ -81,7 +82,8 @@ class ScenarioManager(QObject):
         newSc3 = Scenario()
         newSc3.triggers = [{"service": "face", "name": "know", "parameters": {}}]
         newSc3.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Oh salut {@firstname} {@lastname} !"}, "variables": [{"firstname": {"type": "service", "name": "face", "variable": "firstname"}}, {"lastname": {"type": "service", "name": "face", "variable": "lastname"}} ]},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1]}}]
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1]}},
+        {"name": "speak", "text": {"type": "service", "name": "storage", "variable": "text"}}]
         newSc3.id = 3
         self.scenarios[newSc3.id] = newSc2
 
@@ -231,20 +233,21 @@ class ScenarioManager(QObject):
         serv_ap.play(input["filepath"])
 
     def displayText(self, input):
-        print('MAMAN' + str(input))
         text = input.get("text", "")
         list = re.compile("[\{\}]").split(text)
-        print('\n list :' + str(list))
         for index, string in enumerate(list):
             if string.startswith("@"):
                 string = string.split("@")[1]
                 for element in input["variables"]:
-                    print('\n element : ' + str(element) )
                     if element["name"] == string:
                         list[index] = element["value"]
         text = ""
         text = text.join(list)
         ui.setTextUp(text)
+        self.services["storage"]["text"] = text
+
+    def speak(self, input):
+        api_tts.sendRequest(input["text"])
 
     def converse(self, input):
         api_converse.sendRequest(input["filepath"])

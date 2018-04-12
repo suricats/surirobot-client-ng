@@ -51,7 +51,7 @@ class AudioRecorder(QThread):
 
             # self.end_record.emit(elm['filename'])
             self.logger.info('Calling scenario manager...')
-            self.updateState.emit("sound", 1, {"filepath": elm['filename']})
+            self.updateState.emit("sound", State.STATE_SOUND_NEW, {"filepath": elm['filename']})
 
     @pyqtSlot()
     def start_record(self):

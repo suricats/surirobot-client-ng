@@ -23,7 +23,10 @@ class AudioPlayer(QThread):
             elm = self.q.get()
             self.logger.info('Now playing {}'.format(elm['filename']))
             # sd.play(elm['data'], elm['fs'], blocking=True)
-            os.system('play ' + elm['filename'])
+            try:
+                os.system('play ' + elm['filename'])
+            except ValueError:
+                print('Well')
 
     @pyqtSlot(str)
     def play(self, filename):

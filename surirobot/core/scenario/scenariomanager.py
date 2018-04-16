@@ -79,7 +79,7 @@ class ScenarioManager(QObject):
         # With this implementation a parameter named "name" is forbidden
         newSc2.actions = [{"name": "playSound", "filepath": {"type": "service", "name": "converse", "variable": "audiopath"}},
         {"name": "displayText", "text": {"type": "service", "name": "converse", "variable": "reply"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4,9]}}]
         newSc2.id = 2
         self.scenarios[newSc2.id] = newSc2
         # Recognize a known person
@@ -117,7 +117,7 @@ class ScenarioManager(QObject):
         {"name": "wait", "time": {"type": "input", "variable": 4}},
         {"name": "takePicture"},
         {"name": "displayText", "text": {"type": "input", "variable": "Photo enregistrée"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
+        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4,5]}}]
         newSc6.id = 6
         self.scenarios[newSc6.id] = newSc6
 

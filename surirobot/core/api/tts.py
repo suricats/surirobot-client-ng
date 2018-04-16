@@ -25,13 +25,13 @@ class TtsApiCaller(ApiCaller):
     def receiveReply(self, reply):
         self.isBusy = False
         if (reply.error() != QNetworkReply.NoError):
-            print("Error  " + reply.error() + " : " + reply.readAll())
+            print("TTS - Error  " + str(reply.error()))
             self.networkManager.clearAccessCache()
         else:
             jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
             url = jsonObject["downloadLink"].toString("")
             if (not url):
-                print('TTS - Error')
+                print('TTS - Error : No url')
                 # self.new_reply.emit("Je ne me sens pas bien... [ERROR TTS : Fields needed don't exist.]")
             else:
                 print("Downloading the sound : " + url)

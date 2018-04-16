@@ -34,7 +34,7 @@ class ConverseApiCaller(ApiCaller):
         self.isBusy = False
         buffer = QByteArray(reply.readAll())
         if (reply.error() != QNetworkReply.NoError):
-            print("Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
+            print("NLP - Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
             self.intent = "message"
             self.message = "Il semblerait qu'il y ait eu un problème"
             self.download.emit("https://i1.theportalwiki.net/img/d/d0/GLaDOS_potatos_sp_a4_intro_uhoh03_fr.wav")

@@ -151,6 +151,8 @@ class ScenarioManager(QObject):
                 if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
                     self.services["converse"]["state"] = State.STATE_CONVERSE_AVAILABLE
 
+    def parseSpecialCharacters(self, text):
+        text.replace("\\b", "\\b")
     # Triggers
 
     def newPersonTrigger(self, input):
@@ -161,18 +163,19 @@ class ScenarioManager(QObject):
 
     def knowPersonTrigger(self, input):
         if self.services.get("face", None):
-            # TODO: Implement regex parameters
+            # TODO: Implement regex for full name
             if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
-                if input.get("firstname") and self.services["face"].get("firstname"):
-                    patternFirstname = re.compile(input["firstname"])
+                if input["parameters"].get("firstname", None) and self.services["face"].get("firstname"):
+                    patternFirstname = re.compile(input["parameters"]["firstname"])
                     if patternFirstname.match(self.services["face"]["firstname"]):
-                        if input.get("lastname") and self.services["face"].get("lastname"):
-                            patternLastname = re.compile(input["lastname"])
+                        if input["parameters"].get("lastname", None) and self.services["face"].get("lastname"):
+                            patternLastname = re.compile(input["parameters"]["lastname"])
                             if patternLastname.match(self.services["face"]["lastname"]):
                                 return True
                         else:
                             return True
-                return True
+                else:
+                    return True
         return False
 
     def nobodyTrigger(self, input):

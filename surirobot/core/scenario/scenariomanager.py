@@ -36,7 +36,7 @@ class ScenarioManager(QObject):
         self.generateTriggers()
         self.generateActions()
 
-        self.loadFile()
+        self.loadFile("/scenario.json")
 
     def generateTriggers(self):
         self.triggers["sound"] = {}
@@ -66,98 +66,15 @@ class ScenarioManager(QObject):
         self.actions["takePicture"] = self.takePicture
 
     def loadFile(self, filepath=None):
-        # Wait for audio
-        newSc1 = Scenario()
-        newSc1.triggers = [{"service": "sound", "name": "new", "parameters": {}}]
-        newSc1.actions = [{"name": "converse", "filepath": {"type": "service", "name": "sound", "variable": "filepath"}, "id": {"type": "service", "name": "face", "variable":"id"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [2,1]}}]
-        newSc1.id = 1
-        self.scenarios[newSc1.id] = newSc1
-        #Wait for converse
-        newSc2 = Scenario()
-        newSc2.triggers = [{"service": "converse", "name": "new", "parameters": {}}]
-        # With this implementation a parameter named "name" is forbidden
-        newSc2.actions = [{"name": "playSound", "filepath": {"type": "service", "name": "converse", "variable": "audiopath"}},
-        {"name": "displayText", "text": {"type": "service", "name": "converse", "variable": "reply"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4,9]}}]
-        newSc2.id = 2
-        self.scenarios[newSc2.id] = newSc2
-        # Recognize a known person
-        newSc3 = Scenario()
-        newSc3.triggers = [{"service": "face", "name": "know", "parameters": {}}]
-        newSc3.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Oh salut {@firstname} {@lastname} !"}, "variables": [{"firstname": {"type": "service", "name": "face", "variable": "firstname"}}, {"lastname": {"type": "service", "name": "face", "variable": "lastname"}} ]},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4,9]}},
-        {"name": "speak", "text": {"type": "service", "name": "storage", "variable": "@text"}}]
-        newSc3.id = 3
-        self.scenarios[newSc3.id] = newSc3
+        jsonFile = json.load(open(Dir.BASE + filepath))
+        jsonScenarios = jsonFile["scenarios"]
+        self.scenarios = {}
+        for scenario in jsonScenarios:
+            self.scenarios[scenario["id"]] = scenario
+        self.scope = jsonFile["initial"]
+        print("\nLOADFILE : " + str(self.scope))
 
-        #Detect a unknown person
-        newSc4 = Scenario()
-        newSc4.triggers = [{"service": "face", "name": "unknow", "parameters": {}}]
-        newSc4.actions = [{"name": "displayText", "text": {"type" : "input", "variable": "Bonjour, je ne t'ai jamais vu ! Veux tu que je t'ajoute ?"}},
-        {"name": "speak", "text": {"type": "service", "name": "storage", "variable": "@text"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [5,9]}}]
-        newSc4.id = 4
-        self.scenarios[newSc4.id] = newSc4
-
-        # Wait for audio
-        newSc5 = Scenario()
-        newSc5.triggers = [{"service": "sound", "name": "new", "parameters": {}}]
-        newSc5.actions = [{"name": "converse", "filepath": {"type": "service", "name": "sound", "variable": "filepath"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [6,7,8,9]}}]
-        newSc5.id = 5
-        self.scenarios[newSc5.id] = newSc5
-
-        # Wait for converse : yes
-        newSc6 = Scenario()
-        newSc6.triggers = [{"service": "converse", "name": "new", "parameters": {"intent":  "say-yes"}}]
-        # With this implementation a parameter named "name" is forbidden
-        newSc6.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Hop ! Enregistrée !"}},
-        {"name": "speak", "text": {"type": "service", "name":"storage", "variable": "@text"}},
-        {"name": "wait", "time": {"type": "input", "variable": 4}},
-        {"name": "takePicture"},
-        {"name": "displayText", "text": {"type": "input", "variable": "Photo enregistrée"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4,5]}}]
-        newSc6.id = 6
-        self.scenarios[newSc6.id] = newSc6
-
-        # Wait for converse : no
-        newSc7 = Scenario()
-        newSc7.triggers = [{"service": "converse", "name": "new", "parameters": {"intent":  "say-no"}}]
-        # With this implementation a parameter named "name" is forbidden
-        newSc7.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Très bien."}},
-        {"name": "speak", "text": {"type": "service", "name":"storage", "variable": "@text"}},
-        {"name": "wait", "time": {"type": "input", "variable": 2}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
-        newSc7.id = 7
-        self.scenarios[newSc7.id] = newSc7
-
-        # Don't understand
-        newSc8 = Scenario()
-        newSc8.triggers = [{"service": "converse", "name": "new", "parameters": {}}]
-        # With this implementation a parameter named "name" is forbidden
-        newSc8.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Je n'ai pas compris. Répondez par OUI ou NON."}},
-        {"name": "speak", "text": {"type": "service", "name":"storage", "variable": "@text"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [5]}}]
-        newSc8.id = 8
-        self.scenarios[newSc8.id] = newSc8
-
-        # Nobody on the camera
-        newSc9 = Scenario()
-        newSc9.triggers = [{"service": "face", "name": "nobody", "parameters": {}}]
-        # With this implementation a parameter named "name" is forbidden
-        newSc9.actions = [{"name": "displayText", "text": {"type": "input", "variable": "Au revoir."}},
-        {"name": "speak", "text": {"type": "service", "name":"storage", "variable": "@text"}},
-        {"name": "callScenarios", "id": {"type": "input", "variable": [1,3,4]}}]
-        newSc9.id = 9
-        self.scenarios[newSc9.id] = newSc9
-        # First scope
-        self.scope.append(newSc1)
-        self.scope.append(newSc3)
-        self.scope.append(newSc4)
-
-    # WIP
-    def loadScenarioFromJson(self, file_path):
+    def loadScenarioFromJson(self, filePath):
         self.scenarios = json.load(open(Dir.SCENARIOS + 'yolo.json'))
 
     def suscribeToTrigger(self, sc):
@@ -169,10 +86,7 @@ class ScenarioManager(QObject):
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
         print('Update of scenarios from ' + name)
-        list = []
-        for sc in self.scope:
-            list.append(sc.id)
-        print('\nScope : ' + str(list))
+        print('\nScope : ' + str(self.scope))
         self.services[name] = {}
         self.services[name]["state"] = state
         self.services[name].update(data)
@@ -183,6 +97,7 @@ class ScenarioManager(QObject):
         for name, value in action.items():
             if name != "name":
                 if type(value) is list:
+                    print('list')
                     input[name] = []
                     for v in value:
                         if type(v) is dict:
@@ -194,7 +109,6 @@ class ScenarioManager(QObject):
                         else:
                             input[name].append(v)
                 elif value["type"] and value["type"] == "service" and self.services[value["name"]].get(value["variable"], None):
-                    print(self.services[value["name"]])
                     input[name] = self.services[value["name"]][value["variable"]]
                 else:
                     input[name] = value["variable"]
@@ -202,7 +116,7 @@ class ScenarioManager(QObject):
 
     def checkForTrigger(self, sc):
         active = True
-        for trigger in sc.triggers:
+        for trigger in sc["triggers"]:
             func = self.triggers[trigger["service"]][trigger["name"]]
             if func:
                 triggerActive = func(trigger)
@@ -212,23 +126,24 @@ class ScenarioManager(QObject):
         return active
 
     def checkScope(self):
-        self.scopeChanged = False
-        for sc in self.scope:
-            print('Scenario : ' + str(sc.id))
+        for scId in self.scope:
+            sc = self.scenarios[scId]
+            # print('Scenario : ' + str(scId))
             if self.scopeChanged:
                 self.scopeChanged = False
                 break
             if self.checkForTrigger(sc):
                 self.updateState(sc)
-                print('\nScenario ' + str(sc.id) + " has been activated\n")
-                for action in sc.actions:
+                print('\nScenario ' + str(sc["id"]) + " has been activated\n")
+                for action in sc["actions"]:
                     input = self.retrieveData(action)
                     func = self.actions[action["name"]]
                     if func:
                         func(input)
+        self.scopeChanged = False
 
     def updateState(self, sc):
-        for trigger in sc.triggers:
+        for trigger in sc["triggers"]:
             if self.services.get("sound", None):
                 if trigger["service"] == "sound" and trigger["name"] == "new" and self.services["sound"]["state"] == State.STATE_SOUND_NEW:
                     self.services["sound"]["state"] = State.STATE_SOUND_AVAILABLE
@@ -248,6 +163,15 @@ class ScenarioManager(QObject):
         if self.services.get("face", None):
             # TODO: Implement regex parameters
             if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
+                if input.get("firstname") and self.services["face"].get("firstname"):
+                    patternFirstname = re.compile(input["firstname"])
+                    if patternFirstname.match(self.services["face"]["firstname"]):
+                        if input.get("lastname") and self.services["face"].get("lastname"):
+                            patternLastname = re.compile(input["lastname"])
+                            if patternLastname.match(self.services["face"]["lastname"]):
+                                return True
+                        else:
+                            return True
                 return True
         return False
 
@@ -312,6 +236,7 @@ class ScenarioManager(QObject):
         face_loader.take_picture()
 
     def playSound(self, input):
+        print('\n PLAYSOUND : ' + str(input["filepath"]))
         serv_ap.play(input["filepath"])
 
     def displayText(self, input):
@@ -341,11 +266,6 @@ class ScenarioManager(QObject):
 
     def callScenarios(self, input):
         idTable = input["id"]
-        self.scope = []
-        for id in idTable:
-            self.scope.append(self.scenarios[id])
-            self.scopeChanged = True
-        list = []
-        for sc in self.scope:
-            list.append(sc.id)
-        print('Scope has changed : ' + str(list))
+        self.scope = idTable
+        print('Scope has changed : ' + str(self.scope))
+        self.scopeChanged = True

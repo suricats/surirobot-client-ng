@@ -1,0 +1,427 @@
+{
+  "initial": [1,1001,1002,3,4],
+  "scenarios": [
+    {
+      "id": 1,
+      "description": "Wait for audio",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [2,1]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "description": "Wait for converse",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "playSound",
+          "filepath": {
+            "type": "service",
+            "name": "converse",
+            "variable": "audiopath"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "service",
+            "name": "converse",
+            "variable": "reply"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [1,1001,1002,3,4,9]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "description": "Recognize a known person",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Oh salut {@firstname} {@lastname} !"
+          },
+          "variables": [
+            {
+              "firstname": {
+                "type": "service",
+                "name": "face",
+                "variable": "firstname"
+              }
+            },
+            {
+              "lastname": {
+                "type": "service",
+                "name": "face",
+                "variable": "lastname"
+              }
+            }
+          ]
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [1,3,4,9]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "description": "Detect a unknown person",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "unknow",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Bonjour, je ne t'ai jamais vu ! Veux tu que je t'ajoute ?"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [5,9,3]
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "description": "Wait for audio when an unknow person is recognized",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [6,7,8,9]
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "description": "Wait for converse : yes - unknow person",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-yes"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Hop ! Enregistrée !"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "wait",
+          "time": {
+            "type": "input",
+            "variable": 4
+          }
+        },
+        {
+          "name": "takePicture"
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Photo enregistrée"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [1,3,4,5]
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "description": "Wait for converse : no - unknow person",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-no"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Très bien."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "wait",
+          "time": {
+            "type": "input",
+            "variable": 2
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [1,3,4]
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "description": "Wait for converse : don't understand - unknow person",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Je n'ai pas compris. Répondez par OUI ou NON."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [5]
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "description": "Nobody on front of camera (someone just leaved)",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "nobody",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Au revoir."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [1,3,4]
+          }
+        }
+      ]
+    },
+    {
+      "id": 1001,
+      "description": "Recognize his creator",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {
+            "firstname" : "Alain",
+            "lastname" : "Berrier"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Bonjour père. Que puis-je faire pour vous aujourd'hui ?"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [1,1002,3,4,9]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        }
+      ]
+    },
+    {
+      "id": 1002,
+      "description": "Recognize a founder of Suricats",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {
+            "firstname" : "\b(Thierry|François|Bruno|Bernard)\b",
+            "lastname" : "\b(Berdy|Giraudon|Levy|Chartier)\b"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Oh un fantastique ! Que puis-je faire pour vous ?"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [1,1001,3,4,9]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        }
+      ]
+    }
+  ]
+}

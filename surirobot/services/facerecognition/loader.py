@@ -41,27 +41,21 @@ class FaceLoader(QThread):
             pictures = user.pictures
             if pictures:
                 picture = pictures[0]
-
                 name = user.firstname + ' ' + user.lastname
                 #self.logger.info("Load Face {}".format(name))
                 serv_fr.add_picture(picture)
         self.logger.info('Loaded all the faces from DB')
 
     def add_user(self, firstname, lastname, email, picture_path):
-        print('yolo')
         user = User(firstname=firstname, lastname=lastname, email=email)
         db.session.add(user)
         db.session.commit()
-
-        print('added user')
         new_path = Dir.PICTURES + format(uuid.uuid4()) + '.jpg'
         shutil.copy(picture_path, new_path)
         print(user.id)
         picture = Picture(path=new_path, user=user)
-        print('sale pute')
         db.session.add(picture)
         db.session.commit()
-        print('added picture')
 
         self.q.put(picture)
 

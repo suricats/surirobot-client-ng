@@ -15,5 +15,5 @@ import surirobot.core.scenario
 app.exec_()
 
 # Launch Flask
-#from surirobot.management import app
-#app.run(debug=False)
+# from surirobot.management import app
+# app.run(debug=True)

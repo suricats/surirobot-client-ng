@@ -169,7 +169,7 @@ class ScenarioManager(QObject):
                 # Check if regex for firstname is activated
                 if input["parameters"].get("firstname", None):
                     patternFirstname = re.compile(input["parameters"]["firstname"])
-                    if self.services["face"].get("firstname"):
+                    if not self.services["face"].get("firstname", None):
                         firstNameRegex = False
                     elif patternFirstname.match(self.services["face"]["firstname"]):
                         firstNameRegex = True
@@ -178,10 +178,11 @@ class ScenarioManager(QObject):
 
                 # Check if regex for lastname is activated
                 if input["parameters"].get("lastname", None):
-                    patternFirstname = re.compile(input["parameters"]["lastname"])
-                    if self.services["face"].get("lastname"):
+                    print('H')
+                    patternLastname = re.compile(input["parameters"]["lastname"])
+                    if not self.services["face"].get("lastname", None):
                         lastNameRegex = False
-                    elif patternFirstname.match(self.services["face"]["lastname"]):
+                    elif patternLastname.match(self.services["face"]["lastname"]):
                         lastNameRegex = True
                     else:
                         lastNameRegex = False

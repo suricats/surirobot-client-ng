@@ -72,7 +72,6 @@ class ScenarioManager(QObject):
         for scenario in jsonScenarios:
             self.scenarios[scenario["id"]] = scenario
         self.scope = jsonFile["initial"]
-        print("\nLOADFILE : " + str(self.scope))
 
     def loadScenarioFromJson(self, filePath):
         self.scenarios = json.load(open(Dir.SCENARIOS + 'yolo.json'))
@@ -128,7 +127,7 @@ class ScenarioManager(QObject):
     def checkScope(self):
         for scId in self.scope:
             sc = self.scenarios[scId]
-            # print('Scenario : ' + str(scId))
+            print('Scenario : ' + str(scId))
             if self.scopeChanged:
                 self.scopeChanged = False
                 break
@@ -162,21 +161,33 @@ class ScenarioManager(QObject):
         return False
 
     def knowPersonTrigger(self, input):
+        firstNameRegex = True
+        lastNameRegex = True
         if self.services.get("face", None):
             # TODO: Implement regex for full name
             if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
-                if input["parameters"].get("firstname", None) and self.services["face"].get("firstname"):
+                # Check if regex for firstname is activated
+                if input["parameters"].get("firstname", None):
                     patternFirstname = re.compile(input["parameters"]["firstname"])
-                    if patternFirstname.match(self.services["face"]["firstname"]):
-                        if input["parameters"].get("lastname", None) and self.services["face"].get("lastname"):
-                            patternLastname = re.compile(input["parameters"]["lastname"])
-                            if patternLastname.match(self.services["face"]["lastname"]):
-                                return True
-                        else:
-                            return True
-                else:
-                    return True
-        return False
+                    if self.services["face"].get("firstname"):
+                        firstNameRegex = False
+                    elif patternFirstname.match(self.services["face"]["firstname"]):
+                        firstNameRegex = True
+                    else:
+                        firstNameRegex = False
+
+                # Check if regex for lastname is activated
+                if input["parameters"].get("lastname", None):
+                    patternFirstname = re.compile(input["parameters"]["lastname"])
+                    if self.services["face"].get("lastname"):
+                        lastNameRegex = False
+                    elif patternFirstname.match(self.services["face"]["lastname"]):
+                        lastNameRegex = True
+                    else:
+                        lastNameRegex = False
+            else:
+                return False
+        return firstNameRegex and lastNameRegex
 
     def nobodyTrigger(self, input):
         if self.services.get("face", None):

@@ -1,5 +1,5 @@
 {
-  "initial": [1,1002,1001,3,4],
+  "initial": [1,1002,3,4],
   "scenarios": [
     {
       "id": 1,
@@ -365,7 +365,7 @@
           "name": "displayText",
           "text": {
             "type": "input",
-            "variable": "Bonjour père. Que puis-je faire pour vous aujourd'hui ?"
+            "variable": "Bonjour créateur. Que puis-je faire pour vous aujourd'hui ?"
           }
         },
         {

@@ -24,6 +24,7 @@ class ScenarioManager(QObject):
         self.actions = {}
         self.services = {"face": {}, "emotion": {}, "converse": {}, "sound": {}, "storage": {}}
         self.scope = []
+        self.groups = {}
         self.scenarios = {}
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
@@ -72,18 +73,25 @@ class ScenarioManager(QObject):
         jsonFile = json.load(open(Dir.BASE + filepath))
         jsonScenarios = jsonFile["scenarios"]
         self.scenarios = {}
+        # Load scenarios
         for scenario in jsonScenarios:
             self.scenarios[scenario["id"]] = scenario
-        self.scope = jsonFile["initial"]
+        # Load groups of scenarios
+        self.groups = jsonFile["groups"]
+
+        # Load initial scope
+        for id in jsonFile["initial"]:
+            if type(id) is int:
+                self.scope.append(id)
+            elif type(id) is str:
+                print("group : " + str(self.groups[id]))
+                self.scope += self.groups[id]
+            else:
+                print('ERROR : Scenario - loadFile ')
+        print('Scope : ' + str(self.scope))
 
     def loadScenarioFromJson(self, filePath):
         self.scenarios = json.load(open(Dir.SCENARIOS + 'yolo.json'))
-
-    def suscribeToTrigger(self, sc):
-        for trigger in sc.trigger:
-            for key, value in self.triggers:
-                if trigger["name"] == key:
-                    self.subscriber[key].append(sc)
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
@@ -129,7 +137,7 @@ class ScenarioManager(QObject):
     def checkScope(self):
         for scId in self.scope:
             sc = self.scenarios[scId]
-            print('Scenario : ' + str(scId))
+            # print('Scenario : ' + str(scId))
             if self.scopeChanged:
                 self.scopeChanged = False
                 break
@@ -145,18 +153,20 @@ class ScenarioManager(QObject):
 
     def updateState(self, sc):
         for trigger in sc["triggers"]:
+            # SOUND
             if self.services.get("sound", None):
                 if trigger["service"] == "sound" and trigger["name"] == "new" and self.services["sound"]["state"] == State.STATE_SOUND_NEW:
                     self.services["sound"]["state"] = State.STATE_SOUND_AVAILABLE
+            # CONVERSE
             if self.services.get("converse", None):
                 if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
                     self.services["converse"]["state"] = State.STATE_CONVERSE_AVAILABLE
+            # FACE
             if self.services.get("face", None):
                 if trigger["service"] == "face" and trigger["name"] == "know" and self.services["face"]["state"] == State.STATE_FACE_KNOWN:
                     self.services["face"]["state"] = State.STATE_FACE_KNOWN_AVAILABLE
                 if trigger["service"] == "face" and trigger["name"] == "unknow" and self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
                     self.services["face"]["state"] = State.STATE_FACE_UNNOWN_AVAILABLE
-
 
     # Triggers
 
@@ -171,31 +181,49 @@ class ScenarioManager(QObject):
         # TODO: add sepration new/available with input["parameters"]["new"]
         firstNameRegex = True
         lastNameRegex = True
+        fullNameRegex = True
+        newCondition = False
         if self.services.get("face", None):
-            # TODO: Implement regex for full name
-            if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
-                # Check if regex for firstname is activated
-                if input["parameters"].get("firstname", None):
-                    patternFirstname = re.compile(input["parameters"]["firstname"])
-                    if not self.services["face"].get("firstname", None):
-                        firstNameRegex = False
-                    elif patternFirstname.match(self.services["face"]["firstname"]):
-                        firstNameRegex = True
-                    else:
-                        firstNameRegex = False
+            # Check new/available condition
+            newParameter = input["parameters"].get("new", None)
+            if newParameter is None or newParameter:
+                if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
+                    newCondition = True
+            elif self.services["face"]["state"] == State.STATE_FACE_KNOWN or self.services["converse"]["state"] == State.STATE_FACE_KNOWN_AVAILABLE:
+                newCondition = True
 
-                # Check if regex for lastname is activated
-                if input["parameters"].get("lastname", None):
-                    patternLastname = re.compile(input["parameters"]["lastname"])
-                    if not self.services["face"].get("lastname", None):
-                        lastNameRegex = False
-                    elif patternLastname.match(self.services["face"]["lastname"]):
-                        lastNameRegex = True
-                    else:
-                        lastNameRegex = False
+            # Check if regex for name is activated
+            if input["parameters"].get("name", None):
+                patternName = re.compile(input["parameters"]["name"])
+                if not self.services["face"].get("name", None):
+                    fullNameRegex = False
+                elif patternName.match(self.services["face"]["name"]):
+                    fullNameRegex = True
+                else:
+                    fullNameRegex = False
+
+            # Check if regex for firstname is activated
+            if input["parameters"].get("firstname", None):
+                patternFirstname = re.compile(input["parameters"]["firstname"])
+                if not self.services["face"].get("firstname", None):
+                    firstNameRegex = False
+                elif patternFirstname.match(self.services["face"]["firstname"]):
+                    firstNameRegex = True
+                else:
+                    firstNameRegex = False
+
+            # Check if regex for lastname is activated
+            if input["parameters"].get("lastname", None):
+                patternLastname = re.compile(input["parameters"]["lastname"])
+                if not self.services["face"].get("lastname", None):
+                    lastNameRegex = False
+                elif patternLastname.match(self.services["face"]["lastname"]):
+                    lastNameRegex = True
+                else:
+                    lastNameRegex = False
             else:
                 return False
-        return firstNameRegex and lastNameRegex
+        return firstNameRegex and lastNameRegex and newCondition and fullNameRegex
 
     def nobodyTrigger(self, input):
         if self.services.get("face", None):
@@ -239,12 +267,13 @@ class ScenarioManager(QObject):
         newCondition = False
         intentCondition = False
         if self.services.get("converse", None):
-            if input["parameters"].get("new", None):
+            # Check new/available condition
+            newParameter = input["parameters"].get("new", None)
+            if newParameter is None or newParameter:
                 if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
                     newCondition = True
-            else:
-                if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
-                    newCondition = True
+            elif self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
+                newCondition = True
             if input["parameters"].get("intent", None):
                 if self.services["converse"].get("intent", None):
                     if self.services["converse"]["intent"] == input["parameters"]["intent"]:
@@ -292,6 +321,13 @@ class ScenarioManager(QObject):
 
     def callScenarios(self, input):
         idTable = input["id"]
-        self.scope = idTable
+        self.scope = []
+        for id in idTable:
+            if type(id) is int:
+                self.scope.append(id)
+            elif type(id) is str:
+                self.scope += self.groups[id]
+            else:
+                print('ERROR : Scenario - callScenarios ')
         print('Scope has changed : ' + str(self.scope))
         self.scopeChanged = True

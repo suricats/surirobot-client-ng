@@ -1,19 +1,17 @@
 from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal
-from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader
+from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader, serv_emo
 from surirobot.core.api import api_converse, api_nlp, api_tts
 from surirobot.core import ui
 
-from surirobot.core.scenario.scenario import Scenario
-from surirobot.core.scenario.action import Action
 from surirobot.core.common import State, Dir
 import logging
 import json
 import re
 import time
 
+
 class ScenarioManager(QObject):
     __instance__ = None
-
 
     def __new__(cls):
         if cls.__instance__ is None:
@@ -30,9 +28,13 @@ class ScenarioManager(QObject):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.scopeChanged = False
+
+        # Connect to services
         serv_ar.updateState.connect(self.update)
         api_converse.updateState.connect(self.update)
         serv_fr.updateState.connect(self.update)
+        serv_emo.updateState.connect(self.update)
+
         self.generateTriggers()
         self.generateActions()
 
@@ -46,6 +48,7 @@ class ScenarioManager(QObject):
         self.triggers["storage"] = {}
 
         self.triggers["sound"]["new"] = self.newSoundTrigger
+        self.triggers["sound"]["available"] = self.availableSoundTrigger
 
         self.triggers["converse"]["new"] = self.newConverseTrigger
 
@@ -96,13 +99,12 @@ class ScenarioManager(QObject):
         for name, value in action.items():
             if name != "name":
                 if type(value) is list:
-                    print('list')
                     input[name] = []
                     for v in value:
                         if type(v) is dict:
                             for keyElement, valueElement in v.items():
                                 if valueElement["type"] == "service" and self.services[valueElement["name"]].get(valueElement["variable"], None):
-                                    input[name].append({"name": keyElement, "value" : self.services[valueElement["name"]][valueElement["variable"]]})
+                                    input[name].append({"name": keyElement, "value": self.services[valueElement["name"]][valueElement["variable"]]})
                                 else:
                                     input[name].append(valueElement["variable"])
                         else:
@@ -149,18 +151,24 @@ class ScenarioManager(QObject):
             if self.services.get("converse", None):
                 if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
                     self.services["converse"]["state"] = State.STATE_CONVERSE_AVAILABLE
+            if self.services.get("face", None):
+                if trigger["service"] == "face" and trigger["name"] == "know" and self.services["face"]["state"] == State.STATE_FACE_KNOWN:
+                    self.services["face"]["state"] = State.STATE_FACE_KNOWN_AVAILABLE
+                if trigger["service"] == "face" and trigger["name"] == "unknow" and self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
+                    self.services["face"]["state"] = State.STATE_FACE_UNNOWN_AVAILABLE
 
-    def parseSpecialCharacters(self, text):
-        text.replace("\\b", "\\b")
+
     # Triggers
 
     def newPersonTrigger(self, input):
+        # TODO: add sepration new/available with input["parameters"]["new"]
         if self.services.get("face", None):
             if self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
                 return True
         return False
 
     def knowPersonTrigger(self, input):
+        # TODO: add sepration new/available with input["parameters"]["new"]
         firstNameRegex = True
         lastNameRegex = True
         if self.services.get("face", None):
@@ -178,7 +186,6 @@ class ScenarioManager(QObject):
 
                 # Check if regex for lastname is activated
                 if input["parameters"].get("lastname", None):
-                    print('H')
                     patternLastname = re.compile(input["parameters"]["lastname"])
                     if not self.services["face"].get("lastname", None):
                         lastNameRegex = False
@@ -199,9 +206,14 @@ class ScenarioManager(QObject):
 
     def newEmotionTrigger(self, input):
         if self.services.get("emotion", None):
-            # TODO: add emotion filter
             if self.services["emotion"]["state"] == State.STATE_EMOTION_NEW:
-                return True
+                if input["parameters"].get("emotion", None):
+                    if self.services["emotion"]["emotion"] == input["parameters"]["emotion"]:
+                        return True
+                    else:
+                        return False
+                else:
+                    return True
         return False
 
     def noEmotionTrigger(self, input):
@@ -251,7 +263,6 @@ class ScenarioManager(QObject):
         face_loader.take_picture()
 
     def playSound(self, input):
-        print('\n PLAYSOUND : ' + str(input["filepath"]))
         serv_ap.play(input["filepath"])
 
     def displayText(self, input):

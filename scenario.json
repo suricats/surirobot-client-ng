@@ -1,6 +1,9 @@
 {
-  "initial": [1,1002,1001,1003,1004,3,4],
-  "groups" : ["hey"],
+  "initial": ["converse","special-persons",3,4,"emotion-detection"],
+  "groups" : {"person-detection" : [3,4,9],
+    "emotion-detection" : [10],
+    "special-persons" : [1001,1002,1003],
+    "converse" : [2,1]},
   "scenarios": [
     {
       "id": 1,
@@ -25,7 +28,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [2,1]
+            "variable": ["converse"]
           }
         }
       ]
@@ -61,7 +64,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1001,1002,1003,1004,3,4,9]
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]
@@ -104,7 +107,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1001,1002,1003,1004,3,4,9]
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         },
         {
@@ -147,7 +150,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1001,1002,1003,1004,5,9,3]
+            "variable": ["special-persons",5,9,3]
           }
         }
       ]
@@ -229,7 +232,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,3,4,5]
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]
@@ -273,7 +276,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,3,4]
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]
@@ -308,7 +311,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [5]
+            "variable": ["special-persons",5,9,3]
           }
         }
       ]
@@ -343,7 +346,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1001,1002,1003,1004,3,4]
+            "variable": ["converse","special-persons",3,4,"emotion-detection"]
           }
         }
       ]
@@ -373,7 +376,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1002,1003,1004,3,4,9]
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         },
         {
@@ -411,7 +414,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1001,1003,1004,3,4,9]
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         },
         {
@@ -449,7 +452,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1002,1001,1004,3,4,9]
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         },
         {
@@ -463,7 +466,7 @@
       ]
     },
     {
-      "id": 1004,
+      "id": 10,
       "description": "Can tell if you are sad",
       "triggers": [
         {
@@ -486,7 +489,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1002,1001,3,4,9]
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         },
         {

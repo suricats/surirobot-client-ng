@@ -30,9 +30,9 @@ class ConverseApiCaller(ApiCaller):
 
     @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
-        print('\nConverse : Receive reply')
         self.isBusy = False
         buffer = QByteArray(reply.readAll())
+        print('\nConverse : Receive reply : ' + str(buffer))
         if (reply.error() != QNetworkReply.NoError):
             print("NLP - Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
             self.intent = "message"

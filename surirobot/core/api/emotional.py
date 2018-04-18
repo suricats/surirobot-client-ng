@@ -1,5 +1,5 @@
 from .base import ApiCaller
-from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest,QNetworkAccessManager
+from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest, QNetworkAccessManager
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QJsonDocument, QUrl, QVariant, QFile, QIODevice
 from surirobot.core.common import State
 
@@ -15,30 +15,26 @@ class EmotionalAPICaller(ApiCaller):
 
     @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
-        print('received')
         if (reply.error() != QNetworkReply.NoError):
-            print("Error " + reply.error() + reply.readAll().toString())
+            print("Error " + str(reply.error()) + reply.readAll())
             self.networkManager.clearAccessCache()
         else:
-            jsonObject = QJsonDocument.fromJson(reply.readAll())
+            jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
 
             emotion = jsonObject["data"]
             print(emotion)
             if emotion:
                 self.received_reply.emit(
-                    State.STATE_EMOTION_NEW, {'emotion': [emotion]}
+                    State.STATE_EMOTION_NEW, {'emotion': emotion.toString()}
                 )
             else:
                 self.received_reply.emit(
                     State.STATE_EMOTION_NO, {'emotion': []}
                 )
-        self.isBusy = False
         reply.deleteLater()
 
     @pyqtSlot(str)
     def sendRequest(self, text):
-        self.isBusy = True
-
         multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
         # Picture
         picturePart = QHttpPart()
@@ -47,10 +43,10 @@ class EmotionalAPICaller(ApiCaller):
         file = QFile(text)
         file.open(QIODevice.ReadOnly)
         picturePart.setBodyDevice(file)
+        file.setParent(multiPart)
+
         multiPart.append(picturePart)
-
         request = QNetworkRequest(QUrl(self.url))
-
-        request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
-        self.networkManager.post(request, multiPart)
-        print('yolo')
+        print("Sended to Emotional API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + " Ko")
+        reply = self.networkManager.post(request, multiPart)
+        multiPart.setParent(reply)

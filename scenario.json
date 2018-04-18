@@ -1,5 +1,6 @@
 {
-  "initial": [1,1002,1001,3,4],
+  "initial": [1,1002,1001,1003,1004,3,4],
+  "groups" : ["hey"],
   "scenarios": [
     {
       "id": 1,
@@ -60,7 +61,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1001,1002,3,4,9]
+            "variable": [1,1001,1002,1003,1004,3,4,9]
           }
         }
       ]
@@ -103,7 +104,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1001,1002,3,4,9]
+            "variable": [1,1001,1002,1003,1004,3,4,9]
           }
         },
         {
@@ -146,7 +147,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1001,1002,5,9,3]
+            "variable": [1001,1002,1003,1004,5,9,3]
           }
         }
       ]
@@ -342,7 +343,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1001,1002,3,4]
+            "variable": [1,1001,1002,1003,1004,3,4]
           }
         }
       ]
@@ -372,7 +373,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1002,3,4,9]
+            "variable": [1,1002,1003,1004,3,4,9]
           }
         },
         {
@@ -410,7 +411,82 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [1,1001,3,4,9]
+            "variable": [1,1001,1003,1004,3,4,9]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        }
+      ]
+    },
+    {
+      "id": 1003,
+      "description": "Recognize Loic Steer",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {
+            "firstname" : "Loïc",
+            "lastname" : "Steer"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Yo Loïc ! ça boum ma poule ?"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [1,1002,1001,1004,3,4,9]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        }
+      ]
+    },
+    {
+      "id": 1004,
+      "description": "Can tell if you are sad",
+      "triggers": [
+        {
+          "service": "emotion",
+          "name": "new",
+          "parameters": {
+            "emotion": "sadness"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Oh tu es triste... Tu veux que je te raconte une blague ?"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [1,1002,1001,3,4,9]
           }
         },
         {

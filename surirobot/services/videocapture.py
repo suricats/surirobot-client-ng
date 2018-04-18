@@ -15,6 +15,9 @@ class VideoCapture(QThread):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
+        cv2.startWindowThread()
+        cv2.namedWindow("preview")
+
     def __del__(self):
         self.wait()
 
@@ -22,10 +25,13 @@ class VideoCapture(QThread):
         video_capture = cv2.VideoCapture(0)
 
         while(True):
-            time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
-            ret, frame = video_capture.read()
-            self.last_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-
+            try:
+                time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
+                ret, frame = video_capture.read()
+                self.last_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+                cv2.imshow("preview", self.last_frame)
+            except Exception as e:
+                print('Error : ' + str(e))
         video_capture.release()
 
     def get_frame(self):

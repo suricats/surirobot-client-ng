@@ -1,7 +1,7 @@
 {
-  "initial": ["converse","special-persons",3,4,"emotion-detection"],
+  "initial": ["converse","emotion-detection","special-persons",3,4],
   "groups" : {"person-detection" : [3,4,9],
-    "emotion-detection" : [10],
+    "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
     "converse" : [2,1]},
   "scenarios": [
@@ -467,13 +467,20 @@
     },
     {
       "id": 10,
-      "description": "Can tell if you are sad",
+      "description": "SAD - Joke : ask",
       "triggers": [
         {
           "service": "emotion",
           "name": "new",
           "parameters": {
             "emotion": "sadness"
+          }
+        },
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {
+            "new": false
           }
         }
       ],
@@ -484,6 +491,230 @@
             "type": "input",
             "variable": "Oh tu es triste... Tu veux que je te raconte une blague ?"
           }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["special-persons","person-detection",11]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "description": "SAD - Joke : wait",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [12,14,15]
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "description": "SAD - Joke : confirm",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-yes"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "converseAnswer",
+          "intent": {
+            "type": "input",
+            "variable": "Raconte moi une blague"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [13]
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "description": "SAD - Joke : tell",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+
+        {
+          "name": "displayText",
+          "text": {
+            "type": "service",
+            "name": "converse",
+            "variable": "reply"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "description": "SAD - Joke : denied",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-no"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Très bien."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "wait",
+          "time": {
+            "type": "input",
+            "variable": 2
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "description": "SAD - Joke : don't understand",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Je n'ai pas compris. Répondez par OUI ou NON."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["special-persons","person-detection",11]
+          }
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "description": "HAPPY - tell",
+      "triggers": [
+        {
+          "service": "emotion",
+          "name": "new",
+          "parameters": {
+            "emotion": "happiness"
+          }
+        },
+        {
+          "service": "face",
+          "name": "know",
+          "parameters" : {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "{@firstname}, ça me fait plaisir de voir que tu es heureux aujourd'hui :)"
+          },
+          "variables": [
+            {
+              "firstname": {
+                "type": "service",
+                "name": "face",
+                "variable": "firstname"
+              }
+            }
+          ]
         },
         {
           "name": "callScenarios",

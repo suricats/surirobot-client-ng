@@ -13,7 +13,7 @@ api_tts = TtsApiCaller(
 api_tts.start()
 
 from surirobot.core.api.nlp import NlpApiCaller
-api_nlp = TtsApiCaller(
+api_nlp = NlpApiCaller(
     os.environ.get('API_NLP_URL')
 )
 api_nlp.start()

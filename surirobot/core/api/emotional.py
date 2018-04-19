@@ -16,7 +16,7 @@ class EmotionalAPICaller(ApiCaller):
     @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         if (reply.error() != QNetworkReply.NoError):
-            print("Error " + str(reply.error()) + reply.readAll())
+            print("Error " + str(reply.error()) + str(reply.readAll()))
             self.networkManager.clearAccessCache()
         else:
             jsonObject = QJsonDocument.fromJson(reply.readAll()).object()

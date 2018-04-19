@@ -32,18 +32,20 @@ class ConverseApiCaller(ApiCaller):
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = QByteArray(reply.readAll())
-        print('\nConverse : Receive reply : ' + str(buffer))
+        # print('\nConverse : Receive reply : ' + str(buffer))
         if (reply.error() != QNetworkReply.NoError):
-            print("NLP - Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
+            print("Converse - Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
             self.intent = "message"
             self.message = "Il semblerait qu'il y ait eu un problème"
             self.download.emit("https://i1.theportalwiki.net/img/d/d0/GLaDOS_potatos_sp_a4_intro_uhoh03_fr.wav")
             self.networkManager.clearAccessCache()
         jsonObject = QJsonDocument.fromJson(buffer).object()
-        self.intent = jsonObject["intent"].toString()
-        self.message = jsonObject["answerText"].toString()
-        url = jsonObject["answerAudioLink"].toString()
-        self.download.emit(url)
+        # Converse reply
+        if jsonObject["intent"] and jsonObject["answerText"] and jsonObject["answerAudioLink"]:
+            self.intent = jsonObject["intent"].toString()
+            self.message = jsonObject["answerText"].toString()
+            url = jsonObject["answerAudioLink"].toString()
+            self.download.emit(url)
         reply.deleteLater()
 
     @pyqtSlot(str)
@@ -70,7 +72,7 @@ class ConverseApiCaller(ApiCaller):
         multiPart.append(audioPart)
         multiPart.append(textPart)
         multiPart.append(idPart)
-        request = QNetworkRequest(QUrl(self.url))
+        request = QNetworkRequest(QUrl(self.url+'/converse'))
         print("Sended to Converse API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + "Ko")
         self.isBusy = True
         reply = self.networkManager.post(request, multiPart)

@@ -33,6 +33,7 @@ class ScenarioManager(QObject):
         # Connect to services
         serv_ar.updateState.connect(self.update)
         api_converse.updateState.connect(self.update)
+        api_nlp.updateState.connect(self.update)
         serv_fr.updateState.connect(self.update)
         serv_emo.updateState.connect(self.update)
 
@@ -63,6 +64,7 @@ class ScenarioManager(QObject):
     def generateActions(self):
         self.actions["playSound"] = self.playSound
         self.actions["converse"] = self.converse
+        self.actions["converseAnswer"] = self.converseAnswer
         self.actions["callScenarios"] = self.callScenarios
         self.actions["displayText"] = self.displayText
         self.actions["speak"] = self.speak
@@ -166,7 +168,9 @@ class ScenarioManager(QObject):
                 if trigger["service"] == "face" and trigger["name"] == "know" and self.services["face"]["state"] == State.STATE_FACE_KNOWN:
                     self.services["face"]["state"] = State.STATE_FACE_KNOWN_AVAILABLE
                 if trigger["service"] == "face" and trigger["name"] == "unknow" and self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
-                    self.services["face"]["state"] = State.STATE_FACE_UNNOWN_AVAILABLE
+                    self.services["face"]["state"] = State.STATE_FACE_UNKNOWN_AVAILABLE
+                if trigger["service"] == "face" and trigger["name"] == "nobody" and self.services["face"]["state"] == State.STATE_FACE_NOBODY:
+                    self.services["face"]["state"] = State.STATE_FACE_NOBODY_AVAILABLE
 
     # Triggers
 
@@ -189,7 +193,7 @@ class ScenarioManager(QObject):
             if newParameter is None or newParameter:
                 if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
                     newCondition = True
-            elif self.services["face"]["state"] == State.STATE_FACE_KNOWN or self.services["converse"]["state"] == State.STATE_FACE_KNOWN_AVAILABLE:
+            elif self.services["face"]["state"] == State.STATE_FACE_KNOWN or self.services["face"]["state"] == State.STATE_FACE_KNOWN_AVAILABLE:
                 newCondition = True
 
             # Check if regex for name is activated
@@ -221,8 +225,6 @@ class ScenarioManager(QObject):
                     lastNameRegex = True
                 else:
                     lastNameRegex = False
-            else:
-                return False
         return firstNameRegex and lastNameRegex and newCondition and fullNameRegex
 
     def nobodyTrigger(self, input):
@@ -295,7 +297,7 @@ class ScenarioManager(QObject):
         serv_ap.play(input["filepath"])
 
     def displayText(self, input):
-        print('displayText')
+        print('displayText : ' + str(input))
         text = input.get("text", "")
         list = re.compile("[\{\}]").split(text)
         for index, string in enumerate(list):
@@ -311,6 +313,7 @@ class ScenarioManager(QObject):
         self.services["storage"]["@text"] = text
 
     def speak(self, input):
+        print('\nSPEAK\n')
         api_tts.sendRequest(input["text"])
 
     def converse(self, input):
@@ -318,6 +321,13 @@ class ScenarioManager(QObject):
             api_converse.sendRequest(input["filepath"], input["id"])
         else:
             api_converse.sendRequest(input["filepath"])
+
+    def converseAnswer(self, input):
+        if input.get("intent", None):
+            if input.get("id", None):
+                api_nlp.sendRequest(input["intent"], input["id"])
+            else:
+                api_nlp.sendRequest(input["intent"])
 
     def callScenarios(self, input):
         idTable = input["id"]

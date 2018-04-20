@@ -22,7 +22,9 @@ class VideoCapture(QThread):
         self.wait()
 
     def run(self):
-        video_capture = cv2.VideoCapture(0)
+        video_capture = cv2.VideoCapture(1)
+        if not video_capture.isOpened():
+            video_capture = cv2.VideoCapture(0)
 
         while(True):
             try:

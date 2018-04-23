@@ -26,8 +26,8 @@ class KeyPressEventHandler(QObject):
         #serv_ar.started_record.connect(self.manageRecord)
         self.startRecord.connect(serv_ar.start_record)
 
-        self.yoloTimer.timeout.connect(face_loader.take_picture)
-        self.take_picture.connect(face_loader.take_picture)
+        # self.yoloTimer.timeout.connect(face_loader.take_picture_new_user)
+        # self.take_picture.connect(face_loader.take_picture_new_user)
 
     # Communication between 2 different threads
     @pyqtSlot(bool)

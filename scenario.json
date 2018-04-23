@@ -819,7 +819,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [20,"person-detection"]
+            "variable": [20,"person-detection-know-out-know-out"]
           }
         }
       ]
@@ -875,7 +875,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [23,"person-detection"]
+            "variable": [23,"person-detection-know-out"]
           }
         }
       ]
@@ -903,7 +903,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [24,25,26,"person-detection"]
+            "variable": [24,25,26,"person-detection-know-out"]
           }
         }
       ]
@@ -940,7 +940,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [27,"person-detection"]
+            "variable": [27,"person-detection-know-out"]
           }
         }
       ]
@@ -977,7 +977,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [20,"person-detection"]
+            "variable": [20,"person-detection-know-out"]
           }
         }
       ]
@@ -1012,7 +1012,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [24,25,26,"person-detection"]
+            "variable": [24,25,26,"person-detection-know-out"]
           }
         }
       ]
@@ -1040,7 +1040,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [29,28,"person-detection"]
+            "variable": [29,28,"person-detection-know-out"]
           }
         }
       ]
@@ -1075,7 +1075,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [27,"person-detection"]
+            "variable": [27,"person-detection-know-out"]
           }
         }
       ]
@@ -1131,7 +1131,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [30,"person-detection"]
+            "variable": [30,"person-detection-know-out"]
           }
         }
       ]
@@ -1159,7 +1159,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [31,32,33,"person-detection"]
+            "variable": [31,32,33,"person-detection-know-out"]
           }
         }
       ]
@@ -1209,6 +1209,83 @@
           }
         },
         {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 5000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "3"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "2"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "1"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Cheese !"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "takePicture",
+          "firstname": {
+            "type": "service",
+            "name": "storage",
+            "variable": "firstname"
+          },
+          "lastname": {
+            "type": "service",
+            "name": "storage",
+            "variable": "lastname"
+          }
+
+        },
+        {
           "name": "callScenarios",
           "id": {
             "type": "input",
@@ -1249,7 +1326,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [25,"person-detection"]
+            "variable": [27,"person-detection-know-out"]
           }
         }
       ]
@@ -1284,7 +1361,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [31,32,32,"person-detection"]
+            "variable": [31,32,32,"person-detection-know-out"]
           }
         }
       ]

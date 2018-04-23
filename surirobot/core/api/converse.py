@@ -16,7 +16,6 @@ class ConverseApiCaller(ApiCaller):
     def __init__(self, url='https://www.google.fr'):
         ApiCaller.__init__(self, url)
 
-        self.intentMode = False
         self.fileDownloader = FileDownloader()
         self.fileDownloader.new_file.connect(self.downloadFinished)
         self.download.connect(self.fileDownloader.sendRequest)
@@ -46,6 +45,8 @@ class ConverseApiCaller(ApiCaller):
             self.message = jsonObject["answerText"].toString()
             url = jsonObject["answerAudioLink"].toString()
             self.download.emit(url)
+        else:
+            print('Converse - Error : Invalid response format.')
         reply.deleteLater()
 
     @pyqtSlot(str)

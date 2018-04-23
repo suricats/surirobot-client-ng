@@ -20,9 +20,7 @@ class EmotionalAPICaller(ApiCaller):
             self.networkManager.clearAccessCache()
         else:
             jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
-
             emotion = jsonObject["data"]
-            print(emotion)
             if emotion:
                 self.received_reply.emit(
                     State.STATE_EMOTION_NEW, {'emotion': emotion.toString()}

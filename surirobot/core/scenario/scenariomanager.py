@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal
 from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader, serv_emo
-from surirobot.core.api import api_converse, api_nlp, api_tts
+from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core import ui
 
 from surirobot.core.common import State, Dir
@@ -34,8 +34,9 @@ class ScenarioManager(QObject):
         serv_ar.updateState.connect(self.update)
         api_converse.updateState.connect(self.update)
         api_nlp.updateState.connect(self.update)
+        api_stt.updateState.connect(self.update)
         serv_fr.updateState.connect(self.update)
-        serv_emo.updateState.connect(self.update)
+        # serv_emo.updateState.connect(self.update)
 
         self.generateTriggers()
         self.generateActions()
@@ -70,6 +71,8 @@ class ScenarioManager(QObject):
         self.actions["speak"] = self.speak
         self.actions["wait"] = self.waitFor
         self.actions["takePicture"] = self.takePicture
+        self.actions["listen"] = self.listen
+        self.actions["store"] = self.store
 
     def loadFile(self, filepath=None):
         jsonFile = json.load(open(Dir.BASE + filepath))
@@ -98,6 +101,7 @@ class ScenarioManager(QObject):
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
         print('Update of scenarios from ' + name)
+        # print('Data : ' + str(data))
         print('\nScope : ' + str(self.scope))
         self.services[name] = {}
         self.services[name]["state"] = state
@@ -106,8 +110,10 @@ class ScenarioManager(QObject):
 
     def retrieveData(self, action):
         input = {}
+        print('action : ' + str(action))
         for name, value in action.items():
             if name != "name":
+                print('name : ' + str(name) + ', value : ' + str(value))
                 if type(value) is list:
                     input[name] = []
                     for v in value:
@@ -119,8 +125,11 @@ class ScenarioManager(QObject):
                                     input[name].append(valueElement["variable"])
                         else:
                             input[name].append(v)
-                elif value["type"] and value["type"] == "service" and self.services[value["name"]].get(value["variable"], None):
-                    input[name] = self.services[value["name"]][value["variable"]]
+                elif value.get("type", None) == "service" and self.services.get(value.get("name", None), None):
+                    if self.services[value["name"]].get(value["variable"], None):
+                        input[name] = self.services[value["name"]][value["variable"]]
+                elif type(value) is dict and not value.get("variable", None):
+                    input[name] = value
                 else:
                     input[name] = value["variable"]
         return input
@@ -130,6 +139,7 @@ class ScenarioManager(QObject):
         for trigger in sc["triggers"]:
             func = self.triggers[trigger["service"]][trigger["name"]]
             if func:
+                # print("TRIGGER : " + str(trigger))
                 triggerActive = func(trigger)
             if not triggerActive:
                 active = False
@@ -285,10 +295,18 @@ class ScenarioManager(QObject):
         return newCondition and intentCondition
 
     # Actions
+
     def waitFor(self, input):
         print('wait')
         # if input.get("time", None):
         #    time.sleep(input["time"])
+
+    def store(self, input):
+        if input.get("list", None):
+            outputList = self.retrieveData(input["list"])
+            print("outputList : " + str(outputList))
+            self.services["storage"].update(outputList)
+        print(str(self.services["storage"]))
 
     def takePicture(self, input):
         face_loader.take_picture()
@@ -328,6 +346,12 @@ class ScenarioManager(QObject):
                 api_nlp.sendRequest(input["intent"], input["id"])
             else:
                 api_nlp.sendRequest(input["intent"])
+
+    def listen(self, input):
+        if input.get("filepath", None):
+            api_stt.sendRequest(input["filepath"])
+        else:
+            self.logger.info('Action(listen) : Missing parameters.')
 
     def callScenarios(self, input):
         idTable = input["id"]

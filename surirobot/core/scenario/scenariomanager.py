@@ -1,8 +1,8 @@
-from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal
+from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal, QTimer
 from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader, serv_emo
 from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core import ui
-
+from surirobot.services.facerecognition.counter import Counter
 from surirobot.core.common import State, Dir
 import logging
 import json
@@ -26,6 +26,8 @@ class ScenarioManager(QObject):
         self.scope = []
         self.groups = {}
         self.scenarios = {}
+        self.freeze = False
+        self.remainingActions = []
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.scopeChanged = False
@@ -110,10 +112,8 @@ class ScenarioManager(QObject):
 
     def retrieveData(self, action):
         input = {}
-        print('action : ' + str(action))
         for name, value in action.items():
             if name != "name":
-                print('name : ' + str(name) + ', value : ' + str(value))
                 if type(value) is list:
                     input[name] = []
                     for v in value:
@@ -147,21 +147,27 @@ class ScenarioManager(QObject):
         return active
 
     def checkScope(self):
-        for scId in self.scope:
-            sc = self.scenarios[scId]
-            # print('Scenario : ' + str(scId))
-            if self.scopeChanged:
-                self.scopeChanged = False
-                break
-            if self.checkForTrigger(sc):
-                self.updateState(sc)
-                print('\nScenario ' + str(sc["id"]) + " has been activated\n")
-                for action in sc["actions"]:
-                    input = self.retrieveData(action)
-                    func = self.actions[action["name"]]
-                    if func:
-                        func(input)
-        self.scopeChanged = False
+        if not self.freeze:
+            for scId in self.scope:
+                sc = self.scenarios[scId]
+                # print('Scenario : ' + str(scId))
+                if self.scopeChanged:
+                    self.scopeChanged = False
+                    break
+                if self.checkForTrigger(sc):
+                    self.updateState(sc)
+                    print('\nScenario ' + str(sc["id"]) + " has been activated\n")
+                    for index, action in enumerate(sc["actions"]):
+                        input = self.retrieveData(action)
+                        func = self.actions[action["name"]]
+                        if func:
+                            func(input)
+                            # Special for wait action
+                            if self.freeze:
+                                self.remainingActions = sc["actions"][index+1:]
+                                print('Remaining actions : ' + str(self.remainingActions))
+                                break
+            self.scopeChanged = False
 
     def updateState(self, sc):
         for trigger in sc["triggers"]:
@@ -181,6 +187,20 @@ class ScenarioManager(QObject):
                     self.services["face"]["state"] = State.STATE_FACE_UNKNOWN_AVAILABLE
                 if trigger["service"] == "face" and trigger["name"] == "nobody" and self.services["face"]["state"] == State.STATE_FACE_NOBODY:
                     self.services["face"]["state"] = State.STATE_FACE_NOBODY_AVAILABLE
+
+    @pyqtSlot()
+    def resumeManager(self):
+        actions = self.remainingActions[:]
+        for index, action in enumerate(actions):
+            input = self.retrieveData(action)
+            func = self.actions[action["name"]]
+            if func:
+                func(input)
+                # Special for wait action
+                if self.freeze:
+                    self.remainingActions = actions[index+1:]
+                    print('Remaining actions : ' + str(self.remainingActions))
+        self.checkScope()
 
     # Triggers
 
@@ -297,9 +317,9 @@ class ScenarioManager(QObject):
     # Actions
 
     def waitFor(self, input):
-        print('wait')
-        # if input.get("time", None):
-        #    time.sleep(input["time"])
+        if input.get("time", None):
+            self.freeze = True
+            QTimer.singleShot(input["time"], self.resumeManager)
 
     def store(self, input):
         if input.get("list", None):
@@ -309,7 +329,8 @@ class ScenarioManager(QObject):
         print(str(self.services["storage"]))
 
     def takePicture(self, input):
-        face_loader.take_picture()
+        if input.get("firstname", None) and input.get("lastname", None):
+            face_loader.take_picture_new_user(input["firstname"], input["lastname"])
 
     def playSound(self, input):
         serv_ap.play(input["filepath"])

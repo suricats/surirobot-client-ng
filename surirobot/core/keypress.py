@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication
 from surirobot.services import serv_ar, serv_vc
 import cv2
 
+
 class KeyPressEventHandler(QObject):
     startRecord = pyqtSignal()
     stopRecord = pyqtSignal()

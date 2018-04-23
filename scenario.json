@@ -3,7 +3,8 @@
   "groups" : {"person-detection" : [3,4,9],
     "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
-    "converse" : [17,2,1]},
+    "converse" : [17,2,1],
+    "person-detection-know-out" : [3,9]},
   "scenarios": [
     {
       "id": 1,
@@ -200,7 +201,7 @@
           "name": "displayText",
           "text": {
             "type": "input",
-            "variable": "Hop ! Enregistrée !"
+            "variable": "Très bien ! Quel est ton nom ?"
           }
         },
         {
@@ -212,27 +213,10 @@
           }
         },
         {
-          "name": "wait",
-          "time": {
-            "type": "input",
-            "variable": 4
-          }
-        },
-        {
-          "name": "takePicture"
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Photo enregistrée"
-          }
-        },
-        {
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+            "variable": [20]
           }
         }
       ]
@@ -773,6 +757,534 @@
           "id": {
             "type": "input",
             "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "description": "Listen for lastname",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "listen",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [22,21,"person-detection-know-out"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "description": "Don't understand - unknow person lastname",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Je n'ai pas compris. Essaie de parler plus fort !"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [20,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "description": "Confirm name",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "@STT"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "J'ai compris {@name}. C'est bien ça ?"
+          },
+          "variables": [
+            {
+              "name": {
+                "type": "service",
+                "name": "converse",
+                "variable": "reply"
+              }
+            }
+          ]
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "store",
+          "list": {
+            "lastname" : {
+              "type" : "service",
+              "name": "converse",
+              "variable": "reply"
+            }
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [23,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "description": "Listen for confirmation lastname",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [24,25,26,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "description": "Confirm name - yes",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-yes"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Parfait ! Quel est ton prénom ?"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [27,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "description": "Confirm name - no",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-no"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Oh mince ! Redonne moi ton nom."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [20,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "description": "Don't understand - unknow person lastname confirmation",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Je n'ai pas compris. Répondez par OUI ou NON."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [24,25,26,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "description": "Listen for firstname",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "listen",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [29,28,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "description": "Don't understand - unknow person firstname",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Je n'ai pas compris. Essaie de parler plus fort !"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [27,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "description": "Confirm firstname",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "@STT"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "J'ai compris {@name}. C'est bien ça ?"
+          },
+          "variables": [
+            {
+              "name": {
+                "type": "service",
+                "name": "converse",
+                "variable": "reply"
+              }
+            }
+          ]
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "store",
+          "list": {
+            "firstname" : {
+              "type" : "service",
+              "name": "converse",
+              "variable": "reply"
+            }
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [30,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "description": "Listen for confirmation firstname",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [31,32,33,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "description": "Confirm firstname - yes",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-yes"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Très bien {@firstname} {@lastname}. Je vais prendre une photo maintenant ! Prépare toi !"
+          },
+          "variables": [
+            {
+              "firstname": {
+                "type": "service",
+                "name": "storage",
+                "variable": "firstname"
+              }
+            },
+            {
+              "lastname": {
+                "type": "service",
+                "name": "storage",
+                "variable": "lastname"
+              }
+            }
+          ]
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "description": "Confirm firstname - no",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-no"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Oh mince ! Redonne moi ton prénom."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [25,"person-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "description": "Don't understand - unknow person firstname confirmation",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Je n'ai pas compris. Répondez par OUI ou NON."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [31,32,32,"person-detection"]
           }
         }
       ]

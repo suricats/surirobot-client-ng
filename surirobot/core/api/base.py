@@ -6,7 +6,7 @@ from abc import abstractmethod
 class ApiCaller(QObject):
     TMP_DIR = 'tmp/'
     DEFAULT_LANGUAGE = 'fr'
-
+    DEFAULT_LANGUAGE_EXT = 'fr-FR'
     new_reply = pyqtSignal(str)
 
     def __init__(self, url='https://www.google.fr'):

@@ -134,11 +134,14 @@ class FaceRecognition(QThread):
 
     @pyqtSlot()
     def timer_known_timeout(self):
-        print('emit known ' + str(self.pretendent_id))
-        self.state_id = self.pretendent_id
-        self.pretendent_id = self.NOBODY
-        self.emit_person_changed(self.state_id)
-        self.emit_state_changed(State.STATE_FACE_KNOWN, self.state_id)
+        if (not self.pretendent_id == self.NOBODY) or (not self.pretendent_id == self.UNKNOWN):
+            print('emit known ' + str(self.pretendent_id))
+            self.state_id = self.pretendent_id
+            self.pretendent_id = self.NOBODY
+            self.emit_person_changed(self.state_id)
+            self.emit_state_changed(State.STATE_FACE_KNOWN, self.state_id)
+        else:
+            print('FaceReco : Error - invalid id')
 
     def emit_state_changed(self, state, id):
         if id == self.NOBODY or id == self.UNKNOWN:

@@ -12,6 +12,12 @@ api_tts = TtsApiCaller(
 )
 api_tts.start()
 
+from surirobot.core.api.stt import SttApiCaller
+api_stt = SttApiCaller(
+    os.environ.get('API_STT_URL')
+)
+api_stt.start()
+
 from surirobot.core.api.nlp import NlpApiCaller
 api_nlp = NlpApiCaller(
     os.environ.get('API_NLP_URL')

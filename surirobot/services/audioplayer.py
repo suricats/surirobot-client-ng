@@ -1,37 +1,33 @@
 from PyQt5.QtCore import QThread, pyqtSlot
-import sounddevice as sd
-import soundfile as sf
-import queue
 import logging
-import os
+import simpleaudio as sa
 
 
 class AudioPlayer(QThread):
     def __init__(self):
         QThread.__init__(self)
 
-        self.q = queue.Queue()
-
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
+        self.playObj = None
 
     def __del__(self):
+        self.stop()
         self.wait()
 
-    def run(self):
-        while(True):
-            elm = self.q.get()
-            self.logger.info('Now playing {}'.format(elm['filename']))
-            # sd.play(elm['data'], elm['fs'], blocking=True)
-            try:
-                os.system('play ' + elm['filename'])
-            except ValueError:
-                print('Well')
+    @pyqtSlot()
+    def stop(self):
+        if self.playObj:
+            self.playObj.stop()
+            self.logger.info('Stop playing.')
 
     @pyqtSlot(str)
     def play(self, filename):
-        elm = {}
-        elm['filename'] = filename
-        elm['data'], elm['fs'] = sf.read(filename, dtype='float32')
-        self.q.put(elm)
-        self.logger.info('Adding {} to play queue'.format(filename))
+        try:
+            self.stop()
+            waveObj = sa.WaveObject.from_wave_file(filename)
+            self.logger.info('Now playing' + str(filename) + '.')
+            self.playObj = waveObj.play()
+        except Exception as e:
+            self.logger.info('Error : .' + str(e))
+        pass

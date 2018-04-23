@@ -1,6 +1,6 @@
 from .base import ApiCaller
-from PyQt5.QtCore import QJsonDocument, pyqtSlot, pyqtSignal
-
+from PyQt5.QtCore import QJsonDocument, pyqtSlot, pyqtSignal, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal, QUrl
+from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
 
 class SttApiCaller(ApiCaller):
     def __init__(self, text):
@@ -13,7 +13,7 @@ class SttApiCaller(ApiCaller):
     def receiveReply(self, reply):
         self.isBusy = False
         if (reply.error() != QNetworkReply.NoError):
-            print("Error  " + reply.error() + " : " + reply.readAll().toStdString())
+            print("STT - Error  " + str(reply.error()))
             self.networkManager.clearAccessCache()
         else:
             jsonObject = QJsonDocument.fromJson(reply.readAll()).object()

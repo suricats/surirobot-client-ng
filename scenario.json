@@ -3,7 +3,7 @@
   "groups" : {"person-detection" : [3,4,9],
     "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
-    "converse" : [2,1]},
+    "converse" : [17,2,1]},
   "scenarios": [
     {
       "id": 1,
@@ -729,6 +729,50 @@
             "type": "service",
             "name": "storage",
             "variable": "@text"
+          }
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "description": "Play music",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "play-music"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "C'est parti matelos !"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "playSound",
+          "filepath": {
+            "type": "input",
+            "variable": "data/music.wav"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]

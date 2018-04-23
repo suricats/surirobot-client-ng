@@ -3,7 +3,6 @@ import cv2
 import time
 import logging
 
-
 class VideoCapture(QThread):
     NB_IMG_PER_SECOND = 4
 
@@ -19,6 +18,7 @@ class VideoCapture(QThread):
         cv2.namedWindow("preview")
 
     def __del__(self):
+        cv2.destroyAllWindows()
         self.wait()
 
     def run(self):

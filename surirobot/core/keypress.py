@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject, QTimer, QEvent, Qt, pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
-from surirobot.services import serv_ar
-
+from surirobot.services import serv_ar, serv_vc
+import cv2
 
 class KeyPressEventHandler(QObject):
     startRecord = pyqtSignal()
@@ -17,7 +17,7 @@ class KeyPressEventHandler(QObject):
         self.expirationTimer.setSingleShot(True)
 
         self.expirationTimer.timeout.connect(serv_ar.stop_record)
-        #serv_ar.started_record.connect(self.manageRecord)
+        # serv_ar.started_record.connect(self.manageRecord)
         self.startRecord.connect(serv_ar.start_record)
 
     # Communication between 2 different threads
@@ -30,6 +30,7 @@ class KeyPressEventHandler(QObject):
         if(event.type() == QEvent.KeyPress):
             keyP = event
             if((keyP.key() == Qt.Key_Escape) or (keyP.key() == Qt.Key_Return)):
+                cv2.destroyAllWindows()
                 QApplication.quit()
             elif(keyP.key() == Qt.Key_C):
                 # Expiration timer is set to prevent keyboard error

@@ -119,16 +119,16 @@ class ScenarioManager(QObject):
                     for v in value:
                         if type(v) is dict:
                             for keyElement, valueElement in v.items():
-                                if valueElement["type"] == "service" and self.services[valueElement["name"]].get(valueElement["variable"], None):
+                                if valueElement["type"] == "service" and self.services[valueElement["name"]].get(valueElement["variable"]):
                                     input[name].append({"name": keyElement, "value": self.services[valueElement["name"]][valueElement["variable"]]})
                                 else:
                                     input[name].append(valueElement["variable"])
                         else:
                             input[name].append(v)
-                elif value.get("type", None) == "service" and self.services.get(value.get("name", None), None):
-                    if self.services[value["name"]].get(value["variable"], None):
+                elif value.get("type") == "service" and self.services.get(value.get("name")):
+                    if self.services[value["name"]].get(value["variable"]):
                         input[name] = self.services[value["name"]][value["variable"]]
-                elif type(value) is dict and not value.get("variable", None):
+                elif type(value) is dict and not value.get("variable"):
                     input[name] = value
                 else:
                     input[name] = value["variable"]
@@ -165,22 +165,22 @@ class ScenarioManager(QObject):
                             # Special for wait action
                             if self.freeze:
                                 self.remainingActions = sc["actions"][index+1:]
-                                print('Remaining actions : ' + str(self.remainingActions))
+                                # print('Remaining actions - checkScope : ' + str(self.remainingActions))
                                 break
             self.scopeChanged = False
 
     def updateState(self, sc):
         for trigger in sc["triggers"]:
             # SOUND
-            if self.services.get("sound", None):
+            if self.services.get("sound"):
                 if trigger["service"] == "sound" and trigger["name"] == "new" and self.services["sound"]["state"] == State.STATE_SOUND_NEW:
                     self.services["sound"]["state"] = State.STATE_SOUND_AVAILABLE
             # CONVERSE
-            if self.services.get("converse", None):
+            if self.services.get("converse"):
                 if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
                     self.services["converse"]["state"] = State.STATE_CONVERSE_AVAILABLE
             # FACE
-            if self.services.get("face", None):
+            if self.services.get("face"):
                 if trigger["service"] == "face" and trigger["name"] == "know" and self.services["face"]["state"] == State.STATE_FACE_KNOWN:
                     self.services["face"]["state"] = State.STATE_FACE_KNOWN_AVAILABLE
                 if trigger["service"] == "face" and trigger["name"] == "unknow" and self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
@@ -190,6 +190,7 @@ class ScenarioManager(QObject):
 
     @pyqtSlot()
     def resumeManager(self):
+        self.freeze = False
         actions = self.remainingActions[:]
         for index, action in enumerate(actions):
             input = self.retrieveData(action)
@@ -199,14 +200,16 @@ class ScenarioManager(QObject):
                 # Special for wait action
                 if self.freeze:
                     self.remainingActions = actions[index+1:]
-                    print('Remaining actions : ' + str(self.remainingActions))
-        self.checkScope()
+                    # print('Remaining actions - resumeManager : ' + str(self.remainingActions))
+                    break
+        if not self.freeze:
+            self.checkScope()
 
     # Triggers
 
     def newPersonTrigger(self, input):
         # TODO: add sepration new/available with input["parameters"]["new"]
-        if self.services.get("face", None):
+        if self.services.get("face"):
             if self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
                 return True
         return False
@@ -217,9 +220,9 @@ class ScenarioManager(QObject):
         lastNameRegex = True
         fullNameRegex = True
         newCondition = False
-        if self.services.get("face", None):
+        if self.services.get("face"):
             # Check new/available condition
-            newParameter = input["parameters"].get("new", None)
+            newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
                 if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
                     newCondition = True
@@ -227,9 +230,9 @@ class ScenarioManager(QObject):
                 newCondition = True
 
             # Check if regex for name is activated
-            if input["parameters"].get("name", None):
+            if input["parameters"].get("name"):
                 patternName = re.compile(input["parameters"]["name"])
-                if not self.services["face"].get("name", None):
+                if not self.services["face"].get("name"):
                     fullNameRegex = False
                 elif patternName.match(self.services["face"]["name"]):
                     fullNameRegex = True
@@ -237,9 +240,9 @@ class ScenarioManager(QObject):
                     fullNameRegex = False
 
             # Check if regex for firstname is activated
-            if input["parameters"].get("firstname", None):
+            if input["parameters"].get("firstname"):
                 patternFirstname = re.compile(input["parameters"]["firstname"])
-                if not self.services["face"].get("firstname", None):
+                if not self.services["face"].get("firstname"):
                     firstNameRegex = False
                 elif patternFirstname.match(self.services["face"]["firstname"]):
                     firstNameRegex = True
@@ -247,9 +250,9 @@ class ScenarioManager(QObject):
                     firstNameRegex = False
 
             # Check if regex for lastname is activated
-            if input["parameters"].get("lastname", None):
+            if input["parameters"].get("lastname"):
                 patternLastname = re.compile(input["parameters"]["lastname"])
-                if not self.services["face"].get("lastname", None):
+                if not self.services["face"].get("lastname"):
                     lastNameRegex = False
                 elif patternLastname.match(self.services["face"]["lastname"]):
                     lastNameRegex = True
@@ -258,16 +261,16 @@ class ScenarioManager(QObject):
         return firstNameRegex and lastNameRegex and newCondition and fullNameRegex
 
     def nobodyTrigger(self, input):
-        if self.services.get("face", None):
+        if self.services.get("face"):
             # TODO: Implement regex parameters
             if self.services["face"]["state"] == State.STATE_FACE_NOBODY:
                 return True
         return False
 
     def newEmotionTrigger(self, input):
-        if self.services.get("emotion", None):
+        if self.services.get("emotion"):
             if self.services["emotion"]["state"] == State.STATE_EMOTION_NEW:
-                if input["parameters"].get("emotion", None):
+                if input["parameters"].get("emotion"):
                     if self.services["emotion"]["emotion"] == input["parameters"]["emotion"]:
                         return True
                     else:
@@ -277,20 +280,20 @@ class ScenarioManager(QObject):
         return False
 
     def noEmotionTrigger(self, input):
-        if self.services.get("emotion", None):
+        if self.services.get("emotion"):
             # TODO: add emotion filter
             if self.services["emotion"]["state"] == State.STATE_EMOTION_NO:
                 return True
         return False
 
     def newSoundTrigger(self, input):
-        if self.services.get("sound", None):
+        if self.services.get("sound"):
             if self.services["sound"]["state"] == State.STATE_SOUND_NEW:
                 return True
         return False
 
     def availableSoundTrigger(self, input):
-        if self.services.get("sound", None):
+        if self.services.get("sound"):
             if self.services["sound"]["state"] == State.STATE_SOUND_AVAILABLE or self.services["sound"]["state"] == State.STATE_SOUND_NEW:
                 return True
         return False
@@ -298,16 +301,16 @@ class ScenarioManager(QObject):
     def newConverseTrigger(self, input):
         newCondition = False
         intentCondition = False
-        if self.services.get("converse", None):
+        if self.services.get("converse"):
             # Check new/available condition
-            newParameter = input["parameters"].get("new", None)
+            newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
                 if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
                     newCondition = True
             elif self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
                 newCondition = True
-            if input["parameters"].get("intent", None):
-                if self.services["converse"].get("intent", None):
+            if input["parameters"].get("intent"):
+                if self.services["converse"].get("intent"):
                     if self.services["converse"]["intent"] == input["parameters"]["intent"]:
                         intentCondition = True
             else:
@@ -317,59 +320,77 @@ class ScenarioManager(QObject):
     # Actions
 
     def waitFor(self, input):
-        if input.get("time", None):
+        if input.get("time"):
             self.freeze = True
             QTimer.singleShot(input["time"], self.resumeManager)
 
     def store(self, input):
-        if input.get("list", None):
+        if input.get("list"):
             outputList = self.retrieveData(input["list"])
-            print("outputList : " + str(outputList))
             self.services["storage"].update(outputList)
-        print(str(self.services["storage"]))
+        else:
+            self.logger.info('Action(store) : Missing parameters.')
 
     def takePicture(self, input):
-        if input.get("firstname", None) and input.get("lastname", None):
+        if input.get("firstname") and input.get("lastname"):
             face_loader.take_picture_new_user(input["firstname"], input["lastname"])
+        else:
+            self.logger.info('Action(takePicture) : Missing parameters.')
 
     def playSound(self, input):
-        serv_ap.play(input["filepath"])
+        if input.get("filepath"):
+            serv_ap.play(input["filepath"])
+        else:
+            self.logger.info('Action(playSound) : Missing parameters.')
 
     def displayText(self, input):
-        print('displayText : ' + str(input))
-        text = input.get("text", "")
-        list = re.compile("[\{\}]").split(text)
-        for index, string in enumerate(list):
-            if string.startswith("@"):
-                string = string.split("@")[1]
-                for element in input["variables"]:
-                    if type(element) is dict:
-                        if element["name"] == string:
-                            list[index] = element["value"]
-        text = ""
-        text = text.join(list)
-        ui.setTextMiddle(text)
-        self.services["storage"]["@text"] = text
+        text = input.get("text")
+        if text:
+            if type(text) is str:
+                text = input.get("text", "")
+                list = re.compile("[\{\}]").split(text)
+                for index, string in enumerate(list):
+                    if string.startswith("@"):
+                        string = string.split("@")[1]
+                        for element in input["variables"]:
+                            if type(element) is dict:
+                                if element["name"] == string:
+                                    list[index] = element["value"]
+                text = ""
+                text = text.join(list)
+                ui.setTextMiddle(text)
+                self.services["storage"]["@text"] = text
+            else:
+                self.logger.info('Action(displayText) : Invalid type parameter.')
+        else:
+            self.logger.info('Action(displayText) : Missing parameters.')
 
     def speak(self, input):
-        print('\nSPEAK\n')
-        api_tts.sendRequest(input["text"])
+        if input.get("text"):
+            api_tts.sendRequest(input["text"])
+        else:
+            self.logger.info('Action(speak) : Missing parameters.')
 
     def converse(self, input):
-        if input.get("id", None):
-            api_converse.sendRequest(input["filepath"], input["id"])
+        if input.get("filepath"):
+            if input.get("id"):
+                api_converse.sendRequest(input["filepath"], input["id"])
+            else:
+                api_converse.sendRequest(input["filepath"])
         else:
-            api_converse.sendRequest(input["filepath"])
+            self.logger.info('Action(converse) : Missing parameters.')
 
     def converseAnswer(self, input):
-        if input.get("intent", None):
-            if input.get("id", None):
+        if input.get("intent"):
+            if input.get("id"):
                 api_nlp.sendRequest(input["intent"], input["id"])
             else:
                 api_nlp.sendRequest(input["intent"])
+        else:
+            self.logger.info('Action(converseAnswer) : Missing parameters.')
 
     def listen(self, input):
-        if input.get("filepath", None):
+        if input.get("filepath"):
             api_stt.sendRequest(input["filepath"])
         else:
             self.logger.info('Action(listen) : Missing parameters.')

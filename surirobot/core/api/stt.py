@@ -24,7 +24,7 @@ class SttApiCaller(ApiCaller):
             self.networkManager.clearAccessCache()
         else:
             jsonObject = QJsonDocument.fromJson(buffer).object()
-            if jsonObject.get("code", None) and jsonObject.get("msg", None) and jsonObject.get("data", None) and jsonObject.get("confidence", None):
+            if jsonObject.get("code") and jsonObject.get("msg") and jsonObject.get("data") and jsonObject.get("confidence"):
                 self.updateState.emit("converse", State.STATE_CONVERSE_NEW, {"intent": "@STT", "reply": jsonObject["data"]["text"][0].toString()})
             else:
                 print('STT - Error : Invalid response format : ' + str(buffer))

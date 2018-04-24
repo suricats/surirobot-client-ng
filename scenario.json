@@ -105,18 +105,18 @@
           ]
         },
         {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        },
-        {
           "name": "speak",
           "text": {
             "type": "service",
             "name": "storage",
             "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]
@@ -1361,7 +1361,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [31,32,32,"person-detection-know-out"]
+            "variable": [30,"person-detection-know-out"]
           }
         }
       ]

@@ -9,7 +9,7 @@ load_dotenv(find_dotenv())
 from surirobot.core import app
 import surirobot.services
 import surirobot.core.keyboard
-#import surirobot.core.controllers
+# import surirobot.core.controllers
 import surirobot.core.api
 import surirobot.core.scenario
 app.exec_()

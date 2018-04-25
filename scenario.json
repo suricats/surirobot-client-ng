@@ -119,6 +119,13 @@
           ]
         },
         {
+          "name": "changeSuriface",
+          "image": {
+            "type" : "input",
+            "variable": "happy2"
+          }
+        },
+        {
           "name": "speak",
           "text": {
             "type": "service",
@@ -330,6 +337,13 @@
           "text": {
             "type": "input",
             "variable": "Au revoir."
+          }
+        },
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type" : "input",
+            "variable": "sleeping"
           }
         },
         {

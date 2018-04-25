@@ -11,6 +11,16 @@ import re
 class ScenarioManager(QObject):
     __instance__ = None
 
+    # Signals
+    signal_tts_request = pyqtSignal(str)
+    signal_converse_request_with_id = pyqtSignal(str, int)
+    signal_converse_request = pyqtSignal(str)
+    signal_nlp_request_with_id = pyqtSignal(str, int)
+    signal_nlp_request = pyqtSignal(str)
+    signal_tts_request = pyqtSignal(str)
+    signal_stt_request = pyqtSignal(str)
+    signal_ui_suriface = pyqtSignal(str)
+
     def __new__(cls):
         if cls.__instance__ is None:
             cls.__instance__ = QObject.__new__(cls)
@@ -30,13 +40,23 @@ class ScenarioManager(QObject):
         self.logger = logging.getLogger(__name__)
         self.scopeChanged = False
 
-        # Connect to services
+        # INPUTS : Connect to services
         serv_ar.updateState.connect(self.update)
         api_converse.updateState.connect(self.update)
         api_nlp.updateState.connect(self.update)
         api_stt.updateState.connect(self.update)
         serv_fr.updateState.connect(self.update)
         # serv_emo.updateState.connect(self.update)
+
+        # OUTPUTS : Connect to services
+        self.signal_tts_request.connect(api_tts.sendRequest)
+        self.signal_converse_request.connect(api_converse.sendRequest)
+        self.signal_converse_request_with_id.connect(api_converse.sendRequest)
+        self.signal_nlp_request_with_id.connect(api_nlp.sendRequest)
+        self.signal_nlp_request.connect(api_nlp.sendRequest)
+        self.signal_stt_request.connect(api_stt.sendRequest)
+        self.signal_tts_request.connect(api_tts.sendRequest)
+        self.signal_ui_suriface.connect(ui.setImage)
 
         self.generateTriggers()
         self.generateActions()
@@ -70,9 +90,10 @@ class ScenarioManager(QObject):
         self.actions["displayText"] = self.displayText
         self.actions["speak"] = self.speak
         self.actions["wait"] = self.waitFor
-        self.actions["takePicture"] = self.takePicture
+        self.actions["takePicture"] = self.addPictureWithUser
         self.actions["listen"] = self.listen
         self.actions["store"] = self.store
+        self.actions["changeSuriface"] = self.changeSuriface
 
     def loadFile(self, filepath=None):
         jsonFile = json.load(open(Dir.BASE + filepath))
@@ -321,6 +342,8 @@ class ScenarioManager(QObject):
         if input.get("time"):
             self.freeze = True
             QTimer.singleShot(input["time"], self.resumeManager)
+        else:
+            self.logger.info('Action(wait) : Missing parameters.')
 
     def store(self, input):
         if input.get("list"):
@@ -329,7 +352,7 @@ class ScenarioManager(QObject):
         else:
             self.logger.info('Action(store) : Missing parameters.')
 
-    def takePicture(self, input):
+    def addPictureWithUser(self, input):
         if input.get("firstname") and input.get("lastname"):
             face_loader.take_picture_new_user(input["firstname"], input["lastname"])
         else:
@@ -345,6 +368,7 @@ class ScenarioManager(QObject):
         text = input.get("text")
         if text:
             if type(text) is str:
+                # Manage variables on text
                 text = input.get("text", "")
                 list = re.compile("[\{\}]").split(text)
                 for index, string in enumerate(list):
@@ -364,36 +388,40 @@ class ScenarioManager(QObject):
             self.logger.info('Action(displayText) : Missing parameters.')
 
     def speak(self, input):
-        print('A')
         if input.get("text"):
-            print('B')
-            api_tts.sendRequest(input["text"])
+            self.signal_tts_request.emit(input["text"])
         else:
             self.logger.info('Action(speak) : Missing parameters.')
 
     def converse(self, input):
         if input.get("filepath"):
             if input.get("id"):
-                api_converse.sendRequest(input["filepath"], input["id"])
+                self.signal_converse_request_with_id.emit(input["filepath"], input["id"])
             else:
-                api_converse.sendRequest(input["filepath"])
+                self.signal_converse_request.emit(input["filepath"])
         else:
             self.logger.info('Action(converse) : Missing parameters.')
 
     def converseAnswer(self, input):
         if input.get("intent"):
             if input.get("id"):
-                api_nlp.sendRequest(input["intent"], input["id"])
+                self.signal_nlp_request_with_id.emit(input["intent"], input["id"])
             else:
-                api_nlp.sendRequest(input["intent"])
+                self.signal_nlp_request.sendRequest(input["intent"])
         else:
             self.logger.info('Action(converseAnswer) : Missing parameters.')
 
     def listen(self, input):
         if input.get("filepath"):
-            api_stt.sendRequest(input["filepath"])
+            self.signal_stt_request.emit(input["filepath"])
         else:
             self.logger.info('Action(listen) : Missing parameters.')
+
+    def changeSuriface(self, input):
+        if input.get("image"):
+            self.signal_ui_suriface.emit(input["image"])
+        else:
+            self.logger.info('Action(changeSuriface) : Missing parameters.')
 
     def callScenarios(self, input):
         idTable = input["id"]

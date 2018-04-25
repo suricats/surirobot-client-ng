@@ -6,10 +6,9 @@ from .new import Ui_MainWindow
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    NORMAL_IMAGE = 'res/SuriRobot1.png'
+    IMAGES_DIR = 'res/surifaces'
+    IMAGES_EXT = ".jpg"
     MICRO_IMAGE = 'res/mic.png'
-    BASIC_IMAGE = 'res/illustrations/activities/basic.jpg'
-    LISTENING_IMAGE = 'res/illustrations/activities/listening2.jpg'
 
     SURI_BASIC = 0
     SURI_LISTENING = 1
@@ -19,34 +18,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ui = Ui_MainWindow()
         self.setupUi(self)
 
-        # Image
-        self.image_map = [
-            self.load_image(self.BASIC_IMAGE),
-            self.load_image(self.LISTENING_IMAGE)
-        ]
-
         self.image.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        image = self.image_map[self.SURI_BASIC]
-        self.image.setPixmap(QPixmap.fromImage(image))
-        self.imageWidget.resize(image.height(), image.width())
+        self.setImage("basic")
 
         # Font
-        f = QFont('Roboto', 16, QFont.Bold)
+        f = QFont('Roboto', 12, QFont.Bold)
 
         # Text Up
         self.labelUp.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.labelUp.setFont(f)
-        self.labelUp.setText("N/A")
+        self.labelUp.setText(".")
 
         # Text Middle
         self.labelMiddle.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.labelMiddle.setFont(f)
-        self.labelMiddle.setText("N/A")
+        self.labelMiddle.setText(".")
 
         # Text Down
         self.labelDown.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.labelDown.setFont(f)
-        self.labelDown.setText("N/A")
+        self.labelDown.setText(".")
 
         # Background color
         pal = QPalette()
@@ -62,6 +53,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def load_image(self, image_path):
         image = QImage()
+        print('image_path :' + str(image_path))
         image.load(image_path)
         return image
 
@@ -78,20 +70,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot(str)
     def setTextUp(self, text):
         self.labelUp.setText(text)
+        self.labelUp.adjustSize()
 
     @pyqtSlot(str)
     def setTextMiddle(self, text):
         self.labelMiddle.setText(text)
+        self.labelMiddle.adjustSize()
 
     @pyqtSlot(str)
     def setTextDown(self, text):
         self.labelDown.setText(text)
+        self.labelDown.adjustSize()
 
-    @pyqtSlot(int)
+    @pyqtSlot(str)
     def setImage(self, image_id):
-        image = self.image_map[image_id]
-        self.image.setPixmap(QPixmap.fromImage(image))
-        self.imageWidget.resize(image.height(), image.width())
+        print('setImage')
+        try:
+            image = self.load_image(self.IMAGES_DIR + '/' + image_id + self.IMAGES_EXT)
+            print('image : ' + str(image.height()))
+            self.image.setPixmap(QPixmap.fromImage(image))
+            self.imageWidget.resize(image.height(), image.width())
+        except Exception as e:
+            print('Error while opening image :' + str(e))
 
     # @pyqtSlot()
     # def updateWidgets(self):

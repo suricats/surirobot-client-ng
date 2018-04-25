@@ -1,7 +1,7 @@
 from .base import ApiCaller
 from .filedownloader import FileDownloader
 from PyQt5.QtCore import QByteArray, QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal, QUrl
-from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest,QNetworkAccessManager
+from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest, QNetworkAccessManager
 import uuid
 from surirobot.services import serv_ap
 from surirobot.core.common import State
@@ -49,6 +49,7 @@ class ConverseApiCaller(ApiCaller):
             print('Converse - Error : Invalid response format.')
         reply.deleteLater()
 
+    @pyqtSlot(str, int)
     @pyqtSlot(str)
     def sendRequest(self, filepath, id=1):
         multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)

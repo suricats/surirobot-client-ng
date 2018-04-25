@@ -6,8 +6,4 @@ from .gui.new import Ui_MainWindow
 # Load QT
 app = QApplication(sys.argv)
 ui = MainWindow()
-ui.smartShow()
-test_window = QMainWindow()
-test_ui = Ui_MainWindow()
-test_ui.setupUi(test_window)
-test_window.show()
+ui.show()

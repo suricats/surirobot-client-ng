@@ -186,7 +186,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="verticalLayoutWidget">
+   <widget class="QWidget" name="textLayoutContainer" native="true">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -243,7 +243,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_2">
+   <widget class="QWidget" name="manualLayoutContainer" native="true">
     <property name="geometry">
      <rect>
       <x>30</x>

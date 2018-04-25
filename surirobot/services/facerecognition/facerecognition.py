@@ -53,7 +53,7 @@ class FaceRecognition(QThread):
         }
 
     def __del__(self):
-        self.wait()
+        self.quit()
 
     def run(self):
         face_locations = []

@@ -19,7 +19,7 @@ class VideoCapture(QThread):
 
     def __del__(self):
         cv2.destroyAllWindows()
-        self.wait()
+        self.quit()
 
     def run(self):
         video_capture = cv2.VideoCapture(1)

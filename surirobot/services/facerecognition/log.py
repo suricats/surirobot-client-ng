@@ -19,4 +19,4 @@ class FaceLogger(QObject):
         db.session.commit()
 
     def __del__(self):
-        self.wait()
+        self.quit()

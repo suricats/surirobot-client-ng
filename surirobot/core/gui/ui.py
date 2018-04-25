@@ -39,13 +39,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.labelUp.setText("N/A")
 
         # Text Middle
-        self.labelMiddle = QLabel(self)
         self.labelMiddle.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.labelMiddle.setFont(f)
         self.labelMiddle.setText("N/A")
 
         # Text Down
-        self.labelDown = QLabel(self)
         self.labelDown.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.labelDown.setFont(f)
         self.labelDown.setText("N/A")
@@ -53,10 +51,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Background color
         pal = QPalette()
 
-        # set black background
+        # set white background
         pal.setColor(QPalette.Background, Qt.white)
         self.setAutoFillBackground(True)
         self.setPalette(pal)
+
+        # Others parameters
+        self.activateManualButton.hide()
+        self.manualLayoutContainer.hide()
 
     def load_image(self, image_path):
         image = QImage()

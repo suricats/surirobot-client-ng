@@ -84,8 +84,8 @@ class ConverseApiCaller(ApiCaller):
         self.fileDownloader.start()
 
     def stop(self):
-        self.fileDownloader.stop()
-        ApiCaller.stop(self)
+        self.fileDownloader.currentThread.quit()
+        super().stop()
 
     @pyqtSlot('QByteArray')
     def downloadFinished(self, data):

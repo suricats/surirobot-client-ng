@@ -12,8 +12,8 @@ import surirobot.core.keyboard
 # import surirobot.core.controllers
 import surirobot.core.api
 import surirobot.core.scenario
-app.exec_()
 
+app.exec_()
 # Launch Flask
 # from surirobot.management import app
 # app.run(debug=True)

@@ -1,10 +1,11 @@
 from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette, QColor, QIcon
 
-from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QPushButton, QTextEdit
+from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QMainWindow, QPushButton, QTextEdit
 from PyQt5.QtCore import Qt, QSize, QTimer, pyqtSlot
+from .new import Ui_MainWindow
 
 
-class MainWindow(QDialog):
+class MainWindow(QMainWindow, Ui_MainWindow):
     NORMAL_IMAGE = 'res/SuriRobot1.png'
     MICRO_IMAGE = 'res/mic.png'
     BASIC_IMAGE = 'res/illustrations/activities/basic.jpg'
@@ -14,7 +15,9 @@ class MainWindow(QDialog):
     SURI_LISTENING = 1
 
     def __init__(self):
-        QDialog.__init__(self)
+        super(MainWindow, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.setupUi(self)
 
         # Image
         self.image_map = [
@@ -22,33 +25,30 @@ class MainWindow(QDialog):
             self.load_image(self.LISTENING_IMAGE)
         ]
 
-        self.imgWidget = QWidget(self)
-        self.labelImage = QLabel(self.imgWidget)
-        self.labelImage.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.image.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         image = self.image_map[self.SURI_BASIC]
-        self.labelImage.setPixmap(QPixmap.fromImage(image))
-        self.imgWidget.resize(image.height(), image.width())
+        self.image.setPixmap(QPixmap.fromImage(image))
+        self.imageWidget.resize(image.height(), image.width())
 
         # Font
         f = QFont('Roboto', 16, QFont.Bold)
 
         # Text Up
-        self.labelTextUp = QLabel(self)
-        self.labelTextUp.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.labelTextUp.setFont(f)
-        self.labelTextUp.setText("N/A")
+        self.labelUp.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.labelUp.setFont(f)
+        self.labelUp.setText("N/A")
 
         # Text Middle
-        self.labelTextMiddle = QLabel(self)
-        self.labelTextMiddle.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.labelTextMiddle.setFont(f)
-        self.labelTextMiddle.setText("N/A")
+        self.labelMiddle = QLabel(self)
+        self.labelMiddle.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.labelMiddle.setFont(f)
+        self.labelMiddle.setText("N/A")
 
         # Text Down
-        self.labelTextDown = QLabel(self)
-        self.labelTextDown.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.labelTextDown.setFont(f)
-        self.labelTextDown.setText("N/A")
+        self.labelDown = QLabel(self)
+        self.labelDown.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.labelDown.setFont(f)
+        self.labelDown.setText("N/A")
 
         # Background color
         pal = QPalette()
@@ -63,93 +63,69 @@ class MainWindow(QDialog):
         image.load(image_path)
         return image
 
-    def smartShow(self):
-        self.showFullScreen()
-        self.updateWidgets()
-        # Timer display fixer
-        displayFixer = QTimer(self)
-        displayFixer.setInterval(1000)
-        displayFixer.setSingleShot(True)
-        displayFixer.timeout.connect(self.updateWidgets)
-        displayFixer.start()
-
-    def setTextUpFont(self, f):
-        self.labelTextUp.setFont(f)
-        self.updateWidgets()
+    # def smartShow(self):
+    #     self.showFullScreen()
+    #     self.updateWidgets()
+    #     # Timer display fixer
+    #     displayFixer = QTimer(self)
+    #     displayFixer.setInterval(1000)
+    #     displayFixer.setSingleShot(True)
+    #     displayFixer.timeout.connect(self.updateWidgets)
+    #     displayFixer.start()
 
     @pyqtSlot(str)
     def setTextUp(self, text):
-        self.labelTextUp.setText(text)
-        self.updateWidgets()
+        self.labelUp.setText(text)
 
     @pyqtSlot(str)
     def setTextMiddle(self, text):
-        self.labelTextMiddle.setText(text)
-        self.updateWidgets()
+        self.labelMiddle.setText(text)
 
     @pyqtSlot(str)
     def setTextDown(self, text):
-        self.labelTextDown.setText(text)
-        self.updateWidgets()
+        self.labelDown.setText(text)
 
     @pyqtSlot(int)
     def setImage(self, image_id):
         image = self.image_map[image_id]
-        self.labelImage.setPixmap(QPixmap.fromImage(image))
-        self.imgWidget.resize(image.height(), image.width())
-        self.updateWidgets()
+        self.image.setPixmap(QPixmap.fromImage(image))
+        self.imageWidget.resize(image.height(), image.width())
 
-    def setEditText(self):
-        self.editText = QTextEdit()
-        self.editText.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.editText.show()
-        self.updateWidgets()
-
-    def getEditText(self):
-        return self.editText.toPlainText()
-
-    def sendEditText(self):
-        ###emit sendEditTextSignal(self.editText.toPlainText())
-        pass
-
-    @pyqtSlot()
-    def updateWidgets(self):
-        self.labelTextUp.adjustSize()
-        self.labelTextMiddle.adjustSize()
-        self.labelTextDown.adjustSize()
-
-        self.labelTextUp.move(
-            self.width() / 2 - self.labelTextUp.width() / 2,
-            self.height() / 3 - self.labelTextUp.height() / 2 + self.imgWidget.height() / 2
-        )
-        self.labelTextMiddle.move(
-            self.width() / 2 - self.labelTextUp.width() / 2,
-            self.height() / 3 - self.labelTextUp.height() / 2 + self.imgWidget.height() / 2 + self.labelTextUp.height()
-        )
-        self.labelTextDown.move(
-            self.width() / 2 - self.labelTextUp.width() / 2,
-            self.height() / 3 - self.labelTextUp.height() / 2 + self.imgWidget.height() / 2 + self.labelTextUp.height() + self.labelTextMiddle.height()
-        )
-
-        self.imgWidget.adjustSize()
-        self.imgWidget.move(
-            self.width() / 2 - self.imgWidget.width() / 2,
-            self.height() / 3 - self.imgWidget.height() / 2
-        )
+    # @pyqtSlot()
+    # def updateWidgets(self):
+    #     self.labelTextUp.adjustSize()
+    #     self.labelTextMiddle.adjustSize()
+    #     self.labelTextDown.adjustSize()
+    #
+    #     self.labelTextUp.move(
+    #         self.width() / 2 - self.labelTextUp.width() / 2,
+    #         self.height() / 3 - self.labelTextUp.height() / 2 + self.imgWidget.height() / 2
+    #     )
+    #     self.labelTextMiddle.move(
+    #         self.width() / 2 - self.labelTextUp.width() / 2,
+    #         self.height() / 3 - self.labelTextUp.height() / 2 + self.imgWidget.height() / 2 + self.labelTextUp.height()
+    #     )
+    #     self.labelTextDown.move(
+    #         self.width() / 2 - self.labelTextUp.width() / 2,
+    #         self.height() / 3 - self.labelTextUp.height() / 2 + self.imgWidget.height() / 2 + self.labelTextUp.height() + self.labelTextMiddle.height()
+    #     )
+    #
+    #     self.imgWidget.adjustSize()
+    #     self.imgWidget.move(
+    #         self.width() / 2 - self.imgWidget.width() / 2,
+    #         self.height() / 3 - self.imgWidget.height() / 2
+    #     )
 
     # SIGNALS
 
     def setTextUpSignal(self, text):
         self.setTextUp(text)
-        self.updateWidgets()
 
     def setTextMiddleSignal(self, text):
         self.setTextMiddle(text)
-        self.updateWidgets()
 
     def setTextDownSignal(self, text):
         self.setTextDown(text)
-        self.updateWidgets()
 
     # Slots
 

@@ -2,12 +2,10 @@ from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal, QTimer
 from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader, serv_emo
 from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core import ui
-from surirobot.services.facerecognition.counter import Counter
 from surirobot.core.common import State, Dir
 import logging
 import json
 import re
-import time
 
 
 class ScenarioManager(QObject):

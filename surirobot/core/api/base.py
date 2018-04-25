@@ -17,13 +17,16 @@ class ApiCaller(QObject):
         self.currentThread = QThread()
         self.moveToThread(self.currentThread)
 
+    def __del__(self):
+        self.stop()
+
     @pyqtSlot('QNetworkReply*')
     @abstractmethod
     def receiveReply(self, reply):
         pass
 
     def start(self):
-        pass
+        self.currentThread.start()
 
     def stop(self):
-        pass
+        self.currentThread.quit()

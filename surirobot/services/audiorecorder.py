@@ -30,7 +30,7 @@ class AudioRecorder(QThread):
         self.update_suri_image.connect(ui.setImage)
 
     def __del__(self):
-        self.wait()
+        self.quit()
 
     def run(self):
         while(True):

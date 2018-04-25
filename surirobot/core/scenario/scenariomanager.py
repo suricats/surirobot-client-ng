@@ -364,7 +364,9 @@ class ScenarioManager(QObject):
             self.logger.info('Action(displayText) : Missing parameters.')
 
     def speak(self, input):
+        print('A')
         if input.get("text"):
+            print('B')
             api_tts.sendRequest(input["text"])
         else:
             self.logger.info('Action(speak) : Missing parameters.')

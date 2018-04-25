@@ -23,7 +23,7 @@ class FaceLoader(QThread):
         self.logger = logging.getLogger(__name__)
 
     def __del__(self):
-        self.wait()
+        self.quit()
 
     def run(self):
         self.load_from_db()

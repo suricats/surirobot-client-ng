@@ -13,7 +13,7 @@ class AudioPlayer(QThread):
 
     def __del__(self):
         self.stop()
-        self.wait()
+        self.quit()
 
     @pyqtSlot()
     def stop(self):

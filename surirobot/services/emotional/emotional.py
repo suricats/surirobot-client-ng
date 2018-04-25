@@ -32,7 +32,7 @@ class EmotionalRecognition(QThread):
         self.isBusy = False
 
     def __del__(self):
-        self.wait()
+        self.quit()
 
     def run(self):
         time.sleep(5)

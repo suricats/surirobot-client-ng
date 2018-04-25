@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1079</width>
-    <height>684</height>
+    <width>1070</width>
+    <height>698</height>
    </rect>
   </property>
   <property name="palette">
@@ -186,14 +186,17 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="textLayoutContainer" native="true">
+   <widget class="QFrame" name="textLayoutContainer">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>280</y>
-      <width>331</width>
+      <x>400</x>
+      <y>370</y>
+      <width>651</width>
       <height>251</height>
      </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
     </property>
     <layout class="QVBoxLayout" name="textLayout">
      <property name="leftMargin">
@@ -216,6 +219,9 @@
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -225,6 +231,9 @@
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -236,6 +245,9 @@
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
        <property name="margin">
         <number>0</number>
        </property>
@@ -246,8 +258,8 @@
    <widget class="QWidget" name="manualLayoutContainer" native="true">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>350</y>
+      <x>50</x>
+      <y>380</y>
       <width>301</width>
       <height>251</height>
      </rect>
@@ -260,6 +272,9 @@
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -301,8 +316,8 @@
    <widget class="QPushButton" name="activateManualButton">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>550</y>
+      <x>420</x>
+      <y>640</y>
       <width>299</width>
       <height>27</height>
      </rect>
@@ -314,10 +329,10 @@
    <widget class="QWidget" name="imageWidget" native="true">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>10</y>
-      <width>331</width>
-      <height>261</height>
+      <x>360</x>
+      <y>20</y>
+      <width>411</width>
+      <height>341</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">

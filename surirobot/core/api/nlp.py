@@ -38,6 +38,7 @@ class NlpApiCaller(ApiCaller):
         reply.deleteLater()
 
     @pyqtSlot(str, int)
+    @pyqtSlot(str)
     def sendRequest(self, text, id=None):
         if (text != ""):
             # Create the json request

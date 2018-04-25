@@ -26,6 +26,13 @@
           }
         },
         {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "computing2"
+          }
+        },
+        {
           "name": "callScenarios",
           "id": {
             "type": "input",
@@ -51,6 +58,13 @@
             "type": "service",
             "name": "converse",
             "variable": "audiopath"
+          }
+        },
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic2"
           }
         },
         {
@@ -1012,7 +1026,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [24,25,26,"person-detection-know-out"]
+            "variable": [23,"person-detection-know-out"]
           }
         }
       ]

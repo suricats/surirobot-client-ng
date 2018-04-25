@@ -22,7 +22,7 @@ class KeyPressEventHandler(QObject):
         self.yoloTimer.setSingleShot(True)
 
         self.expirationTimer.timeout.connect(serv_ar.stop_record)
-        #serv_ar.started_record.connect(self.manageRecord)
+        # serv_ar.started_record.connect(self.manageRecord)
         self.startRecord.connect(serv_ar.start_record)
 
         # self.yoloTimer.timeout.connect(face_loader.take_picture_new_user)

@@ -12,7 +12,7 @@ class AudioRecorder(QThread):
     started_record = pyqtSignal()
     end_record = pyqtSignal(str)
 
-    update_suri_image = pyqtSignal(int)
+    update_suri_image = pyqtSignal(str)
     updateState = pyqtSignal(str, int, dict)
 
     def __init__(self, samplerate=44100, channels=1):
@@ -30,6 +30,7 @@ class AudioRecorder(QThread):
         self.update_suri_image.connect(ui.setImage)
 
     def __del__(self):
+        self.wait()
         self.quit()
 
     def run(self):
@@ -56,12 +57,12 @@ class AudioRecorder(QThread):
     @pyqtSlot()
     def start_record(self):
         self.list.put({'filename': 'tmp/{}.wav'.format(uuid.uuid4())})
-        self.update_suri_image.emit(ui.SURI_LISTENING)
+        self.update_suri_image.emit("listening2")
 
     @pyqtSlot()
     def stop_record(self):
         self.recording = False
-        self.update_suri_image.emit(ui.SURI_BASIC)
+        self.update_suri_image.emit("basic")
 
     def is_recording(self):
         return self.recording

@@ -46,6 +46,7 @@ class ScenarioManager(QObject):
         api_nlp.updateState.connect(self.update)
         api_stt.updateState.connect(self.update)
         serv_fr.updateState.connect(self.update)
+        ui.updateState.connect(self.update)
         # serv_emo.updateState.connect(self.update)
 
         # OUTPUTS : Connect to services
@@ -68,6 +69,7 @@ class ScenarioManager(QObject):
         self.triggers["face"] = {}
         self.triggers["emotion"] = {}
         self.triggers["storage"] = {}
+        self.triggers["keyboard"] = {}
 
         self.triggers["sound"]["new"] = self.newSoundTrigger
         self.triggers["sound"]["available"] = self.availableSoundTrigger
@@ -81,6 +83,8 @@ class ScenarioManager(QObject):
         self.triggers["emotion"]["new"] = self.newEmotionTrigger
         self.triggers["emotion"]["no"] = self.noEmotionTrigger
 
+        self.triggers["keyboard"]["new"] = self.newKeyboardInput
+
     def generateActions(self):
         self.actions["playSound"] = self.playSound
         self.actions["converse"] = self.converse
@@ -93,6 +97,7 @@ class ScenarioManager(QObject):
         self.actions["listen"] = self.listen
         self.actions["store"] = self.store
         self.actions["changeSuriface"] = self.changeSuriface
+        self.actions["activateKeyboardInput"] = self.activateKeyboardInput
 
     def loadFile(self, filepath=None):
         jsonFile = json.load(open(Dir.BASE + filepath))
@@ -197,6 +202,10 @@ class ScenarioManager(QObject):
             if self.services.get("converse"):
                 if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
                     self.services["converse"]["state"] = State.STATE_CONVERSE_AVAILABLE
+            # KEYBOARD
+            if self.services.get("keyboard"):
+                if trigger["service"] == "keyboard" and trigger["name"] == "new" and self.services["keyboard"]["state"] == State.STATE_KEYBOARD_NEW:
+                    self.services["keyboard"]["state"] = State.STATE_KEYBOARD_AVAILABLE
             # FACE
             if self.services.get("face"):
                 if trigger["service"] == "face" and trigger["name"] == "know" and self.services["face"]["state"] == State.STATE_FACE_KNOWN:
@@ -296,6 +305,17 @@ class ScenarioManager(QObject):
                 else:
                     return True
         return False
+
+    def newKeyboardInput(self, input):
+        newCondition = False
+        if self.services.get("keyboard"):
+            # Check new/available condition
+            newParameter = input["parameters"].get("new")
+            if newParameter is None or newParameter:
+                    newCondition = True
+            elif self.services["keyboard"]["state"] == State.STATE_KEYBOARD_NEW or self.services["keyboard"]["state"] == State.STATE_KEYBOARD_AVAILABLE:
+                newCondition = True
+        return newCondition
 
     def noEmotionTrigger(self, input):
         if self.services.get("emotion"):
@@ -423,6 +443,18 @@ class ScenarioManager(QObject):
             self.signal_ui_suriface.emit(input["image"])
         else:
             self.logger.info('Action(changeSuriface) : Missing parameters.')
+
+    def activateKeyboardInput(self, input):
+        if not (input.get("activate") is None):
+            if input["activate"]:
+                ui.activateManualButton.show()
+                if input.get("text"):
+                    ui.manualLabel.setText(input["text"])
+            else:
+                ui.activateManualButton.hide()
+                ui.manualLayoutContainer.hide()
+        else:
+            self.logger.info('Action(activateKeyboardInput) : Missing parameters.')
 
     def callScenarios(self, input):
         idTable = input["id"]

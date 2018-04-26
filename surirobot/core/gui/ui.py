@@ -3,6 +3,7 @@ from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette, QColor, QIcon
 from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QMainWindow, QPushButton, QTextEdit
 from PyQt5.QtCore import Qt, QSize, QTimer, pyqtSlot, pyqtSignal
 from .new import Ui_MainWindow
+from surirobot.core.common import State
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -13,6 +14,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     SURI_BASIC = 0
     SURI_LISTENING = 1
 
+    updateState = pyqtSignal(str, int, dict)
+
     def __init__(self):
         super(MainWindow, self).__init__()
 
@@ -21,7 +24,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.image.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.setImage("basic")
-
+        # Signals
+        self.activateManualButton.clicked.connect(self.setManualInput)
+        self.validateButton.clicked.connect(self.onClickValidateManualInput)
         # Font
         f = QFont('Roboto', 12, QFont.Bold)
 
@@ -94,6 +99,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot(QImage)
     def setCamera(self, qImg):
         self.camera.setPixmap(QPixmap.fromImage(qImg).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
+
+    @pyqtSlot()
+    def setManualInput(self):
+            self.manualLayoutContainer.show()
+
+    @pyqtSlot()
+    def onClickValidateManualInput(self):
+        self.updateState.emit("keyboard", State.STATE_KEYBOARD_NEW, {"text": self.manualEdit.displayText()})
     # @pyqtSlot()
     # def updateWidgets(self):
     #     self.labelTextUp.adjustSize()
@@ -120,15 +133,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #     )
 
     # SIGNALS
-
-    def setTextUpSignal(self, text):
-        self.setTextUp(text)
-
-    def setTextMiddleSignal(self, text):
-        self.setTextMiddle(text)
-
-    def setTextDownSignal(self, text):
-        self.setTextDown(text)
+    #
+    # def setTextUpSignal(self, text):
+    #     self.setTextUp(text)
+    #
+    # def setTextMiddleSignal(self, text):
+    #     self.setTextMiddle(text)
+    #
+    # def setTextDownSignal(self, text):
+    #     self.setTextDown(text)
 
     # Slots
 

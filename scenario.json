@@ -96,6 +96,13 @@
       ],
       "actions": [
         {
+          "name": "activateKeyboardInput",
+          "activate": {
+            "type": "input",
+            "variable": false
+          }
+        },
+        {
           "name": "displayText",
           "text": {
             "type": "input",
@@ -332,6 +339,13 @@
         }
       ],
       "actions": [
+        {
+          "name": "activateKeyboardInput",
+          "activate": {
+            "type": "input",
+            "variable": false
+          }
+        },
         {
           "name": "displayText",
           "text": {
@@ -975,7 +989,7 @@
     },
     {
       "id": 25,
-      "description": "Confirm name - no",
+      "description": "Confirm lastname - no",
       "triggers": [
         {
           "service": "converse",
@@ -986,6 +1000,17 @@
         }
       ],
       "actions": [
+        {
+          "name": "activateKeyboardInput",
+          "activate": {
+            "type": "input",
+            "variable": true
+          },
+          "text": {
+            "type": "input",
+            "variable": "Votre nom"
+          }
+        },
         {
           "name": "displayText",
           "text": {
@@ -1005,7 +1030,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [20,"person-detection-know-out"]
+            "variable": [20,34,"person-detection-know-out"]
           }
         }
       ]
@@ -1056,6 +1081,13 @@
         }
       ],
       "actions": [
+        {
+          "name": "activateKeyboardInput",
+          "activate": {
+            "type": "input",
+            "variable": false
+          }
+        },
         {
           "name": "listen",
           "filepath": {
@@ -1194,7 +1226,7 @@
     },
     {
       "id": 31,
-      "description": "Confirm firstname - yes",
+      "description": "Confirm firstname - yes - TAKE PICTURE",
       "triggers": [
         {
           "service": "converse",
@@ -1205,6 +1237,13 @@
         }
       ],
       "actions": [
+        {
+          "name": "activateKeyboardInput",
+          "activate": {
+            "type": "input",
+            "variable": false
+          }
+        },
         {
           "name": "displayText",
           "text": {
@@ -1336,6 +1375,17 @@
       ],
       "actions": [
         {
+          "name": "activateKeyboardInput",
+          "activate": {
+            "type": "input",
+            "variable": true
+          },
+          "text": {
+            "type": "input",
+            "variable": "Votre prénom"
+          }
+        },
+        {
           "name": "displayText",
           "text": {
             "type": "input",
@@ -1354,7 +1404,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [27,"person-detection-know-out"]
+            "variable": [27,35,"person-detection-know-out"]
           }
         }
       ]
@@ -1390,6 +1440,203 @@
           "id": {
             "type": "input",
             "variable": [30,"person-detection-know-out"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "description": "Wait for keyboard input - lastname",
+      "triggers": [
+        {
+          "service": "keyboard",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions" : [
+        {
+          "name": "activateKeyboardInput",
+          "activate": {
+            "type": "input",
+            "variable": false
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Parfait ! Quel est ton prénom ?"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "store",
+          "list": {
+            "lastname" : {
+              "type" : "service",
+              "name": "keyboard",
+              "variable": "text"
+            }
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [27,"person-detection-know-out"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "description": "Wait for keyboard input - firstname - TAKE PICTURE",
+      "triggers": [
+        {
+          "service": "keyboard",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions" : [
+        {
+          "name": "store",
+          "list": {
+            "firstname" : {
+              "type" : "service",
+              "name": "keyboard",
+              "variable": "text"
+            }
+          }
+        },
+        {
+          "name": "activateKeyboardInput",
+          "activate": {
+            "type": "input",
+            "variable": false
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Très bien {@firstname} {@lastname}. Je vais prendre une photo maintenant ! Prépare toi !"
+          },
+          "variables": [
+            {
+              "firstname": {
+                "type": "service",
+                "name": "storage",
+                "variable": "firstname"
+              }
+            },
+            {
+              "lastname": {
+                "type": "service",
+                "name": "storage",
+                "variable": "lastname"
+              }
+            }
+          ]
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 5000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "3"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "2"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "1"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Cheese !"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "takePicture",
+          "firstname": {
+            "type": "service",
+            "name": "storage",
+            "variable": "firstname"
+          },
+          "lastname": {
+            "type": "service",
+            "name": "storage",
+            "variable": "lastname"
+          }
+
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]

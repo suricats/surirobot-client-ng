@@ -8,6 +8,7 @@ from surirobot.core import ui
 
 from surirobot.core.common import State
 
+
 class AudioRecorder(QThread):
     started_record = pyqtSignal()
     end_record = pyqtSignal(str)

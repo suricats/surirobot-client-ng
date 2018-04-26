@@ -189,14 +189,17 @@
    <widget class="QFrame" name="textLayoutContainer">
     <property name="geometry">
      <rect>
-      <x>400</x>
-      <y>370</y>
-      <width>651</width>
-      <height>251</height>
+      <x>310</x>
+      <y>450</y>
+      <width>471</width>
+      <height>121</height>
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::Box</enum>
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
     <layout class="QVBoxLayout" name="textLayout">
      <property name="leftMargin">
@@ -212,19 +215,6 @@
       <number>8</number>
      </property>
      <item>
-      <widget class="QLabel" name="labelUp">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QLabel" name="labelMiddle">
        <property name="text">
         <string>TextLabel</string>
@@ -237,29 +227,13 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QLabel" name="labelDown">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-       <property name="margin">
-        <number>0</number>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
    <widget class="QWidget" name="manualLayoutContainer" native="true">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>380</y>
+      <x>0</x>
+      <y>440</y>
       <width>301</width>
       <height>251</height>
      </rect>
@@ -316,10 +290,10 @@
    <widget class="QPushButton" name="activateManualButton">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>640</y>
-      <width>299</width>
-      <height>27</height>
+      <x>400</x>
+      <y>600</y>
+      <width>331</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -329,8 +303,8 @@
    <widget class="QWidget" name="imageWidget" native="true">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>20</y>
+      <x>340</x>
+      <y>60</y>
       <width>411</width>
       <height>341</height>
      </rect>
@@ -339,7 +313,82 @@
      <item>
       <widget class="QLabel" name="image">
        <property name="frameShape">
-        <enum>QFrame::Box</enum>
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>30</y>
+      <width>231</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="labelUp">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelDown">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QFrame" name="cameraFrame">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>191</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="midLineWidth">
+     <number>2</number>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="camera">
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
        </property>
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>

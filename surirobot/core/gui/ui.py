@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette, QColor, QIcon
 
 from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QMainWindow, QPushButton, QTextEdit
-from PyQt5.QtCore import Qt, QSize, QTimer, pyqtSlot
+from PyQt5.QtCore import Qt, QSize, QTimer, pyqtSlot, pyqtSignal
 from .new import Ui_MainWindow
 
 
@@ -15,6 +15,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
+
         self.ui = Ui_MainWindow()
         self.setupUi(self)
 
@@ -84,15 +85,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot(str)
     def setImage(self, image_id):
-        print('setImage')
         try:
             image = self.load_image(self.IMAGES_DIR + '/' + image_id + self.IMAGES_EXT)
-            print('image : ' + str(image.height()))
-            self.image.setPixmap(QPixmap.fromImage(image))
-            self.imageWidget.resize(image.height(), image.width())
+            self.image.setPixmap(QPixmap.fromImage(image).scaled(self.imageWidget.width(), self.imageWidget.height(), Qt.KeepAspectRatio))
         except Exception as e:
             print('Error while opening image :' + str(e))
 
+    @pyqtSlot(QImage)
+    def setCamera(self, qImg):
+        self.camera.setPixmap(QPixmap.fromImage(qImg).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
     # @pyqtSlot()
     # def updateWidgets(self):
     #     self.labelTextUp.adjustSize()

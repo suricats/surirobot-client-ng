@@ -41,7 +41,7 @@ class FaceRecognition(QThread):
         self.counter_nobody.timeout.connect(self.timer_nobody_timeout)
         self.counter_unknown = Counter(self.NB_IMG_PER_SECOND * 5)
         self.counter_unknown.timeout.connect(self.timer_unknown_timeout)
-        self.counter_known = Counter(self.NB_IMG_PER_SECOND * 2)
+        self.counter_known = Counter(self.NB_IMG_PER_SECOND * 1)
         self.counter_known.timeout.connect(self.timer_known_timeout)
 
         self.state_id = self.NOBODY
@@ -74,7 +74,7 @@ class FaceRecognition(QThread):
             # num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)
             face_encodings = face_recognition.face_encodings(small_frame, face_locations, 2)
             if face_encodings:
-                if len(face_encodings > 1):
+                if len(face_encodings) > 1:
                     self.emit_state_changed(State.STATE_FACE_MULTIPLES, self.UNKNOWN)
                 else:
                     # See if the face is a match for the known face(s)
@@ -100,10 +100,12 @@ class FaceRecognition(QThread):
             self.pretendent_id = self.NOBODY
             self.counter_unknown.stop()
             self.counter_known.stop()
+            self.emit_state_changed(State.STATE_FACE_NOT_WORKING, self.UNKNOWN)
 
             if not self.counter_nobody.is_active():
                 if self.state_id != self.NOBODY:
                     self.counter_nobody.start()
+                    self.emit_state_changed(State.STATE_FACE_NOT_WORKING, self.UNKNOWN)
 
         elif id == self.UNKNOWN:
             self.pretendent_id = self.NOBODY
@@ -113,6 +115,7 @@ class FaceRecognition(QThread):
             if not self.counter_unknown.is_active():
                 if self.state_id != self.UNKNOWN:
                     self.counter_unknown.start()
+                    self.emit_state_changed(State.STATE_FACE_WORKING, self.UNKNOWN)
 
         else:
             self.counter_nobody.stop()
@@ -124,6 +127,7 @@ class FaceRecognition(QThread):
                 if id != self.pretendent_id:
                     self.pretendent_id = id
                     self.counter_known.start()
+                    self.emit_state_changed(State.STATE_FACE_WORKING, self.UNKNOWN)
 
     @pyqtSlot()
     def timer_nobody_timeout(self):

@@ -80,6 +80,7 @@ class ScenarioManager(QObject):
         self.triggers["face"]["know"] = self.knowPersonTrigger
         self.triggers["face"]["nobody"] = self.nobodyTrigger
         self.triggers["face"]["several"] = self.severalPersonTrigger
+        self.triggers["face"]["working"] = self.faceWorking
 
         self.triggers["emotion"]["new"] = self.newEmotionTrigger
         self.triggers["emotion"]["no"] = self.noEmotionTrigger
@@ -234,6 +235,14 @@ class ScenarioManager(QObject):
             self.checkScope()
 
     # Triggers
+    def faceWorking(self, input):
+        if not (input["parameters"].get("value") is None):
+            if self.services.get("face"):
+                if self.services["face"]["state"] == State.STATE_FACE_WORKING:
+                    return input["parameters"]["value"]
+                else:
+                    return not input["parameters"]["value"]
+        return False
 
     def newPersonTrigger(self, input):
         # TODO: add sepration new/available with input["parameters"]["new"]
@@ -433,7 +442,7 @@ class ScenarioManager(QObject):
             if input.get("id"):
                 self.signal_nlp_request_with_id.emit(input["intent"], input["id"])
             else:
-                self.signal_nlp_request.sendRequest(input["intent"])
+                self.signal_nlp_request.emit(input["intent"])
         else:
             self.logger.info('Action(converseAnswer) : Missing parameters.')
 

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, QDir, pyqtSlot, pyqtSignal, QTimer
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QTimer
 from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader, serv_emo
 from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core import ui
@@ -47,7 +47,7 @@ class ScenarioManager(QObject):
         api_stt.updateState.connect(self.update)
         serv_fr.updateState.connect(self.update)
         ui.updateState.connect(self.update)
-        # serv_emo.updateState.connect(self.update)
+        serv_emo.updateState.connect(self.update)
 
         # OUTPUTS : Connect to services
         self.signal_converse_request.connect(api_converse.sendRequest)
@@ -79,6 +79,7 @@ class ScenarioManager(QObject):
         self.triggers["face"]["unknow"] = self.newPersonTrigger
         self.triggers["face"]["know"] = self.knowPersonTrigger
         self.triggers["face"]["nobody"] = self.nobodyTrigger
+        self.triggers["face"]["several"] = self.severalPersonTrigger
 
         self.triggers["emotion"]["new"] = self.newEmotionTrigger
         self.triggers["emotion"]["no"] = self.noEmotionTrigger
@@ -151,7 +152,7 @@ class ScenarioManager(QObject):
                 elif value.get("type") == "service" and self.services.get(value.get("name")):
                     if self.services[value["name"]].get(value["variable"]):
                         input[name] = self.services[value["name"]][value["variable"]]
-                elif type(value) is dict and not value.get("variable"):
+                elif type(value) is dict and value.get("variable") is None:
                     input[name] = value
                 else:
                     input[name] = value["variable"]
@@ -238,6 +239,12 @@ class ScenarioManager(QObject):
         # TODO: add sepration new/available with input["parameters"]["new"]
         if self.services.get("face"):
             if self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
+                return True
+        return False
+
+    def severalPersonTrigger(self, input):
+        if self.services.get("face"):
+            if self.services["face"]["state"] == State.STATE_FACE_MULTIPLES:
                 return True
         return False
 
@@ -407,14 +414,12 @@ class ScenarioManager(QObject):
             self.logger.info('Action(displayText) : Missing parameters.')
 
     def speak(self, input):
-        print('speak')
         if input.get("text"):
             self.signal_tts_request.emit(input["text"])
         else:
             self.logger.info('Action(speak) : Missing parameters.')
 
     def converse(self, input):
-        print('speak')
         if input.get("filepath"):
             if input.get("id"):
                 self.signal_converse_request_with_id.emit(input["filepath"], input["id"])

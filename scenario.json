@@ -1,10 +1,11 @@
 {
-  "initial": ["converse","emotion-detection","special-persons",3,4,999],
-  "groups" : {"person-detection" : [3,4,9,999],
+  "initial": ["converse","emotion-detection","special-persons","face-working",3,4,40],
+  "groups" : {"person-detection" : [3,4,9,40],
     "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
     "converse" : [17,2,1],
-    "person-detection-know-out" : [3,9]},
+    "person-detection-know-out" : [3,9],
+    "face-working" : [41,42]},
   "scenarios": [
     {
       "id": 1,
@@ -79,7 +80,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+            "variable": ["face-working","converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]
@@ -323,7 +324,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["special-persons",5,9,999,3]
+            "variable": ["special-persons",5,9,40,3]
           }
         }
       ]
@@ -373,13 +374,13 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["converse","special-persons",3,4,999,"emotion-detection"]
+            "variable": ["converse","special-persons",3,4,40,"emotion-detection"]
           }
         }
       ]
     },
     {
-      "id": 999,
+      "id": 40,
       "description": "Too many known people",
       "triggers": [
         {
@@ -424,6 +425,64 @@
           "id": {
             "type": "input",
             "variable": ["converse","special-persons",3,4,9,"emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "description": "Face is working",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "working",
+          "parameters": {
+            "value" : true
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type" : "input",
+            "variable": "listening"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Ne bougez pas... je vois quelque chose."
+          }
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "description": "Face is not working",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "working",
+          "parameters": {
+            "value" : false
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type" : "input",
+            "variable": "basic"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "."
           }
         }
       ]

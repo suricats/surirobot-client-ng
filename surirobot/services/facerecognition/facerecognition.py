@@ -37,9 +37,9 @@ class FaceRecognition(QThread):
         self.faces = []
         self.linker = []
 
-        self.counter_nobody = Counter(self.NB_IMG_PER_SECOND * 5)
+        self.counter_nobody = Counter(self.NB_IMG_PER_SECOND * 3)
         self.counter_nobody.timeout.connect(self.timer_nobody_timeout)
-        self.counter_unknown = Counter(self.NB_IMG_PER_SECOND * 5)
+        self.counter_unknown = Counter(self.NB_IMG_PER_SECOND * 4)
         self.counter_unknown.timeout.connect(self.timer_unknown_timeout)
         self.counter_known = Counter(self.NB_IMG_PER_SECOND * 1)
         self.counter_known.timeout.connect(self.timer_known_timeout)

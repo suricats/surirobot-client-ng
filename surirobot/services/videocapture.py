@@ -8,7 +8,7 @@ from surirobot.core import ui
 
 
 class VideoCapture(QThread):
-    NB_IMG_PER_SECOND = 4
+    NB_IMG_PER_SECOND = 20
     signal_change_camera = pyqtSignal(QImage)
 
     def __init__(self):

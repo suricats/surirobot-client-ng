@@ -73,22 +73,21 @@ class FaceRecognition(QThread):
             face_locations = face_recognition.face_locations(small_frame)
             # num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)
             face_encodings = face_recognition.face_encodings(small_frame, face_locations, 2)
-
             if face_encodings:
-                # See if the face is a match for the known face(s)
-                match = face_recognition.compare_faces(self.faces, face_encodings[0], tolerance)
-                id = self.UNKNOWN
-                match_tuples = list(enumerate(match))
-                match_tuples = list(filter(lambda t: t[1], match_tuples))
-                print('match : ' + str(match))
-                if len(match_tuples) == 0:
-                    self.addToBuffer(self.UNKNOWN)
-                elif len(match_tuples) == 1:
-                    id = self.linker[match_tuples[0][0]]
-                    self.addToBuffer(id)
-                elif len(match_tuples) > 1:
-                    print('POP')
+                if len(face_encodings > 1):
                     self.emit_state_changed(State.STATE_FACE_MULTIPLES, self.UNKNOWN)
+                else:
+                    # See if the face is a match for the known face(s)
+                    match = face_recognition.compare_faces(self.faces, face_encodings[0], tolerance)
+                    id = self.UNKNOWN
+                    match_tuples = list(enumerate(match))
+                    match_tuples = list(filter(lambda t: t[1], match_tuples))
+                    # print('match : ' + str(match))
+                    if len(match_tuples) == 0:
+                        self.addToBuffer(self.UNKNOWN)
+                    elif len(match_tuples) == 1:
+                        id = self.linker[match_tuples[0][0]]
+                        self.addToBuffer(id)
             else:
                 self.addToBuffer(self.NOBODY)
 

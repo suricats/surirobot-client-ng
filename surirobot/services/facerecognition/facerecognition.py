@@ -78,11 +78,17 @@ class FaceRecognition(QThread):
                 # See if the face is a match for the known face(s)
                 match = face_recognition.compare_faces(self.faces, face_encodings[0], tolerance)
                 id = self.UNKNOWN
-                for key, value in enumerate(match):
-                    if value:
-                        id = self.linker[key]
-                        break
-                self.addToBuffer(id)
+                match_tuples = list(enumerate(match))
+                match_tuples = list(filter(lambda t: t[1], match_tuples))
+                print('match : ' + str(match))
+                if len(match_tuples) == 0:
+                    self.addToBuffer(self.UNKNOWN)
+                elif len(match_tuples) == 1:
+                    id = self.linker[match_tuples[0][0]]
+                    self.addToBuffer(id)
+                elif len(match_tuples) > 1:
+                    print('POP')
+                    self.emit_state_changed(State.STATE_FACE_MULTIPLES, self.UNKNOWN)
             else:
                 self.addToBuffer(self.NOBODY)
 
@@ -134,7 +140,7 @@ class FaceRecognition(QThread):
 
     @pyqtSlot()
     def timer_known_timeout(self):
-        if (not self.pretendent_id == self.NOBODY) or (not self.pretendent_id == self.UNKNOWN):
+        if (not self.pretendent_id == self.NOBODY) and (not self.pretendent_id == self.UNKNOWN):
             print('emit known ' + str(self.pretendent_id))
             self.state_id = self.pretendent_id
             self.pretendent_id = self.NOBODY
@@ -171,7 +177,7 @@ class FaceRecognition(QThread):
             }
 
         img = face_recognition.load_image_file(picture.path)
-        #self.logger.info("Face encoding .....")
+        # self.logger.info("Face encoding .....")
         face = face_recognition.face_encodings(img, None, 10)[0]
 
         self.faces.append(face)

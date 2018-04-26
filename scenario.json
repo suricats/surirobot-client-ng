@@ -1,6 +1,6 @@
 {
-  "initial": ["converse","emotion-detection","special-persons",3,4],
-  "groups" : {"person-detection" : [3,4,9],
+  "initial": ["converse","emotion-detection","special-persons",3,4,999],
+  "groups" : {"person-detection" : [3,4,9,999],
     "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
     "converse" : [17,2,1],
@@ -323,7 +323,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["special-persons",5,9,3]
+            "variable": ["special-persons",5,9,999,3]
           }
         }
       ]
@@ -345,6 +345,7 @@
             "type": "input",
             "variable": false
           }
+
         },
         {
           "name": "displayText",
@@ -372,7 +373,57 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["converse","special-persons",3,4,"emotion-detection"]
+            "variable": ["converse","special-persons",3,4,999,"emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 999,
+      "description": "Too many known people",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "several",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "activateKeyboardInput",
+          "activate": {
+            "type": "input",
+            "variable": false
+          }
+
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Il y'a trop de personnes devant la camera ! Je suis perdu !"
+          }
+        },
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type" : "input",
+            "variable": "sad"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons",3,4,9,"emotion-detection"]
           }
         }
       ]
@@ -391,6 +442,13 @@
         }
       ],
       "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic2"
+          }
+        },
         {
           "name": "displayText",
           "text": {
@@ -430,6 +488,13 @@
       ],
       "actions": [
         {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic2"
+          }
+        },
+        {
           "name": "displayText",
           "text": {
             "type": "input",
@@ -467,6 +532,13 @@
         }
       ],
       "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic2"
+          }
+        },
         {
           "name": "displayText",
           "text": {
@@ -511,6 +583,13 @@
         }
       ],
       "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "sad"
+          }
+        },
         {
           "name": "displayText",
           "text": {
@@ -603,7 +682,13 @@
         }
       ],
       "actions": [
-
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic2"
+          }
+        },
         {
           "name": "displayText",
           "text": {
@@ -1008,8 +1093,9 @@
           },
           "text": {
             "type": "input",
-            "variable": "Votre nom"
+            "variable":"Votre nom"
           }
+
         },
         {
           "name": "displayText",
@@ -1384,6 +1470,7 @@
             "type": "input",
             "variable": "Votre prénom"
           }
+
         },
         {
           "name": "displayText",

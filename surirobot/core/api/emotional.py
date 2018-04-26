@@ -1,5 +1,5 @@
 from .base import ApiCaller
-from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest, QNetworkAccessManager
+from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QJsonDocument, QUrl, QVariant, QFile, QIODevice
 from surirobot.core.common import State
 
@@ -16,7 +16,7 @@ class EmotionalAPICaller(ApiCaller):
     @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         if (reply.error() != QNetworkReply.NoError):
-            print("Error " + str(reply.error()) + str(reply.readAll()))
+            print("EMOTIONAL - Error " + str(reply.error()) + str(reply.readAll()))
             self.networkManager.clearAccessCache()
         else:
             jsonObject = QJsonDocument.fromJson(reply.readAll()).object()

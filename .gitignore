@@ -5,3 +5,5 @@ __pycache__
 .DS_*
 venv
 test.py
+build
+dist

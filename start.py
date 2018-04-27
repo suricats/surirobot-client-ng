@@ -1,6 +1,5 @@
 
 from dotenv import load_dotenv, find_dotenv
-import sys
 
 # Load .env
 load_dotenv(find_dotenv())
@@ -9,10 +8,10 @@ load_dotenv(find_dotenv())
 from surirobot.core import app
 import surirobot.services
 import surirobot.core.keyboard
-# import surirobot.core.controllers
-import surirobot.core.api
-import surirobot.core.scenario
 
+import surirobot.core.api
+from surirobot.core.manager import manager
+app.aboutToQuit.connect(manager.deleteTemporaryFiles)
 app.exec_()
 # Launch Flask
 # from surirobot.management import app

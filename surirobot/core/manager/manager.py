@@ -6,12 +6,12 @@ from surirobot.core.common import State, Dir
 import logging
 import json
 import re
-import random
+import os, shutil
 
 
-class ScenarioManager(QObject):
+class Manager(QObject):
     __instance__ = None
-    random.seed()
+    TMP_FOLDER = './tmp'
     # Signals
     signal_tts_request = pyqtSignal(str)
     signal_converse_request_with_id = pyqtSignal(str, int)
@@ -138,9 +138,6 @@ class ScenarioManager(QObject):
                 print('ERROR : Scenario - loadScenarioFile ')
         print('Scope : ' + str(self.scope))
 
-    def loadScenarioFromJson(self, filePath):
-        self.scenarios = json.load(open(Dir.SCENARIOS + 'yolo.json'))
-
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
         print('Update of scenarios from ' + name)
@@ -249,6 +246,18 @@ class ScenarioManager(QObject):
                     break
         if not self.freeze:
             self.checkScope()
+
+    @pyqtSlot()
+    def deleteTemporaryFiles(self):
+        for the_file in os.listdir(self.TMP_FOLDER):
+            file_path = os.path.join(self.TMP_FOLDER, the_file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(e)
 
     # Triggers
     def faceWorking(self, input):

@@ -16,6 +16,7 @@ class ScenarioManager(QObject):
     signal_tts_request = pyqtSignal(str)
     signal_converse_request_with_id = pyqtSignal(str, int)
     signal_converse_request = pyqtSignal(str)
+    signal_converse_update_request = pyqtSignal(str, str, int)
     signal_nlp_request_with_id = pyqtSignal(str, int)
     signal_nlp_request = pyqtSignal(str)
     signal_tts_request = pyqtSignal(str)
@@ -59,6 +60,7 @@ class ScenarioManager(QObject):
         self.signal_stt_request.connect(api_stt.sendRequest)
         self.signal_tts_request.connect(api_tts.sendRequest)
         self.signal_ui_suriface.connect(ui.setImage)
+        self.signal_converse_update_request.connect(api_converse.updateMemory)
 
         # Indicators
         self.signal_ui_indicator.connect(ui.changeIndicator)
@@ -113,6 +115,7 @@ class ScenarioManager(QObject):
         self.actions["store"] = self.store
         self.actions["changeSuriface"] = self.changeSuriface
         self.actions["activateKeyboardInput"] = self.activateKeyboardInput
+        self.actions["updateMemory"] = self.converseUpdateMemory
 
     def loadScenarioFile(self, filepath=None):
         jsonFile = json.load(open(Dir.BASE + filepath))
@@ -444,6 +447,7 @@ class ScenarioManager(QObject):
     def converse(self, input):
         if input.get("filepath"):
             if input.get("id"):
+                self.signal_converse_update_request.emit("username", serv_fr.idToName(input["id"]), input["id"])
                 self.signal_converse_request_with_id.emit(input["filepath"], input["id"])
             else:
                 self.signal_converse_request.emit(input["filepath"])
@@ -458,6 +462,12 @@ class ScenarioManager(QObject):
                 self.signal_nlp_request.emit(input["intent"])
         else:
             self.logger.info('Action(converseAnswer) : Missing parameters.')
+
+    def converseUpdateMemory(self, input):
+        if input.get("field") and input.get("value") and input.get("id"):
+            self.signal_converse_update_request.emit(input["field"], input["value"], input["id"])
+        else:
+            self.logger.info('Action(converseUpdateMemory) : Missing parameters.')
 
     def listen(self, input):
         if input.get("filepath"):

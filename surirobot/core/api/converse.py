@@ -42,20 +42,36 @@ class ConverseApiCaller(ApiCaller):
             self.networkManager.clearAccessCache()
         jsonObject = QJsonDocument.fromJson(buffer).object()
         # Converse reply
-        if jsonObject["intent"] and jsonObject["answerText"] and jsonObject["answerAudioLink"]:
+        if jsonObject.get("intent") and jsonObject.get("answerText") and jsonObject.get("answerAudioLink"):
             self.intent = jsonObject["intent"].toString()
             self.message = jsonObject["answerText"].toString()
             url = jsonObject["answerAudioLink"].toString()
             self.download.emit(url)
+        elif jsonObject.get("field") and jsonObject.get("value") and jsonObject.get("userId"):
+            print('Converse - updateMemory responded.')
         else:
             self.signalIndicator.emit("converse", "orange")
-            print('Converse - Error : Invalid response format.')
+            print('Converse - Error : Invalid response format.\n' + str(buffer))
         reply.deleteLater()
+
+    @pyqtSlot(str, str, int)
+    def updateMemory(self, field, value, userId):
+        # Create the json request
+        jsonObject = {
+            'field': field,
+            'value': value,
+            'userId': str(userId)
+        }
+        jsonData = QJsonDocument(jsonObject)
+        data = jsonData.toJson()
+        request = QNetworkRequest(QUrl(self.url + '/updateMemory'))
+        request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
+        self.isBusy = True
+        self.networkManager.post(request, data)
 
     @pyqtSlot(str, int)
     @pyqtSlot(str)
     def sendRequest(self, filepath, id=1):
-        print('id : ' + str(id))
         multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
         # Language
         textPart = QHttpPart()

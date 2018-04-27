@@ -464,10 +464,8 @@
       "triggers": [
         {
           "service": "face",
-          "name": "working",
-          "parameters": {
-            "value" : false
-          }
+          "name": "nobody",
+          "parameters": {}
         }
       ],
       "actions": [

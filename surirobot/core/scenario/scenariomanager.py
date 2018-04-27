@@ -6,11 +6,12 @@ from surirobot.core.common import State, Dir
 import logging
 import json
 import re
+import random
 
 
 class ScenarioManager(QObject):
     __instance__ = None
-
+    random.seed()
     # Signals
     signal_tts_request = pyqtSignal(str)
     signal_converse_request_with_id = pyqtSignal(str, int)

@@ -12,7 +12,7 @@ class FaceRecognition(QThread):
     updateState = pyqtSignal(str, int, dict)
     # deprecated signal -> will be removed
     signalPersonChanged = pyqtSignal(str)
-
+    signalIndicator = pyqtSignal(str, str)
     NB_IMG_PER_SECOND = 2
     MODULE_NAME = 'face'
 
@@ -39,24 +39,25 @@ class FaceRecognition(QThread):
 
         self.faceWorkLoop = QTimer()
         self.faceWorkLoop.timeout.connect(self.detect)
+        self.faceWorkLoop.setInterval(1000/self.NB_IMG_PER_SECOND)
 
         self.nobodyTimer = QTimer()
         self.nobodyTimer.setSingleShot(True)
-        self.nobodyTimerInterval = (1000/self.NB_IMG_PER_SECOND) * 6
+        self.nobodyTimer.setInterval((1000/self.NB_IMG_PER_SECOND) * 6)
         self.nobodyTimer.timeout.connect(self.nobodyTimeout)
 
-        self.counter_unknown = QTimer()
-        self.counter_unknown.setSingleShot(True)
-        self.unknownTimerInterval = (1000/self.NB_IMG_PER_SECOND) * 12
-        self.counter_unknown.timeout.connect(self.timer_unknown_timeout)
+        self.unknownTimer = QTimer()
+        self.unknownTimer.setSingleShot(True)
+        self.unknownTimer.setInterval((1000/self.NB_IMG_PER_SECOND) * 12)
+        self.unknownTimer.timeout.connect(self.unknownTimeout)
 
-        self.counter_known = QTimer()
-        self.counter_known.setSingleShot(True)
-        self.knownTimerInterval = (1000/self.NB_IMG_PER_SECOND) * 5
-        self.counter_known.timeout.connect(self.timer_known_timeout)
+        self.knownTimer = QTimer()
+        self.knownTimer.setSingleShot(True)
+        self.knownTimer.setInterval((1000/self.NB_IMG_PER_SECOND) * 5)
+        self.knownTimer.timeout.connect(self.knownTimeout)
 
-        self.state_id = self.NOBODY
-        self.pretendent_id = self.NOBODY
+        self.stateId = self.NOBODY
+        self.pretendentId = self.NOBODY
 
         self.buffer = {
             'id': self.UNKNOWN,
@@ -69,114 +70,120 @@ class FaceRecognition(QThread):
     def start(self):
         QThread.start(self)
         time.sleep(3)
-        self.emit_person_changed(self.NOBODY)
-        self.emit_state_changed(self.NOBODY, self.NOBODY)
-        self.faceWorkLoop.start(1000/self.NB_IMG_PER_SECOND)
+        self.personChanged(self.NOBODY)
+        self.stateChanged(self.NOBODY, self.NOBODY)
+        self.faceWorkLoop.start()
 
     @pyqtSlot()
     def detect(self):
-        face_locations = []
-        face_encodings = []
-        small_frame = serv_vc.get_frame()
-
-        # Find all the faces and face encodings in the current frame of video
-        face_locations = face_recognition.face_locations(small_frame)
-        # num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)
-        face_encodings = face_recognition.face_encodings(small_frame, face_locations, 2)
-        if face_encodings:
-            if len(face_encodings) > 1:
-                self.emit_state_changed(State.STATE_FACE_MULTIPLES, self.UNKNOWN)
-            else:
-                # See if the face is a match for the known face(s)
-                match = face_recognition.compare_faces(self.faces, face_encodings[0], self.tolerance)
-                id = self.UNKNOWN
-                match_tuples = list(enumerate(match))
-                match_tuples = list(filter(lambda t: t[1], match_tuples))
-                # print('match : ' + str(match))
-                if len(match_tuples) == 0:
-                    self.addToBuffer(self.UNKNOWN)
-                elif len(match_tuples) == 1:
-                    id = self.linker[match_tuples[0][0]]
-                    self.addToBuffer(id)
+        faceLocations = []
+        faceEncodings = []
+        smallFrame = serv_vc.get_frame()
+        if smallFrame is None:
+            self.signalIndicator.emit("face", "red")
         else:
-            self.addToBuffer(self.NOBODY)
+            # Find all the faces and face encodings in the current frame of video
+            faceLocations = face_recognition.face_locations(smallFrame)
+            # num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)
+            faceEncodings = face_recognition.face_encodings(smallFrame, faceLocations, 2)
+            if faceEncodings:
+                if len(faceEncodings) > 1:
+                    self.stateChanged(State.FACE_MULTIPLES)
+                else:
+                    # See if the face is a match for the known face(s)
+                    match = face_recognition.compare_faces(self.faces, faceEncodings[0], self.tolerance)
+                    id = self.UNKNOWN
+                    # Transform in tuples of (index, value)
+                    match = list(enumerate(match))
+                    match = list(filter(lambda t: t[1], match))
+                    # print('match : ' + str(match))
+                    if len(match) == 0:
+                        self.addToBuffer(self.UNKNOWN)
+                    elif len(match) == 1:
+                        id = self.linker[match[0][0]]
+                        self.addToBuffer(id)
+            else:
+                self.addToBuffer(self.NOBODY)
+        self.faceWorkLoop.setInterval(-time.time() % (1 / self.NB_IMG_PER_SECOND)*1000)
 
     def addToBuffer(self, id):
         # Case nobody is on the camera
         if id == self.NOBODY:
-            self.pretendent_id = self.NOBODY
-            self.counter_unknown.stop()
-            self.counter_known.stop()
+            self.pretendentId = self.NOBODY
+            self.unknownTimer.stop()
+            self.knownTimer.stop()
 
             if not self.nobodyTimer.isActive():
-                if self.state_id != self.NOBODY:
-                    self.nobodyTimer.start(self.nobodyTimerInterval)
+                if self.stateId != self.NOBODY:
+                    self.nobodyTimer.start()
 
-        # Case an face is present but we don't know who is it
+        # Case a face is present but we don't know who is it
         elif id == self.UNKNOWN:
-            self.pretendent_id = self.NOBODY
+            self.pretendentId = self.NOBODY
             self.nobodyTimer.stop()
-            self.counter_known.stop()
+            self.knownTimer.stop()
 
-            if not self.counter_unknown.isActive():
-                if self.state_id != self.UNKNOWN:
-                    self.counter_unknown.start(self.unknownTimerInterval)
-                    self.emit_state_changed(State.STATE_FACE_WORKING, self.UNKNOWN)
+            if not self.unknownTimer.isActive():
+                if self.stateId != self.UNKNOWN:
+                    self.unknownTimer.start()
+                    self.stateChanged(State.FACE_WORKING)
 
-        # Case an know person is present
+        # Case a know person is present
         else:
             self.nobodyTimer.stop()
-            self.counter_unknown.stop()
+            self.unknownTimer.stop()
 
-            if id == self.state_id:
-                self.counter_known.stop()
+            if id == self.stateId:
+                self.knownTimer.stop()
             else:
-                if id != self.pretendent_id:
-                    self.pretendent_id = id
-                    self.counter_known.start(self.knownTimerInterval)
-                    self.emit_state_changed(State.STATE_FACE_WORKING, self.UNKNOWN)
+                if id != self.pretendentId:
+                    self.pretendentId = id
+                    self.knownTimer.start()
+                    self.stateChanged(State.FACE_WORKING)
 
     @pyqtSlot()
     def nobodyTimeout(self):
-        self.state_id = self.NOBODY
-        self.emit_person_changed(self.state_id)
-        self.emit_state_changed(State.STATE_FACE_NOBODY, self.NOBODY)
+        self.stateId = self.NOBODY
+        self.personChanged(self.stateId)
+        self.stateChanged(State.FACE_NOBODY, self.NOBODY)
 
     @pyqtSlot()
-    def timer_unknown_timeout(self):
-        self.state_id = self.UNKNOWN
-        self.emit_person_changed(self.state_id)
-        self.emit_state_changed(State.STATE_FACE_UNKNOWN, self.UNKNOWN)
+    def unknownTimeout(self):
+        self.signalIndicator.emit("face", "green")
+        self.stateId = self.UNKNOWN
+        self.personChanged(self.stateId)
+        self.stateChanged(State.FACE_UNKNOWN, self.UNKNOWN)
 
     @pyqtSlot()
-    def timer_known_timeout(self):
-        if (not self.pretendent_id == self.NOBODY) and (not self.pretendent_id == self.UNKNOWN):
-            print('emit known ' + str(self.pretendent_id))
-            self.state_id = self.pretendent_id
-            self.pretendent_id = self.NOBODY
-            self.emit_person_changed(self.state_id)
-            self.emit_state_changed(State.STATE_FACE_KNOWN, self.state_id)
+    def knownTimeout(self):
+        self.signalIndicator.emit("face", "green")
+        if (not self.pretendentId == self.NOBODY) and (not self.pretendentId == self.UNKNOWN):
+            self.logger.info('Detection of ' + str(self.pretendentId))
+            self.stateId = self.pretendentId
+            self.pretendentId = self.NOBODY
+            self.personChanged(self.stateId)
+            self.stateChanged(State.FACE_KNOWN, self.stateId)
         else:
-            print('FaceReco : Error - invalid id')
+            self.logger.info('Error - invalid id')
 
-    def emit_state_changed(self, state, id):
-        if id == self.NOBODY or id == self.UNKNOWN:
+    def stateChanged(self, state, id=None):
+        if id == self.NOBODY or id == self.UNKNOWN or id is None:
             data = {}
         else:
             data = {
                 'id': id,
-                'firstname': self.id_to_firstname(id),
-                'lastname': self.id_to_lastname(id),
-                'name': self.id_to_name(id)
+                'firstname': self.idToFirstname(id),
+                'lastname': self.idToLastname(id),
+                'name': self.idToName(id)
             }
         self.updateState.emit(self.MODULE_NAME, state, data)
 
-    def emit_person_changed(self, id):
-        name = self.id_to_name(id)
+    def personChanged(self, id):
+        name = self.idToName(id)
         print(name)
         self.signalPersonChanged.emit(name)
 
-    def add_picture(self, picture):
+    def addPicture(self, picture):
         if picture.user.id in self.data:
             pass
         else:
@@ -193,12 +200,12 @@ class FaceRecognition(QThread):
         self.faces.append(face)
         self.linker.append(picture.user.id)
 
-    def remove_picture(self, picture):
+    def removePicture(self, picture):
         key = self.linker.index(picture.user.id)
         del self.faces[key]
         del self.linker[key]
 
-    def id_to_name(self, id):
+    def idToName(self, id):
         if id == self.UNKNOWN:
             return self.UNKNOWN_NAME
         if id == self.NOBODY:
@@ -206,7 +213,7 @@ class FaceRecognition(QThread):
 
         return self.data[id]['name']
 
-    def id_to_firstname(self, id):
+    def idToFirstname(self, id):
         if id == self.UNKNOWN:
             return self.UNKNOWN_NAME
         if id == self.NOBODY:
@@ -214,7 +221,7 @@ class FaceRecognition(QThread):
 
         return self.data[id]['firstname']
 
-    def id_to_lastname(self, id):
+    def idToLastname(self, id):
         if id == self.UNKNOWN:
             return self.UNKNOWN_NAME
         if id == self.NOBODY:

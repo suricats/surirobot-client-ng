@@ -6,6 +6,7 @@ from surirobot.core.common import State
 
 class EmotionalAPICaller(ApiCaller):
     received_reply = pyqtSignal(int, dict)
+    signalIndicator = pyqtSignal(str, str)
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
@@ -17,17 +18,19 @@ class EmotionalAPICaller(ApiCaller):
     def receiveReply(self, reply):
         if (reply.error() != QNetworkReply.NoError):
             print("EMOTIONAL - Error " + str(reply.error()) + str(reply.readAll()))
+            self.signalIndicator.emit("emotion", "red")
             self.networkManager.clearAccessCache()
         else:
             jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
             emotion = jsonObject["data"]
+            self.signalIndicator.emit("emotion", "green")
             if emotion:
                 self.received_reply.emit(
-                    State.STATE_EMOTION_NEW, {'emotion': emotion.toString()}
+                    State.EMOTION_NEW, {'emotion': emotion.toString()}
                 )
             else:
                 self.received_reply.emit(
-                    State.STATE_EMOTION_NO, {'emotion': []}
+                    State.EMOTION_NO, {'emotion': []}
                 )
         reply.deleteLater()
 

@@ -32,7 +32,7 @@ class NlpApiCaller(ApiCaller):
                     self.intent = intents[0]["slugs"]
                 else:
                     self.intent = "dont-understood"
-                self.updateState.emit("converse", State.STATE_CONVERSE_NEW, {"intent": self.intent.toString(), "reply": self.message.toString()})
+                self.updateState.emit("converse", State.CONVERSE_NEW, {"intent": self.intent.toString(), "reply": self.message.toString()})
             else:
                 self.new_reply.emit("Can't find message.")
         reply.deleteLater()

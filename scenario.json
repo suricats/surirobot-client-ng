@@ -3,7 +3,7 @@
   "groups" : {"person-detection" : [3,4,9,40],
     "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
-    "converse" : [17,2,1],
+    "converse" : [43,2,1],
     "person-detection-know-out" : [3,9],
     "face-working" : [41,42]},
   "scenarios": [
@@ -24,6 +24,53 @@
             "type": "service",
             "name": "sound",
             "variable": "filepath"
+          }
+        },
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "computing2"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "description": "Wait for audio - recogniez person",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        },
+        {
+          "service": "face",
+          "name": "know",
+          "parameters" : {
+            "new": false
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          },
+          "id": {
+            "type": "service",
+            "name": "face",
+            "variable": "id"
           }
         },
         {

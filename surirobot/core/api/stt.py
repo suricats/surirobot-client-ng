@@ -24,10 +24,10 @@ class SttApiCaller(ApiCaller):
         else:
             jsonObject = QJsonDocument.fromJson(buffer).object()
             if jsonObject.get("code") and jsonObject.get("msg") and jsonObject.get("data") and jsonObject.get("confidence"):
-                self.updateState.emit("converse", State.STATE_CONVERSE_NEW, {"intent": "@STT", "reply": jsonObject["data"]["text"][0].toString()})
+                self.updateState.emit("converse", State.CONVERSE_NEW, {"intent": "@STT", "reply": jsonObject["data"]["text"][0].toString()})
             else:
                 print('STT - Error : Invalid response format : ' + str(buffer))
-                self.updateState.emit("converse", State.STATE_CONVERSE_NEW, {"intent": "dont-understand", "reply": "Je n'ai pas compris."})
+                self.updateState.emit("converse", State.CONVERSE_NEW, {"intent": "dont-understand", "reply": "Je n'ai pas compris."})
 
         reply.deleteLater()
 

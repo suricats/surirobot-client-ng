@@ -7,11 +7,11 @@ from surirobot.management import db
 from surirobot.management.mod_api.models import User, Picture
 from surirobot.services import serv_fr, serv_vc
 from surirobot.core.common import Dir
-from random import randint
 import cv2
 
 
 class FaceLoader(QThread):
+    signalIndicator = pyqtSignal(str, str)
     new_user = pyqtSignal(str)
 
     def __init__(self):
@@ -34,16 +34,17 @@ class FaceLoader(QThread):
 
     def load_from_db(self):
         self.logger.info("Start loading faces ....")
-
         users = User.query.all()
 
         for user in users:
             pictures = user.pictures
             if pictures:
                 picture = pictures[0]
-                name = user.firstname + ' ' + user.lastname
-                #self.logger.info("Load Face {}".format(name))
-                serv_fr.add_picture(picture)
+                # name = user.firstname + ' ' + user.lastname
+                # self.logger.info("Load Face {}".format(name))
+                serv_fr.addPicture(picture)
+                self.signalIndicator.emit("face", "orange")
+        self.signalIndicator.emit("face", "green")
         self.logger.info('Loaded all the faces from DB')
 
     def add_user(self, firstname, lastname, email, picture_path):

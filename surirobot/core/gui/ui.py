@@ -2,13 +2,15 @@ from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette, QColor, QIcon
 
 from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QMainWindow, QPushButton, QTextEdit
 from PyQt5.QtCore import Qt, QSize, QTimer, pyqtSlot, pyqtSignal
-from .new import Ui_MainWindow
+from .mainwindow import Ui_MainWindow
 from surirobot.core.common import State
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    IMAGES_DIR = 'res/surifaces'
-    IMAGES_EXT = ".jpg"
+    SURIFACES_DIR = 'res/surifaces'
+    INDICATORS_DIR = 'res/indicators'
+    JPG = ".jpg"
+    PNG = ".png"
     MICRO_IMAGE = 'res/mic.png'
 
     SURI_BASIC = 0
@@ -22,7 +24,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ui = Ui_MainWindow()
         self.setupUi(self)
 
-        self.image.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.setImage("basic")
         # Signals
         self.activateManualButton.clicked.connect(self.setManualInput)
@@ -59,7 +60,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def load_image(self, image_path):
         image = QImage()
-        print('image_path :' + str(image_path))
+        # print('image_path :' + str(image_path))
         image.load(image_path)
         return image
 
@@ -91,7 +92,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot(str)
     def setImage(self, image_id):
         try:
-            image = self.load_image(self.IMAGES_DIR + '/' + image_id + self.IMAGES_EXT)
+            image = self.load_image(self.SURIFACES_DIR + '/' + image_id + self.JPG)
             self.image.setPixmap(QPixmap.fromImage(image).scaled(self.imageWidget.width(), self.imageWidget.height(), Qt.KeepAspectRatio))
         except Exception as e:
             print('Error while opening image :' + str(e))
@@ -106,7 +107,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def onClickValidateManualInput(self):
-        self.updateState.emit("keyboard", State.STATE_KEYBOARD_NEW, {"text": self.manualEdit.displayText()})
+        self.updateState.emit("keyboard", State.KEYBOARD_NEW, {"text": self.manualEdit.displayText()})
+
+    @pyqtSlot(str, str)
+    def changeIndicator(self, service, value):
+        image = self.load_image(self.INDICATORS_DIR + '/' + service + '/' + value + self.PNG)
+        if not image.isNull():
+            if service == "face":
+                self.faceIndicator.setPixmap(QPixmap.fromImage(image))
+            elif service == "converse":
+                self.converseIndicator.setPixmap(QPixmap.fromImage(image))
+            elif service == "emotion":
+                self.emotionIndicator.setPixmap(QPixmap.fromImage(image))
+            else:
+                print('Error - changeIndicator : Service unknown')
+        else:
+            print('Error - changeIndicator : Image can\'t be found')
     # @pyqtSlot()
     # def updateWidgets(self):
     #     self.labelTextUp.adjustSize()
@@ -131,20 +147,3 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #         self.width() / 2 - self.imgWidget.width() / 2,
     #         self.height() / 3 - self.imgWidget.height() / 2
     #     )
-
-    # SIGNALS
-    #
-    # def setTextUpSignal(self, text):
-    #     self.setTextUp(text)
-    #
-    # def setTextMiddleSignal(self, text):
-    #     self.setTextMiddle(text)
-    #
-    # def setTextDownSignal(self, text):
-    #     self.setTextDown(text)
-
-    # Slots
-
-    #def createManualWindow(self):
-    #    manualW = manualWindow()
-    #    manualW.show()

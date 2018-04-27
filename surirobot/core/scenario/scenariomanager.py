@@ -21,6 +21,7 @@ class ScenarioManager(QObject):
     signal_tts_request = pyqtSignal(str)
     signal_stt_request = pyqtSignal(str)
     signal_ui_suriface = pyqtSignal(str)
+    signal_ui_indicator = pyqtSignal(str, str)
 
     def __new__(cls):
         if cls.__instance__ is None:
@@ -59,10 +60,21 @@ class ScenarioManager(QObject):
         self.signal_tts_request.connect(api_tts.sendRequest)
         self.signal_ui_suriface.connect(ui.setImage)
 
+        # Indicators
+        self.signal_ui_indicator.connect(ui.changeIndicator)
+        serv_fr.signalIndicator.connect(ui.changeIndicator)
+        face_loader.signalIndicator.connect(ui.changeIndicator)
+        serv_emo.signalIndicator.connect(ui.changeIndicator)
+        api_converse.signalIndicator.connect(ui.changeIndicator)
+
+        self.signal_ui_indicator.emit("face", "grey")
+        self.signal_ui_indicator.emit("emotion", "grey")
+        self.signal_ui_indicator.emit("converse", "grey")
+
         self.generateTriggers()
         self.generateActions()
 
-        self.loadFile("/scenario.json")
+        self.loadScenarioFile("/scenario.json")
 
     def generateTriggers(self):
         self.triggers["sound"] = {}
@@ -102,7 +114,7 @@ class ScenarioManager(QObject):
         self.actions["changeSuriface"] = self.changeSuriface
         self.actions["activateKeyboardInput"] = self.activateKeyboardInput
 
-    def loadFile(self, filepath=None):
+    def loadScenarioFile(self, filepath=None):
         jsonFile = json.load(open(Dir.BASE + filepath))
         jsonScenarios = jsonFile["scenarios"]
         self.scenarios = {}
@@ -120,7 +132,7 @@ class ScenarioManager(QObject):
                 print("group : " + str(self.groups[id]))
                 self.scope += self.groups[id]
             else:
-                print('ERROR : Scenario - loadFile ')
+                print('ERROR : Scenario - loadScenarioFile ')
         print('Scope : ' + str(self.scope))
 
     def loadScenarioFromJson(self, filePath):
@@ -199,24 +211,24 @@ class ScenarioManager(QObject):
         for trigger in sc["triggers"]:
             # SOUND
             if self.services.get("sound"):
-                if trigger["service"] == "sound" and trigger["name"] == "new" and self.services["sound"]["state"] == State.STATE_SOUND_NEW:
-                    self.services["sound"]["state"] = State.STATE_SOUND_AVAILABLE
+                if trigger["service"] == "sound" and trigger["name"] == "new" and self.services["sound"]["state"] == State.SOUND_NEW:
+                    self.services["sound"]["state"] = State.SOUND_AVAILABLE
             # CONVERSE
             if self.services.get("converse"):
-                if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
-                    self.services["converse"]["state"] = State.STATE_CONVERSE_AVAILABLE
+                if trigger["service"] == "converse" and trigger["name"] == "new" and self.services["converse"]["state"] == State.CONVERSE_NEW:
+                    self.services["converse"]["state"] = State.CONVERSE_AVAILABLE
             # KEYBOARD
             if self.services.get("keyboard"):
-                if trigger["service"] == "keyboard" and trigger["name"] == "new" and self.services["keyboard"]["state"] == State.STATE_KEYBOARD_NEW:
-                    self.services["keyboard"]["state"] = State.STATE_KEYBOARD_AVAILABLE
+                if trigger["service"] == "keyboard" and trigger["name"] == "new" and self.services["keyboard"]["state"] == State.KEYBOARD_NEW:
+                    self.services["keyboard"]["state"] = State.KEYBOARD_AVAILABLE
             # FACE
             if self.services.get("face"):
-                if trigger["service"] == "face" and trigger["name"] == "know" and self.services["face"]["state"] == State.STATE_FACE_KNOWN:
-                    self.services["face"]["state"] = State.STATE_FACE_KNOWN_AVAILABLE
-                if trigger["service"] == "face" and trigger["name"] == "unknow" and self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
-                    self.services["face"]["state"] = State.STATE_FACE_UNKNOWN_AVAILABLE
-                if trigger["service"] == "face" and trigger["name"] == "nobody" and self.services["face"]["state"] == State.STATE_FACE_NOBODY:
-                    self.services["face"]["state"] = State.STATE_FACE_NOBODY_AVAILABLE
+                if trigger["service"] == "face" and trigger["name"] == "know" and self.services["face"]["state"] == State.FACE_KNOWN:
+                    self.services["face"]["state"] = State.FACE_KNOWN_AVAILABLE
+                if trigger["service"] == "face" and trigger["name"] == "unknow" and self.services["face"]["state"] == State.FACE_UNKNOWN:
+                    self.services["face"]["state"] = State.FACE_UNKNOWN_AVAILABLE
+                if trigger["service"] == "face" and trigger["name"] == "nobody" and self.services["face"]["state"] == State.FACE_NOBODY:
+                    self.services["face"]["state"] = State.FACE_NOBODY_AVAILABLE
 
     @pyqtSlot()
     def resumeManager(self):
@@ -239,7 +251,7 @@ class ScenarioManager(QObject):
     def faceWorking(self, input):
         if not (input["parameters"].get("value") is None):
             if self.services.get("face"):
-                if self.services["face"]["state"] == State.STATE_FACE_WORKING:
+                if self.services["face"]["state"] == State.FACE_WORKING:
                     return input["parameters"]["value"]
                 else:
                     return not input["parameters"]["value"]
@@ -248,13 +260,13 @@ class ScenarioManager(QObject):
     def newPersonTrigger(self, input):
         # TODO: add sepration new/available with input["parameters"]["new"]
         if self.services.get("face"):
-            if self.services["face"]["state"] == State.STATE_FACE_UNKNOWN:
+            if self.services["face"]["state"] == State.FACE_UNKNOWN:
                 return True
         return False
 
     def severalPersonTrigger(self, input):
         if self.services.get("face"):
-            if self.services["face"]["state"] == State.STATE_FACE_MULTIPLES:
+            if self.services["face"]["state"] == State.FACE_MULTIPLES:
                 return True
         return False
 
@@ -268,9 +280,9 @@ class ScenarioManager(QObject):
             # Check new/available condition
             newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
-                if self.services["face"]["state"] == State.STATE_FACE_KNOWN:
+                if self.services["face"]["state"] == State.FACE_KNOWN:
                     newCondition = True
-            elif self.services["face"]["state"] == State.STATE_FACE_KNOWN or self.services["face"]["state"] == State.STATE_FACE_KNOWN_AVAILABLE:
+            elif self.services["face"]["state"] == State.FACE_KNOWN or self.services["face"]["state"] == State.FACE_KNOWN_AVAILABLE:
                 newCondition = True
 
             # Check if regex for name is activated
@@ -307,13 +319,13 @@ class ScenarioManager(QObject):
     def nobodyTrigger(self, input):
         if self.services.get("face"):
             # TODO: Implement regex parameters
-            if self.services["face"]["state"] == State.STATE_FACE_NOBODY:
+            if self.services["face"]["state"] == State.FACE_NOBODY:
                 return True
         return False
 
     def newEmotionTrigger(self, input):
         if self.services.get("emotion"):
-            if self.services["emotion"]["state"] == State.STATE_EMOTION_NEW:
+            if self.services["emotion"]["state"] == State.EMOTION_NEW:
                 if input["parameters"].get("emotion"):
                     if self.services["emotion"]["emotion"] == input["parameters"]["emotion"]:
                         return True
@@ -330,26 +342,26 @@ class ScenarioManager(QObject):
             newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
                     newCondition = True
-            elif self.services["keyboard"]["state"] == State.STATE_KEYBOARD_NEW or self.services["keyboard"]["state"] == State.STATE_KEYBOARD_AVAILABLE:
+            elif self.services["keyboard"]["state"] == State.KEYBOARD_NEW or self.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE:
                 newCondition = True
         return newCondition
 
     def noEmotionTrigger(self, input):
         if self.services.get("emotion"):
             # TODO: add emotion filter
-            if self.services["emotion"]["state"] == State.STATE_EMOTION_NO:
+            if self.services["emotion"]["state"] == State.EMOTION_NO:
                 return True
         return False
 
     def newSoundTrigger(self, input):
         if self.services.get("sound"):
-            if self.services["sound"]["state"] == State.STATE_SOUND_NEW:
+            if self.services["sound"]["state"] == State.SOUND_NEW:
                 return True
         return False
 
     def availableSoundTrigger(self, input):
         if self.services.get("sound"):
-            if self.services["sound"]["state"] == State.STATE_SOUND_AVAILABLE or self.services["sound"]["state"] == State.STATE_SOUND_NEW:
+            if self.services["sound"]["state"] == State.SOUND_AVAILABLE or self.services["sound"]["state"] == State.SOUND_NEW:
                 return True
         return False
 
@@ -360,9 +372,9 @@ class ScenarioManager(QObject):
             # Check new/available condition
             newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
-                if self.services["converse"]["state"] == State.STATE_CONVERSE_NEW:
+                if self.services["converse"]["state"] == State.CONVERSE_NEW:
                     newCondition = True
-            elif self.services["converse"]["state"] == State.STATE_CONVERSE_NEW or self.services["converse"]["state"] == State.STATE_CONVERSE_AVAILABLE:
+            elif self.services["converse"]["state"] == State.CONVERSE_NEW or self.services["converse"]["state"] == State.CONVERSE_AVAILABLE:
                 newCondition = True
             if input["parameters"].get("intent"):
                 if self.services["converse"].get("intent"):

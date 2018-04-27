@@ -4,6 +4,8 @@ from PyQt5.Qt import QImage
 import cv2
 import time
 import logging
+import os
+import re
 from surirobot.core import ui
 
 
@@ -20,18 +22,24 @@ class VideoCapture(QThread):
         self.logger = logging.getLogger(__name__)
 
         self.signal_change_camera.connect(ui.setCamera)
-        # cv2.startWindowThread()
-        # cv2.namedWindow("preview")
 
     def __del__(self):
         cv2.destroyAllWindows()
         self.quit()
 
     def run(self):
-        video_capture = cv2.VideoCapture(1)
-        if not video_capture.isOpened():
-            video_capture = cv2.VideoCapture(0)
+        # Get the devices
+        try:
+            fileList = os.listdir('/dev')
+            regex = re.compile(r'^video')
+            deviceList = list(filter(regex.match, fileList))
+            # video_capture = cv2.VideoCapture(len(deviceList))
+            video_capture = cv2.VideoCapture(len(deviceList)-1)
+        except Exception as e:
+            video_capture = cv2.VideoCapture(-1)
 
+        if not video_capture.isOpened():
+            print('Error - Can\'t open camera')
         while(True):
             try:
                 time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))

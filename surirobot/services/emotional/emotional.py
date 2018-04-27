@@ -12,6 +12,7 @@ from surirobot.core import ui
 
 class EmotionalRecognition(QThread):
     updateState = pyqtSignal(str, int, dict)
+    signalIndicator = pyqtSignal(str, str)
 
     send_request = pyqtSignal(str)
 
@@ -30,6 +31,8 @@ class EmotionalRecognition(QThread):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.isBusy = False
+
+        self.api_emotion.signalIndicator.connect(self.relayer)
 
     def __del__(self):
         self.quit()
@@ -53,3 +56,7 @@ class EmotionalRecognition(QThread):
         self.isBusy = False
         ui.setTextDown(str(data))
         self.updateState.emit(self.MODULE_NAME, state, data)
+
+    @pyqtSlot(str, str)
+    def relayer(self, a1, a2):
+        self.signalIndicator.emit(a1, a2)

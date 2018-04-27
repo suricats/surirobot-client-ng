@@ -12,6 +12,7 @@ class ConverseApiCaller(ApiCaller):
     play_sound = pyqtSignal(str)
     new_intent = pyqtSignal(int, 'QByteArray')
     updateState = pyqtSignal(str, int, dict)
+    signalIndicator = pyqtSignal(str, str)
 
     def __init__(self, url='https://www.google.fr'):
         ApiCaller.__init__(self, url)
@@ -34,6 +35,7 @@ class ConverseApiCaller(ApiCaller):
         # print('\nConverse : Receive reply : ' + str(buffer))
         if (reply.error() != QNetworkReply.NoError):
             print("Converse - Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
+            self.signalIndicator.emit("converse", "red")
             self.intent = "message"
             self.message = "Il semblerait qu'il y ait eu un problème"
             self.download.emit("https://i1.theportalwiki.net/img/d/d0/GLaDOS_potatos_sp_a4_intro_uhoh03_fr.wav")
@@ -46,12 +48,14 @@ class ConverseApiCaller(ApiCaller):
             url = jsonObject["answerAudioLink"].toString()
             self.download.emit(url)
         else:
+            self.signalIndicator.emit("converse", "orange")
             print('Converse - Error : Invalid response format.')
         reply.deleteLater()
 
     @pyqtSlot(str, int)
     @pyqtSlot(str)
     def sendRequest(self, filepath, id=1):
+        print('id : ' + str(id))
         multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
         # Language
         textPart = QHttpPart()
@@ -99,7 +103,8 @@ class ConverseApiCaller(ApiCaller):
         file.write(data)
         print("Sound file generated at : " + filename)
         file.close()
-        self.updateState.emit("converse", State.STATE_CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": filename})
+        self.signalIndicator.emit("converse", "green")
+        self.updateState.emit("converse", State.CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": filename})
         # Play the audio
         # Restart the audioplayer
         # self.play_sound.emit(filename)

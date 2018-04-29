@@ -8,3 +8,4 @@ test.py
 build
 dist
 start.spec
+.idea/

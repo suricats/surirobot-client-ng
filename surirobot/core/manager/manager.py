@@ -12,7 +12,6 @@ import shutil
 
 class Manager(QObject):
     __instance__ = None
-    TMP_FOLDER = './tmp'
     # Signals
     signal_tts_request = pyqtSignal(str)
     signal_converse_request_with_id = pyqtSignal(str, int)
@@ -250,15 +249,16 @@ class Manager(QObject):
 
     @pyqtSlot()
     def deleteTemporaryFiles(self):
-        for the_file in os.listdir(self.TMP_FOLDER):
-            file_path = os.path.join(self.TMP_FOLDER, the_file)
-            try:
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-                elif os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
-            except Exception as e:
-                print(e)
+        for the_file in os.listdir(Dir.TMP):
+            if not the_file.startswith("."):
+                file_path = os.path.join(Dir.TMP, the_file)
+                try:
+                    if os.path.isfile(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print(e)
 
     # Triggers
     def faceWorking(self, input):

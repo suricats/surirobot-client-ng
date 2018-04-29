@@ -6,6 +6,7 @@ import time
 import logging
 import os
 import re
+import platform
 from surirobot.core import ui
 
 
@@ -28,15 +29,18 @@ class VideoCapture(QThread):
         self.quit()
 
     def run(self):
-        # Get the devices
-        try:
-            fileList = os.listdir('/dev')
-            regex = re.compile(r'^video')
-            deviceList = list(filter(regex.match, fileList))
-            # video_capture = cv2.VideoCapture(len(deviceList))
-            video_capture = cv2.VideoCapture(len(deviceList)-1)
-        except Exception as e:
-            video_capture = cv2.VideoCapture(-1)
+        if platform.system() == "Darwin":
+            video_capture = cv2.VideoCapture(0)
+        else:
+            # Get the devices
+            try:
+                fileList = os.listdir('/dev')
+                regex = re.compile(r'^video')
+                deviceList = list(filter(regex.match, fileList))
+                # video_capture = cv2.VideoCapture(len(deviceList))
+                video_capture = cv2.VideoCapture(len(deviceList)-1)
+            except Exception as e:
+                video_capture = cv2.VideoCapture(-1)
 
         if not video_capture.isOpened():
             print('Error - Can\'t open camera')

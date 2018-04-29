@@ -6,7 +6,8 @@ from surirobot.core.common import State, Dir
 import logging
 import json
 import re
-import os, shutil
+import os
+import shutil
 
 
 class Manager(QObject):

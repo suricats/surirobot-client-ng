@@ -3,9 +3,8 @@ __pycache__
 */__pycache__
 .env
 .DS_*
-venv
+venv/
 test.py
-build
-dist
-start.spec
+build/
+dist/
 .idea/

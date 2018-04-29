@@ -1,10 +1,11 @@
 from PyQt5.QtCore import QObject, QThread, pyqtSlot, pyqtSignal
 from PyQt5.QtNetwork import QNetworkAccessManager
 from abc import abstractmethod
+from surirobot.core.common import Dir
 
 
 class ApiCaller(QObject):
-    TMP_DIR = 'tmp/'
+    TMP_DIR = Dir.TMP
     DEFAULT_LANGUAGE = 'fr'
     DEFAULT_LANGUAGE_EXT = 'fr-FR'
     new_reply = pyqtSignal(str)

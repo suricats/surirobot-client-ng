@@ -30,7 +30,7 @@ class FaceLoader(QThread):
 
         while True:
             picture = self.q.get()
-            serv_fr.add_picture(picture)
+            serv_fr.addPicture(picture)
 
     def load_from_db(self):
         self.logger.info("Start loading faces ....")

@@ -1050,7 +1050,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [20,"person-detection-know-out-know-out"]
+            "variable": [20,"person-detection-know"]
           }
         }
       ]

@@ -146,6 +146,7 @@ class Manager(QObject):
         self.services[name] = {}
         self.services[name]["state"] = state
         self.services[name].update(data)
+        print('keyboard : ' + str(self.services.get("keyboard")))
         self.checkScope()
 
     def retrieveData(self, action):
@@ -354,8 +355,9 @@ class Manager(QObject):
             # Check new/available condition
             newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
+                if self.services["keyboard"]["state"] == State.KEYBOARD_NEW:
                     newCondition = True
-            elif self.services["keyboard"]["state"] == State.KEYBOARD_NEW or self.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE:
+            elif self.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE or self.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE:
                 newCondition = True
         return newCondition
 
@@ -500,6 +502,7 @@ class Manager(QObject):
             else:
                 ui.activateManualButton.hide()
                 ui.manualLayoutContainer.hide()
+                ui.manualEdit.setText('')
         else:
             self.logger.info('Action(activateKeyboardInput) : Missing parameters.')
 

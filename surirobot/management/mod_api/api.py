@@ -154,7 +154,7 @@ class PictureListApi(Resource):
         db.session.add(picture)
         db.session.commit()
 
-        serv_fr.add_picture(picture)
+        serv_fr.addPicture(picture)
 
         return picture, 201
 

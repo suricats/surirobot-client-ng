@@ -1,6 +1,8 @@
 from PyQt5.QtCore import QThread, pyqtSlot
 import logging
 import sys
+import platform
+import subprocess
 from playsound import playsound
 
 class AudioPlayer(QThread):
@@ -18,6 +20,9 @@ class AudioPlayer(QThread):
     def play(self, filename):
         try:
             self.logger.info('Now playing' + str(filename) + '.')
-            playsound(filename)
+            if platform.system() == "Darwin":
+                subprocesss.call(["afplay", filename])
+            else:
+                playsound(filename)
         except Exception as e:
             self.logger.info('Error : .' + str(e))

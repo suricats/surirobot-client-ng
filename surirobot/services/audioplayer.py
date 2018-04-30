@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QThread, pyqtSlot
 import logging
 import simpleaudio as sa
-
+from pathlib import Path
 
 class AudioPlayer(QThread):
     def __init__(self):
@@ -24,6 +24,8 @@ class AudioPlayer(QThread):
     @pyqtSlot(str)
     def play(self, filename):
         try:
+            print(filename)
+            filename = Path(filename)
             print(filename)
             self.stop()
             print('A')

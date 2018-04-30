@@ -195,10 +195,12 @@ class FaceRecognition(QThread):
 
         img = face_recognition.load_image_file(picture.path)
         # self.logger.info("Face encoding .....")
-        face = face_recognition.face_encodings(img, None, 10)[0]
-
-        self.faces.append(face)
-        self.linker.append(picture.user.id)
+        if face_recognition.face_encodings(img, None, 10):
+            face = face_recognition.face_encodings(img, None, 10)[0]
+            self.faces.append(face)
+            self.linker.append(picture.user.id)
+        else:
+            self.logger.info('No face on the picture')
 
     def removePicture(self, picture):
         key = self.linker.index(picture.user.id)

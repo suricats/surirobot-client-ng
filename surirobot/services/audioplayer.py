@@ -21,7 +21,7 @@ class AudioPlayer(QThread):
         try:
             self.logger.info('Now playing' + str(filename) + '.')
             if platform.system() == "Darwin":
-                subprocesss.call(["afplay", filename])
+                subprocess.call(["afplay", filename])
             else:
                 playsound(filename)
         except Exception as e:

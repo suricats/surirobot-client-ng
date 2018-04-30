@@ -7,5 +7,5 @@ soundfile
 flask
 flask_restful
 flask_sqlalchemy
-playsound
+simpleaudio
 pyinstaller

@@ -1,8 +1,7 @@
 from PyQt5.QtCore import QThread, pyqtSlot
 import logging
-import simpleaudio as sa
-import platform
-
+import sys
+from playsound import playsound
 
 class AudioPlayer(QThread):
     def __init__(self):
@@ -13,29 +12,12 @@ class AudioPlayer(QThread):
         self.playObj = None
 
     def __del__(self):
-        self.stop()
         self.quit()
-
-    @pyqtSlot()
-    def stop(self):
-        if self.playObj:
-            self.playObj.stop()
-            self.logger.info('Stop playing.')
 
     @pyqtSlot(str)
     def play(self, filename):
         try:
-            print(filename)
-            if platform.system() == "Darwin":
-                filename = filename[1:]
-            self.stop()
-            print('A')
-            waveObj = sa.WaveObject.from_wave_file(filename)
-            print('B')
             self.logger.info('Now playing' + str(filename) + '.')
-            print('C')
-            self.playObj = waveObj.play()
-            print('D')
+            playsound(filename)
         except Exception as e:
             self.logger.info('Error : .' + str(e))
-        pass

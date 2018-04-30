@@ -2,6 +2,7 @@ from PyQt5.QtCore import QThread, pyqtSlot
 import logging
 import simpleaudio as sa
 import subprocess
+import platform
 
 
 class AudioPlayer(QThread):

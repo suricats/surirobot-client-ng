@@ -1,7 +1,8 @@
 from PyQt5.QtCore import QThread, pyqtSlot
 import logging
 import simpleaudio as sa
-from pathlib import Path
+import platform
+
 
 class AudioPlayer(QThread):
     def __init__(self):
@@ -25,8 +26,8 @@ class AudioPlayer(QThread):
     def play(self, filename):
         try:
             print(filename)
-            filename = Path(filename)
-            print(filename)
+            if platform.system() == "Darwin":
+                filename = filename[1:]
             self.stop()
             print('A')
             waveObj = sa.WaveObject.from_wave_file(filename)

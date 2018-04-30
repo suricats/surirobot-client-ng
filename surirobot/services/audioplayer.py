@@ -24,10 +24,15 @@ class AudioPlayer(QThread):
     @pyqtSlot(str)
     def play(self, filename):
         try:
+            print(filename)
             self.stop()
+            print('A')
             waveObj = sa.WaveObject.from_wave_file(filename)
+            print('B')
             self.logger.info('Now playing' + str(filename) + '.')
+            print('C')
             self.playObj = waveObj.play()
+            print('D')
         except Exception as e:
             self.logger.info('Error : .' + str(e))
         pass

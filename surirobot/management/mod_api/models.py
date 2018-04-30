@@ -34,7 +34,7 @@ class LogRecognize(db.Model):
     __tablename__ = 'log_recognize'
 
     id = db.Column(db.Integer, primary_key=True)
-    value = db.Column(db.Boolean)
+    value = db.Column(db.String)
     date = db.Column(db.DateTime)
 
     def __init__(self, value):

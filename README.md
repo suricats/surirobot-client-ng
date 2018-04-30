@@ -4,7 +4,7 @@ Full client.
 
 ## Installation under macOS using homebrew
 
-Install libs: `brew install python3 boost-python3 dlib`
+Install libs: `brew install python3 boost-python3 dlib cmake`
 
 Install required python3 modules: `pip3 install -r requirements.txt`
 

@@ -48,7 +48,7 @@ class FaceRecognition(QThread):
 
         self.unknownTimer = QTimer()
         self.unknownTimer.setSingleShot(True)
-        self.unknownTimer.setInterval((1000/self.NB_IMG_PER_SECOND) * 12)
+        self.unknownTimer.setInterval((1000/self.NB_IMG_PER_SECOND) * 8)
         self.unknownTimer.timeout.connect(self.unknownTimeout)
 
         self.knownTimer = QTimer()

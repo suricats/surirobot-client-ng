@@ -277,7 +277,7 @@
           "name": "displayText",
           "text": {
             "type": "input",
-            "variable": "Très bien ! Quel est ton nom ?"
+            "variable": "Très bien ! Quel est ton nom de famille ?"
           }
         },
         {

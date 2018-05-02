@@ -334,7 +334,7 @@
       <x>810</x>
       <y>30</y>
       <width>231</width>
-      <height>121</height>
+      <height>191</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -355,6 +355,38 @@
       <widget class="QLabel" name="labelDown">
        <property name="text">
         <string>TextLabel</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelDown_2">
+       <property name="text">
+        <string>Restez appuyé sur C pour lui parler.</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelDown_3">
+       <property name="text">
+        <string>SI vous disparaissez de la caméra, il vous dira en revoir !</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

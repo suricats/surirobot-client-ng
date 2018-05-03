@@ -49,7 +49,8 @@ Install required python3 modules: `pip3 install -r requirements.txt`
 
 For Ubuntu 18
 - change libatlas-dev by libatlas-base-dev
-- add libasound2-dev 
+- add libasound2-dev portaudio19-dev
+
 Install the lastest version of python3 dlib:
 
 ```bash

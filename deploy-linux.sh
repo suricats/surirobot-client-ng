@@ -4,7 +4,7 @@ rm -rf ${DIR}/build
 rm -rf ${DIR}/dist
 pyinstaller start.spec
 mkdir ${DIR}/dist/surirobot/face_recognition_models
-cp -rf /usr/local/lib/python3.5/dist-packages/face_recognition_models/models ${DIR}/dist/surirobot/face_recognition_models/models
+cp -rf ${DIR}/../face_recognition_models/models ${DIR}/dist/surirobot/face_recognition_models/models
 cp -rf res ${DIR}/dist/surirobot/
 cp -rf data ${DIR}/dist/surirobot/
 mkdir ${DIR}/dist/surirobot/tmp

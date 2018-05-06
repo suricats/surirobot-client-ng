@@ -44,7 +44,7 @@
     },
     {
       "id": 43,
-      "description": "Wait for audio - recogniez person",
+      "description": "Wait for audio - recognize person",
       "triggers": [
         {
           "service": "sound",
@@ -495,13 +495,6 @@
             "type" : "input",
             "variable": "listening"
           }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Ne bougez pas... je vois quelque chose."
-          }
         }
       ]
     },
@@ -511,8 +504,10 @@
       "triggers": [
         {
           "service": "face",
-          "name": "nobody",
-          "parameters": {}
+          "name": "working",
+          "parameters": {
+            "value" : false
+          }
         }
       ],
       "actions": [
@@ -521,13 +516,6 @@
           "image": {
             "type" : "input",
             "variable": "basic"
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "."
           }
         }
       ]

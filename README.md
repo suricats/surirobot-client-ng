@@ -39,13 +39,17 @@ apt-get install -y --fix-missing \
     pkg-config \
     python3-dev \
     python3-numpy \
-		python3-setuptools \
-		python3-pip \
+    python3-setuptools \
+    python3-pip \
     software-properties-common \
     zip
 ```
 
 Install required python3 modules: `pip3 install -r requirements.txt`
+
+For Ubuntu 18
+- change libatlas-dev by libatlas-base-dev
+- add libasound2-dev portaudio19-dev
 
 Install the lastest version of python3 dlib:
 

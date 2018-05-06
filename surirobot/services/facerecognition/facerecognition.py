@@ -112,7 +112,7 @@ class FaceRecognition(QThread):
             self.pretendentId = self.NOBODY
             self.unknownTimer.stop()
             self.knownTimer.stop()
-
+            self.dataValueChanged(State.FACE_DATAVALUE_NOT_WORKING)
             if not self.nobodyTimer.isActive():
                 if self.stateId != self.NOBODY:
                     self.nobodyTimer.start()
@@ -126,7 +126,7 @@ class FaceRecognition(QThread):
             if not self.unknownTimer.isActive():
                 if self.stateId != self.UNKNOWN:
                     self.unknownTimer.start()
-                    self.stateChanged(State.FACE_WORKING)
+                    self.dataValueChanged(State.FACE_DATAVALUE_WORKING)
 
         # Case a know person is present
         else:
@@ -139,7 +139,7 @@ class FaceRecognition(QThread):
                 if id != self.pretendentId:
                     self.pretendentId = id
                     self.knownTimer.start()
-                    self.stateChanged(State.FACE_WORKING)
+                    self.dataValueChanged(State.FACE_DATAVALUE_WORKING)
 
     @pyqtSlot()
     def nobodyTimeout(self):
@@ -177,6 +177,12 @@ class FaceRecognition(QThread):
                 'name': self.idToName(id)
             }
         self.updateState.emit(self.MODULE_NAME, state, data)
+
+    def dataValueChanged(self, datavalue):
+        data = {
+            'datavalue':  datavalue
+        }
+        self.updateState.emit(self.MODULE_NAME, State.NO_STATE, data)
 
     def personChanged(self, id):
         name = self.idToName(id)

@@ -17,7 +17,7 @@ class EmotionalAPICaller(ApiCaller):
     @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         if (reply.error() != QNetworkReply.NoError):
-            print("EMOTIONAL - Error " + str(reply.error()) + str(reply.readAll()))
+            print("EMOTIONAL - Error " + str(reply.error()) + ' : ' + str(reply.readAll()))
             self.signalIndicator.emit("emotion", "red")
             self.networkManager.clearAccessCache()
         else:

@@ -9,6 +9,7 @@ from surirobot.services import serv_ap
 class TtsApiCaller(ApiCaller):
     download = pyqtSignal(str)
     play_sound = pyqtSignal(str)
+    signalIndicator = pyqtSignal(str, str)
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
@@ -24,18 +25,22 @@ class TtsApiCaller(ApiCaller):
     @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         self.isBusy = False
+        buffer = reply.readAll()
         if (reply.error() != QNetworkReply.NoError):
             print("TTS - Error  " + str(reply.error()))
+            print("Data : " + str(buffer))
+            self.signalIndicator.emit("converse", "red")
             self.networkManager.clearAccessCache()
         else:
-            jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
-            url = jsonObject["downloadLink"].toString("")
-            if (not url):
-                print('TTS - Error : No url')
-                # self.new_reply.emit("Je ne me sens pas bien... [ERROR TTS : Fields needed don't exist.]")
-            else:
+            jsonObject = QJsonDocument.fromJson(buffer).object()
+            if jsonObject.get("downloadLink"):
+                url = jsonObject["downloadLink"].toString("")
                 print("Downloading the sound : " + url)
                 self.download.emit(url)
+            else:
+                print('TTS - Error : No url')
+                print('Data : ' + str(buffer))
+                self.signalIndicator.emit("converse", "orange")
         reply.deleteLater()
 
     @pyqtSlot(str)
@@ -49,7 +54,10 @@ class TtsApiCaller(ApiCaller):
 
         jsonData = QJsonDocument(jsonObject)
         data = jsonData.toJson()
-        request = QNetworkRequest(QUrl(self.url))
+
+        url = QUrl(self.url)
+        request = QNetworkRequest(url)
+        print('url : ' + str(url))
 
         request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
         self.networkManager.post(request, data)

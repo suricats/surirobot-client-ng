@@ -68,6 +68,7 @@ class Manager(QObject):
         face_loader.signalIndicator.connect(ui.changeIndicator)
         serv_emo.signalIndicator.connect(ui.changeIndicator)
         api_converse.signalIndicator.connect(ui.changeIndicator)
+        api_tts.signalIndicator.connect(ui.changeIndicator)
 
         self.signal_ui_indicator.emit("face", "grey")
         self.signal_ui_indicator.emit("emotion", "grey")
@@ -142,11 +143,10 @@ class Manager(QObject):
     def update(self, name, state, data):
         print('Update of scenarios from ' + name)
         # print('Data : ' + str(data))
-        print('\nScope : ' + str(self.scope))
-        self.services[name] = {}
+        # print('\nScope : ' + str(self.scope))
+        # self.services[name] = {}
         self.services[name]["state"] = state
         self.services[name].update(data)
-        print('keyboard : ' + str(self.services.get("keyboard")))
         self.checkScope()
 
     def retrieveData(self, action):
@@ -265,7 +265,7 @@ class Manager(QObject):
     def faceWorking(self, input):
         if not (input["parameters"].get("value") is None):
             if self.services.get("face"):
-                if self.services["face"]["state"] == State.FACE_WORKING:
+                if self.services["face"]["datavalue"] == State.FACE_DATAVALUE_WORKING:
                     return input["parameters"]["value"]
                 else:
                     return not input["parameters"]["value"]

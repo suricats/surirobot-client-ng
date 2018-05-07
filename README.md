@@ -42,14 +42,15 @@ apt-get install -y --fix-missing \
     python3-setuptools \
     python3-pip \
     software-properties-common \
-    zip
+    zip \
+    libasound2-dev
 ```
 
 Install required python3 modules: `pip3 install -r requirements.txt`
 
 For Ubuntu 18
 - change libatlas-dev by libatlas-base-dev
-- add libasound2-dev portaudio19-dev
+- add portaudio19-dev
 
 Install the lastest version of python3 dlib:
 

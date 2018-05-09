@@ -141,7 +141,6 @@ class Manager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
-        self.signal_nlp_request.emit("hey")
         print('Update of scenarios from ' + name)
         # print('Data : ' + str(data))
         # print('\nScope : ' + str(self.scope))

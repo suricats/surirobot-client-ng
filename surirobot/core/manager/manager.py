@@ -33,7 +33,7 @@ class Manager(QObject):
         QObject.__init__(self)
         self.triggers = {}
         self.actions = {}
-        self.services = {"face": {}, "emotion": {}, "converse": {}, "sound": {}, "storage": {}}
+        self.services = {"face": {}, "emotion": {}, "converse": {}, "sound": {}, "storage": {}, "keyboard": {}}
         self.scope = []
         self.groups = {}
         self.scenarios = {}
@@ -141,7 +141,6 @@ class Manager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
-        self.signal_nlp_request.emit("hey")
         print('Update of scenarios from ' + name)
         # print('Data : ' + str(data))
         # print('\nScope : ' + str(self.scope))

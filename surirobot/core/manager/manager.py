@@ -33,7 +33,7 @@ class Manager(QObject):
         QObject.__init__(self)
         self.triggers = {}
         self.actions = {}
-        self.services = {"face": {}, "emotion": {}, "converse": {}, "sound": {}, "storage": {}}
+        self.services = {"face": {}, "emotion": {}, "converse": {}, "sound": {}, "storage": {}, "keyboard": {}}
         self.scope = []
         self.groups = {}
         self.scenarios = {}

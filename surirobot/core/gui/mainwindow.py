@@ -213,6 +213,11 @@ class Ui_MainWindow(object):
         self.emotionIndicator.setAlignment(QtCore.Qt.AlignCenter)
         self.emotionIndicator.setObjectName("emotionIndicator")
         self.horizontalLayout_4.addWidget(self.emotionIndicator)
+        self.nextCamera = QtWidgets.QCommandLinkButton(self.centralWidget)
+        self.nextCamera.setGeometry(QtCore.QRect(230, 90, 31, 31))
+        self.nextCamera.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.nextCamera.setText("")
+        self.nextCamera.setObjectName("nextCamera")
         MainWindow.setCentralWidget(self.centralWidget)
 
         self.retranslateUi(MainWindow)

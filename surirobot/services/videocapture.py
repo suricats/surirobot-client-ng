@@ -1,5 +1,4 @@
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal, QTimer
 from PyQt5.Qt import QImage
 import cv2
 import time
@@ -21,16 +20,27 @@ class VideoCapture(QThread):
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
-
+        self.nbCam = 0
+        self.currentCam = 0
+        self.video_capture = None
         self.signal_change_camera.connect(ui.setCamera)
+        ui.nextCamera.pressed.connect(self.changeCamera)
+
+        self.videoWorkLoop = QTimer()
+        self.videoWorkLoop.timeout.connect(self.detect)
+        self.videoWorkLoop.setInterval(1000/self.NB_IMG_PER_SECOND)
 
     def __del__(self):
+        self.video_capture.release()
         cv2.destroyAllWindows()
         self.quit()
 
-    def run(self):
+    def start(self):
         if platform.system() == "Darwin":
-            video_capture = cv2.VideoCapture(0)
+            self.video_capture = cv2.VideoCapture(0)
+            self.nbCam = 1
+            self.currentCam = 0
+            ui.nextCamera.hide()
         else:
             # Get the devices
             try:
@@ -38,25 +48,37 @@ class VideoCapture(QThread):
                 regex = re.compile(r'^video')
                 deviceList = list(filter(regex.match, fileList))
                 # video_capture = cv2.VideoCapture(len(deviceList))
-                video_capture = cv2.VideoCapture(len(deviceList)-1)
+                self.nbCam = len(deviceList)
+                if self.nbCam <= 1:
+                    ui.nextCamera.hide()
+                self.currentCam = 0
+                self.video_capture = cv2.VideoCapture(0)
             except Exception as e:
-                video_capture = cv2.VideoCapture(-1)
-
-        if not video_capture.isOpened():
+                self.video_capture = cv2.VideoCapture(-1)
+        if self.video_capture.isOpened():
+            self.videoWorkLoop.start()
+        else:
             print('Error - Can\'t open camera')
-        while(True):
-            try:
-                time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
-                ret, frame = video_capture.read()
-                self.last_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-                # cv2.imshow("preview", self.last_frame)
-                height, width, channel = frame.shape
-                bytesPerLine = 3 * width
-                qImg = QImage(frame.data, width, height, bytesPerLine, QImage.Format_RGB888)
-                self.signal_change_camera.emit(qImg)
-            except Exception as e:
-                print('Error : ' + str(e))
-        video_capture.release()
+
+    @pyqtSlot()
+    def detect(self):
+        try:
+            ret, frame = self.video_capture.read()
+            self.last_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+            # cv2.imshow("preview", self.last_frame)
+            height, width, channel = frame.shape
+            bytesPerLine = 3 * width
+            qImg = QImage(frame.data, width, height, bytesPerLine, QImage.Format_RGB888)
+            self.signal_change_camera.emit(qImg)
+        except Exception as e:
+            print('Error : ' + str(e))
+        self.videoWorkLoop.setInterval(-time.time() % (1 / self.NB_IMG_PER_SECOND)*1000)
+
+    @pyqtSlot()
+    def changeCamera(self):
+        print('yolo')
+        self.currentCam = (self.currentCam+1) % self.nbCam
+        self.video_capture.open(self.currentCam)
 
     def get_frame(self):
         return self.last_frame

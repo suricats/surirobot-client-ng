@@ -1,6 +1,6 @@
 from .base import ApiCaller
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QJsonDocument, QUrl, QVariant, QFile, QIODevice
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QJsonDocument, QUrl, QVariant, QFile, QIODevice, QByteArray
 from surirobot.core.common import State
 
 
@@ -36,18 +36,30 @@ class EmotionalAPICaller(ApiCaller):
 
     @pyqtSlot(str)
     def sendRequest(self, text):
-        multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
-        # Picture
-        picturePart = QHttpPart()
-        picturePart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"picture\"; filename=\"picture.jpeg\""))
-        picturePart.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("image/jpeg"))
+        print('A')
         file = QFile(text)
-        file.open(QIODevice.ReadOnly)
-        picturePart.setBodyDevice(file)
-        file.setParent(multiPart)
-
-        multiPart.append(picturePart)
+        print('B')
+        body = QByteArray(file.readAll())
+        print('C')
+        # data = QByteArray(body.toAscii())
+        print('D')
         request = QNetworkRequest(QUrl(self.url))
+        print('E')
+        request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("image/jpeg"))
         print("Sended to Emotional API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + " Ko")
-        reply = self.networkManager.post(request, multiPart)
-        multiPart.setParent(reply)
+        self.networkManager.post(request, body)
+        # multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
+        # # Picture
+        # picturePart = QHttpPart()
+        # picturePart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"picture\"; filename=\"picture.jpeg\""))
+        # picturePart.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("image/jpeg"))
+        # file = QFile(text)
+        # file.open(QIODevice.ReadOnly)
+        # picturePart.setBodyDevice(file)
+        # file.setParent(multiPart)
+        #
+        # multiPart.append(picturePart)
+        # request = QNetworkRequest(QUrl(self.url))
+        # print("Sended to Emotional API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + " Ko")
+        # reply = self.networkManager.post(request, multiPart)
+        # multiPart.setParent(reply)

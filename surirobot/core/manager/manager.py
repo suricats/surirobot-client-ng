@@ -141,7 +141,7 @@ class Manager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
-        print('Update of scenarios from ' + name)
+        # print('Update of scenarios from ' + name)
         # print('Data : ' + str(data))
         # print('\nScope : ' + str(self.scope))
         # self.services[name] = {}
@@ -195,7 +195,7 @@ class Manager(QObject):
                     break
                 if self.checkForTrigger(sc):
                     self.updateState(sc)
-                    print('\nScenario ' + str(sc["id"]) + " has been activated\n")
+                    # print('\nScenario ' + str(sc["id"]) + " has been activated\n")
                     for index, action in enumerate(sc["actions"]):
                         input = self.retrieveData(action)
                         func = self.actions[action["name"]]

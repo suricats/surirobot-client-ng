@@ -16,50 +16,41 @@ class EmotionalAPICaller(ApiCaller):
 
     @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
-        if (reply.error() != QNetworkReply.NoError):
-            print("EMOTIONAL - Error " + str(reply.error()) + ' : ' + str(reply.readAll()))
-            self.signalIndicator.emit("emotion", "red")
-            self.networkManager.clearAccessCache()
-        else:
-            jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
-            emotion = jsonObject["data"]
-            self.signalIndicator.emit("emotion", "green")
-            if emotion:
-                self.received_reply.emit(
-                    State.EMOTION_NEW, {'emotion': emotion.toString()}
-                )
+        print("huho")
+        try:
+            if (reply.error() != QNetworkReply.NoError):
+                print("EMOTIONAL - Error " + str(reply.error()))
+                print("HTTP " + str(reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute) + ' : ' + str(reply.readAll())))
+                self.signalIndicator.emit("emotion", "red")
+                self.networkManager.clearAccessCache()
             else:
-                self.received_reply.emit(
-                    State.EMOTION_NO, {'emotion': []}
-                )
-        reply.deleteLater()
+                jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
+                print(jsonObject)
+                emotion = jsonObject["emotion"]
+                percent = jsonObject["percent"]
+
+                self.signalIndicator.emit("emotion", "green")
+                if emotion:
+                    self.received_reply.emit(
+                        State.EMOTION_NEW, {'emotion': emotion.toString()}
+                    )
+                else:
+                    self.received_reply.emit(
+                        State.EMOTION_NO, {'emotion': []}
+                    )
+            reply.deleteLater()
+        except Exception as e:
+            print("Error : "  + str(e))
 
     @pyqtSlot(str)
     def sendRequest(self, text):
-        print('A')
-        file = QFile(text)
-        print('B')
-        body = QByteArray(file.readAll())
-        print('C')
-        # data = QByteArray(body.toAscii())
-        print('D')
-        request = QNetworkRequest(QUrl(self.url))
-        print('E')
-        request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("image/jpeg"))
-        print("Sended to Emotional API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + " Ko")
-        self.networkManager.post(request, body)
-        # multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
-        # # Picture
-        # picturePart = QHttpPart()
-        # picturePart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"picture\"; filename=\"picture.jpeg\""))
-        # picturePart.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("image/jpeg"))
-        # file = QFile(text)
-        # file.open(QIODevice.ReadOnly)
-        # picturePart.setBodyDevice(file)
-        # file.setParent(multiPart)
-        #
-        # multiPart.append(picturePart)
-        # request = QNetworkRequest(QUrl(self.url))
-        # print("Sended to Emotional API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + " Ko")
-        # reply = self.networkManager.post(request, multiPart)
-        # multiPart.setParent(reply)
+        try:
+            file = QFile(text)
+            file.open(QIODevice.ReadOnly)
+            body = file.readAll()
+            request = QNetworkRequest(QUrl(self.url))
+            request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("image/jpeg"))
+            print("Sended to Emotional API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + " Ko")
+            self.networkManager.post(request, body)
+        except Exception as e:
+            print(e)

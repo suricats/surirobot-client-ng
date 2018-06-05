@@ -16,18 +16,21 @@ class EmotionalAPICaller(ApiCaller):
 
     @pyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
-        print("huho")
+        buffer = reply.readAll()
         try:
             if (reply.error() != QNetworkReply.NoError):
                 print("EMOTIONAL - Error " + str(reply.error()))
-                print("HTTP " + str(reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute) + ' : ' + str(reply.readAll())))
+                if reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute):
+                    print("HTTP " + str(reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute) + ' : ' + str(buffer)))
                 self.signalIndicator.emit("emotion", "red")
                 self.networkManager.clearAccessCache()
+                self.received_reply.emit(
+                    State.EMOTION_NO, {'emotion': []}
+                )
             else:
-                jsonObject = QJsonDocument.fromJson(reply.readAll()).object()
-                print(jsonObject)
+                jsonObject = QJsonDocument.fromJson(buffer).object()
                 emotion = jsonObject["emotion"]
-                percent = jsonObject["percent"]
+                # percent = jsonObject["percent"]
 
                 self.signalIndicator.emit("emotion", "green")
                 if emotion:
@@ -40,7 +43,7 @@ class EmotionalAPICaller(ApiCaller):
                     )
             reply.deleteLater()
         except Exception as e:
-            print("Error : "  + str(e))
+            print("Error : " + str(e) + "\n" + str(buffer))
 
     @pyqtSlot(str)
     def sendRequest(self, text):

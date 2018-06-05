@@ -34,7 +34,8 @@ class ConverseApiCaller(ApiCaller):
         buffer = QByteArray(reply.readAll())
         # print('\nConverse : Receive reply : ' + str(buffer))
         if (reply.error() != QNetworkReply.NoError):
-            print("Converse - Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
+            print("Converse - Error  " + str(reply.error()) + " : ")
+            print("HTTP " + str(reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute)) + ' : ' + buffer.data().decode('utf8'))
             self.signalIndicator.emit("converse", "red")
             self.intent = "message"
             self.message = "Il semblerait qu'il y ait eu un problème"
@@ -44,6 +45,7 @@ class ConverseApiCaller(ApiCaller):
         # Converse reply
         if jsonObject.get("intent") and jsonObject.get("answerText") and jsonObject.get("answerAudioLink"):
             self.intent = jsonObject["intent"].toString()
+            print("intent : " + self.intent)
             self.message = jsonObject["answerText"].toString()
             url = jsonObject["answerAudioLink"].toString()
             self.download.emit(url)

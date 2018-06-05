@@ -44,10 +44,11 @@ class EmotionalRecognition(QThread):
                 time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
                 if not self.isBusy:
                     frame = serv_vc.get_frame()
-                    file_path = Dir.TMP + format(uuid.uuid4()) + '.jpeg'
-                    cv2.imwrite(file_path, frame)
-                    self.isBusy = True
-                    self.send_request.emit(file_path)
+                    if frame is not None:
+                        file_path = Dir.TMP + format(uuid.uuid4()) + '.jpeg'
+                        cv2.imwrite(file_path, frame)
+                        self.isBusy = True
+                        self.send_request.emit(file_path)
             except Exception as e:
                 print('Emotional - Error : ' + str(e))
 

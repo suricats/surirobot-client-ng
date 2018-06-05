@@ -1,11 +1,19 @@
 {
   "initial": ["converse","emotion-detection","special-persons","face-working",3,4,40],
-  "groups" : {"person-detection" : [3,4,9,40],
+  "groups" : {
+    "person-detection" : [3,4,9,40],
     "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
     "converse" : [43,2,1],
     "person-detection-know-out" : [3,9],
-    "face-working" : [41,42]},
+    "face-working" : [41,42]
+  },
+  "actions" : [
+    {
+      "id": 1,
+      "description" : "Action"
+    }
+  ],
   "scenarios": [
     {
       "id": 1,

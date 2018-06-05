@@ -77,7 +77,7 @@ class Manager(QObject):
         self.generateTriggers()
         self.generateActions()
 
-        self.loadScenarioFile("/scenario.json")
+        self.loadScenarioFile("/scenario-video.json")
 
     def generateTriggers(self):
         self.triggers["sound"] = {}
@@ -186,27 +186,30 @@ class Manager(QObject):
         return active
 
     def checkScope(self):
-        if not self.freeze:
-            for scId in self.scope:
-                sc = self.scenarios[scId]
-                # print('Scenario : ' + str(scId))
-                if self.scopeChanged:
-                    self.scopeChanged = False
-                    break
-                if self.checkForTrigger(sc):
-                    self.updateState(sc)
-                    # print('\nScenario ' + str(sc["id"]) + " has been activated\n")
-                    for index, action in enumerate(sc["actions"]):
-                        input = self.retrieveData(action)
-                        func = self.actions[action["name"]]
-                        if func:
-                            func(input)
-                            # Special for wait action
-                            if self.freeze:
-                                self.remainingActions = sc["actions"][index+1:]
-                                # print('Remaining actions - checkScope : ' + str(self.remainingActions))
-                                break
-            self.scopeChanged = False
+        try:
+            if not self.freeze:
+                for scId in self.scope:
+                    sc = self.scenarios[scId]
+                    # print('Scenario : ' + str(scId))
+                    if self.scopeChanged:
+                        self.scopeChanged = False
+                        break
+                    if self.checkForTrigger(sc):
+                        self.updateState(sc)
+                        # print('\nScenario ' + str(sc["id"]) + " has been activated\n")
+                        for index, action in enumerate(sc["actions"]):
+                            input = self.retrieveData(action)
+                            func = self.actions[action["name"]]
+                            if func:
+                                func(input)
+                                # Special for wait action
+                                if self.freeze:
+                                    self.remainingActions = sc["actions"][index+1:]
+                                    # print('Remaining actions - checkScope : ' + str(self.remainingActions))
+                                    break
+                self.scopeChanged = False
+        except Exception as e:
+            print("Error - checkScope : " + str(e))
 
     def updateState(self, sc):
         for trigger in sc["triggers"]:

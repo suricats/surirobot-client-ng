@@ -64,12 +64,13 @@ class VideoCapture(QThread):
     def detect(self):
         try:
             ret, frame = self.video_capture.read()
-            self.last_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-            # cv2.imshow("preview", self.last_frame)
-            height, width, channel = frame.shape
-            bytesPerLine = 3 * width
-            qImg = QImage(frame.data, width, height, bytesPerLine, QImage.Format_RGB888)
-            self.signal_change_camera.emit(qImg)
+            if frame is not None:
+                self.last_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+                # cv2.imshow("preview", self.last_frame)
+                height, width, channel = frame.shape
+                bytesPerLine = 3 * width
+                qImg = QImage(frame.data, width, height, bytesPerLine, QImage.Format_RGB888)
+                self.signal_change_camera.emit(qImg)
         except Exception as e:
             print('Error : ' + str(e))
         self.videoWorkLoop.setInterval(-time.time() % (1 / self.NB_IMG_PER_SECOND)*1000)

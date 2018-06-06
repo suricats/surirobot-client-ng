@@ -51,7 +51,7 @@ Install required python3 modules: `pip3 install -r requirements.txt`
 For Ubuntu 18
 - change libatlas-dev by libatlas-base-dev
 - add portaudio19-dev
-
+- If you have issues with HTTPS request see : https://stackoverflow.com/questions/50201988/pyqt5-ubuntu-18-04-error-99-on-qnetworkreply-when-request-to-https-url/50720834#50720834
 Install the lastest version of python3 dlib:
 
 ```bash

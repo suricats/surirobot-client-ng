@@ -4,8 +4,7 @@ from PyQt5.QtCore import QByteArray, QJsonDocument, QVariant, QFile, QIODevice, 
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest, QNetworkAccessManager
 import uuid
 from surirobot.services import serv_ap
-from surirobot.core.common import State
-
+from surirobot.core.common import State,Dir
 
 class ConverseApiCaller(ApiCaller):
     download = pyqtSignal(str)
@@ -37,9 +36,9 @@ class ConverseApiCaller(ApiCaller):
             print("Converse - Error  " + str(reply.error()) + " : ")
             print("HTTP " + str(reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute)) + ' : ' + buffer.data().decode('utf8'))
             self.signalIndicator.emit("converse", "red")
-            self.intent = "message"
-            self.message = "Il semblerait qu'il y ait eu un problème"
-            self.download.emit("https://i1.theportalwiki.net/img/d/d0/GLaDOS_potatos_sp_a4_intro_uhoh03_fr.wav")
+            self.message = "Oh mince ! Je ne fonctionne plus très bien :("
+            filename = Dir.DATA + "error.wav"
+            self.updateState.emit("converse", State.CONVERSE_NEW, {"intent": "error", "reply": self.message, "audiopath": filename})
             self.networkManager.clearAccessCache()
         jsonObject = QJsonDocument.fromJson(buffer).object()
         # Converse reply

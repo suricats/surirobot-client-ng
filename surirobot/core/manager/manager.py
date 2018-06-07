@@ -77,7 +77,7 @@ class Manager(QObject):
         self.generateTriggers()
         self.generateActions()
 
-        self.loadScenarioFile("/scenario-video.json")
+        self.loadScenarioFile("/scenario.json")
 
     def generateTriggers(self):
         self.triggers["sound"] = {}

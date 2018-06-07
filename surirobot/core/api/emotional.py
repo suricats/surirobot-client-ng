@@ -35,8 +35,8 @@ class EmotionalAPICaller(ApiCaller):
                 self.signalIndicator.emit("emotion", "green")
                 if emotion:
                     self.received_reply.emit(
-                        # State.EMOTION_NEW, {'emotion': emotion.toString()}
-                        State.EMOTION_NEW, {'emotion': 'angry'}
+                        State.EMOTION_NEW, {'emotion': emotion.toString()}
+                        # State.EMOTION_NEW, {'emotion': 'angry'}
                     )
                 else:
                     self.received_reply.emit(

@@ -4,7 +4,7 @@
     "person-detection" : [3,4,9,40],
     "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
-    "converse" : [43,2,1],
+    "converse" : [-3,43,2,1],
     "person-detection-know-out" : [3,9],
     "face-working" : [41,42]
   },
@@ -15,6 +15,220 @@
     }
   ],
   "scenarios": [
+    {
+			"id": -3,
+			"description": "Ask for operations",
+			"triggers": [{
+				"service": "converse",
+				"name": "new",
+				"parameters": {
+					"intent": "ask-operations"
+				}
+			}],
+			"actions": [{
+					"name": "activateKeyboardInput",
+					"activate": {
+						"type": "input",
+						"variable": false
+					}
+				},
+        {
+					"name": "changeSuriface",
+					"image": {
+						"type": "input",
+						"variable": "basic"
+					}
+				},
+				{
+					"name": "displayText",
+					"text": {
+						"type": "input",
+						"variable": "Voici vos dernières opérations :"
+					}
+				},
+				{
+					"name": "speak",
+					"text": {
+						"type": "service",
+						"name": "storage",
+						"variable": "@text"
+					}
+				},
+				{
+					"name": "displayText",
+					"text": {
+						"type": "input",
+						"variable": "30 mai 2018 : VIREMENT SURICATS : +856€\n30 mai 2018 : CB MIAM-MIAM NOODL : -8,90€\n29 mai 2018 : CB Spotify : -14,99€\n11 mai 2018 : CB SUBWAY : -10,50€"
+					},
+					"variables": [{
+							"firstname": {
+								"type": "service",
+								"name": "face",
+								"variable": "firstname"
+							}
+						},
+						{
+							"lastname": {
+								"type": "service",
+								"name": "face",
+								"variable": "lastname"
+							}
+						}
+					]
+				},
+				{
+					"name": "wait",
+					"time": {
+						"type": "input",
+						"variable": 4000
+					}
+				},
+				{
+					"name": "speak",
+					"text": {
+						"type": "input",
+						"variable": "Que voulez vous faire maintenant ?"
+					}
+				},
+				{
+					"name": "changeSuriface",
+					"image": {
+						"type": "input",
+						"variable": "listening"
+					}
+				},
+				{
+					"name": "wait",
+					"time": {
+						"type": "input",
+						"variable": 5000
+					}
+				},
+				{
+					"name": "callScenarios",
+					"id": {
+						"type": "input",
+						"variable": [-2, 0, "converse", "person-detection", "emotion-detection"]
+					}
+				}
+			]
+
+		},
+    {
+  			"id": -2,
+  			"description": "[MEET UP] :  Angry",
+  			"triggers": [{
+  				"service": "emotion",
+  				"name": "new",
+  				"parameters": {
+  					"emotion": "anger"
+  				}
+  			}],
+  			"actions": [{
+  					"name": "changeSuriface",
+  					"image": {
+  						"type": "input",
+  						"variable": "worried"
+  					}
+  				},
+  				{
+  					"name": "displayText",
+  					"text": {
+  						"type": "input",
+  						"variable": "Voulez vous que j'appelle un conseiller pour venir vous aider ?"
+  					}
+  				},
+  				{
+  					"name": "callScenarios",
+  					"id": {
+  						"type": "input",
+  						"variable": [5, 9, 3]
+  					}
+  				},
+  				{
+  					"name": "speak",
+  					"text": {
+  						"type": "service",
+  						"name": "storage",
+  						"variable": "@text"
+  					}
+  				}
+  			]
+  		},
+  		{
+  			"id": -1,
+  			"description": "[MEET UP] :  Wait for converse -take appointment",
+  			"triggers": [{
+  				"service": "converse",
+  				"name": "new",
+  				"parameters": {
+  					"intent": "appointment"
+  				}
+  			}],
+  			"actions": [
+          {
+  					"name": "changeSuriface",
+  					"image": {
+  						"type": "input",
+  						"variable": "basic"
+  					}
+  				},
+          {
+  					"name": "displayText",
+  					"text": {
+  						"type": "input",
+  						"variable": "Vendredi 15 Juin à 17h.\nLundi 18 Juin à 14h.\nMercredi 20 Juin à 9h30."
+  					}
+  				},
+  				{
+  					"name": "speak",
+  					"text": {
+  						"type": "input",
+  						"name": "storage",
+  						"variable": "Votre conseiller participe actuellement à un mite eupe. Voici ses disponibilité."
+  					}
+  				},
+  				{
+  					"name": "callScenarios",
+  					"id": {
+  						"type": "input",
+  						"variable": ["face-working", "converse", "person-detection", "emotion-detection"]
+  					}
+  				}
+  			]
+  		},
+      {
+  			"id": 0,
+  			"description": "[MEET UP] : Wait for audio - take appointment",
+  			"triggers": [{
+  				"service": "sound",
+  				"name": "new",
+  				"parameters": {}
+  			}],
+  			"actions": [{
+  					"name": "converse",
+  					"filepath": {
+  						"type": "service",
+  						"name": "sound",
+  						"variable": "filepath"
+  					}
+  				},
+  				{
+  					"name": "changeSuriface",
+  					"image": {
+  						"type": "input",
+  						"variable": "computing2"
+  					}
+  				},
+  				{
+  					"name": "callScenarios",
+  					"id": {
+  						"type": "input",
+  						"variable": [-1, "converse"]
+  					}
+  				}
+  			]
+  		},
     {
       "id": 1,
       "description": "Wait for audio",
@@ -142,7 +356,7 @@
     },
     {
       "id": 3,
-      "description": "Recognize a known person",
+      "description": "[MEET UP] : Recognize a known person",
       "triggers": [
         {
           "service": "face",
@@ -159,28 +373,27 @@
           }
         },
         {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Oh salut {@firstname} {@lastname} !"
-          },
-          "variables": [
-            {
-              "firstname": {
-                "type": "service",
-                "name": "face",
-                "variable": "firstname"
-              }
-            },
-            {
-              "lastname": {
-                "type": "service",
-                "name": "face",
-                "variable": "lastname"
-              }
-            }
-          ]
-        },
+					"name": "displayText",
+					"text": {
+						"type": "input",
+						"variable": "Bonjour {@firstname} {@lastname}. Que puis-je faire pour vous ?"
+					},
+					"variables": [{
+							"firstname": {
+								"type": "service",
+								"name": "face",
+								"variable": "firstname"
+							}
+						},
+						{
+							"lastname": {
+								"type": "service",
+								"name": "face",
+								"variable": "lastname"
+							}
+						}
+					]
+				},
         {
           "name": "changeSuriface",
           "image": {
@@ -200,7 +413,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+            "variable": [-2,0,"converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal, QTimer
+from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal, QTimer, QElapsedTimer
 import os
 import logging
 import time
@@ -42,16 +42,19 @@ class FaceRecognition(QThread):
         self.faceWorkLoop.setInterval(1000/self.NB_IMG_PER_SECOND)
 
         self.nobodyTimer = QTimer()
+        self.nobodyElaspedTimer = QElapsedTimer()
         self.nobodyTimer.setSingleShot(True)
         self.nobodyTimer.setInterval((1000/self.NB_IMG_PER_SECOND) * 6)
         self.nobodyTimer.timeout.connect(self.nobodyTimeout)
 
         self.unknownTimer = QTimer()
+        self.unknowElaspedTimer = QElapsedTimer()
         self.unknownTimer.setSingleShot(True)
         self.unknownTimer.setInterval((1000/self.NB_IMG_PER_SECOND) * 8)
         self.unknownTimer.timeout.connect(self.unknownTimeout)
 
         self.knownTimer = QTimer()
+        self.knowElaspedTimer = QElapsedTimer()
         self.knownTimer.setSingleShot(True)
         self.knownTimer.setInterval((1000/self.NB_IMG_PER_SECOND) * 5)
         self.knownTimer.timeout.connect(self.knownTimeout)
@@ -116,6 +119,7 @@ class FaceRecognition(QThread):
             if not self.nobodyTimer.isActive():
                 if self.stateId != self.NOBODY:
                     self.nobodyTimer.start()
+                    self.nobodyElaspedTimer.start()
 
         # Case a face is present but we don't know who is it
         elif id == self.UNKNOWN:
@@ -126,6 +130,7 @@ class FaceRecognition(QThread):
             if not self.unknownTimer.isActive():
                 if self.stateId != self.UNKNOWN:
                     self.unknownTimer.start()
+                    self.unknowElaspedTimer.start()
                     self.dataValueChanged(State.FACE_DATAVALUE_WORKING)
 
         # Case a know person is present
@@ -139,6 +144,7 @@ class FaceRecognition(QThread):
                 if id != self.pretendentId:
                     self.pretendentId = id
                     self.knownTimer.start()
+                    self.knowElaspedTimer.start()
                     self.dataValueChanged(State.FACE_DATAVALUE_WORKING)
 
     @pyqtSlot()

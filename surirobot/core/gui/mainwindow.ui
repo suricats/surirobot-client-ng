@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1070</width>
-    <height>698</height>
+    <width>1230</width>
+    <height>777</height>
    </rect>
   </property>
   <property name="palette">
@@ -189,10 +189,10 @@
    <widget class="QFrame" name="textLayoutContainer">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>500</y>
-      <width>471</width>
-      <height>121</height>
+      <x>290</x>
+      <y>100</y>
+      <width>591</width>
+      <height>241</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -290,8 +290,8 @@
    <widget class="QPushButton" name="activateManualButton">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>640</y>
+      <x>440</x>
+      <y>720</y>
       <width>331</width>
       <height>41</height>
      </rect>
@@ -303,8 +303,8 @@
    <widget class="QWidget" name="imageWidget" native="true">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>130</y>
+      <x>390</x>
+      <y>350</y>
       <width>411</width>
       <height>341</height>
      </rect>
@@ -331,8 +331,8 @@
    <widget class="QWidget" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>30</y>
+      <x>990</x>
+      <y>10</y>
       <width>231</width>
       <height>191</height>
      </rect>
@@ -438,8 +438,8 @@
    <widget class="QWidget" name="faceIndicatorWidget" native="true">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>70</y>
+      <x>1000</x>
+      <y>210</y>
       <width>51</width>
       <height>51</height>
      </rect>
@@ -472,8 +472,8 @@
    <widget class="QWidget" name="converseIndicatorWidget" native="true">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>70</y>
+      <x>1090</x>
+      <y>210</y>
       <width>51</width>
       <height>51</height>
      </rect>
@@ -506,8 +506,8 @@
    <widget class="QWidget" name="emotionIndicatorWidget" native="true">
     <property name="geometry">
      <rect>
-      <x>670</x>
-      <y>70</y>
+      <x>1170</x>
+      <y>210</y>
       <width>51</width>
       <height>51</height>
      </rect>
@@ -551,6 +551,222 @@
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="knowProgressBar">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>380</y>
+      <width>231</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="palette">
+     <palette>
+      <active>
+       <colorrole role="Highlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>138</red>
+          <green>226</green>
+          <blue>52</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </active>
+      <inactive>
+       <colorrole role="Highlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>138</red>
+          <green>226</green>
+          <blue>52</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </inactive>
+      <disabled>
+       <colorrole role="Highlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>240</red>
+          <green>240</green>
+          <blue>240</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </disabled>
+     </palette>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="knowProgressText">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>337</y>
+      <width>213</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reconnaissance de personne connue en cours...</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+    <property name="margin">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="nobodyProgressText">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>447</y>
+      <width>213</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Attention, vous n'êtes plus reconnu(e) !</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+    <property name="margin">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="nobodyProgressBar">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>490</y>
+      <width>231</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="palette">
+     <palette>
+      <active>
+       <colorrole role="Highlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>204</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </active>
+      <inactive>
+       <colorrole role="Highlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>204</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </inactive>
+      <disabled>
+       <colorrole role="Highlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>240</red>
+          <green>240</green>
+          <blue>240</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </disabled>
+     </palette>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="unknowProgressText">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>567</y>
+      <width>213</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Vérification de la présence d'une personne inconnue...</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+    <property name="margin">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="unknowProgressBar">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>610</y>
+      <width>231</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="palette">
+     <palette>
+      <active>
+       <colorrole role="Highlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>252</red>
+          <green>175</green>
+          <blue>62</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </active>
+      <inactive>
+       <colorrole role="Highlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>252</red>
+          <green>175</green>
+          <blue>62</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </inactive>
+      <disabled>
+       <colorrole role="Highlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>240</red>
+          <green>240</green>
+          <blue>240</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </disabled>
+     </palette>
+    </property>
+    <property name="value">
+     <number>0</number>
     </property>
    </widget>
   </widget>

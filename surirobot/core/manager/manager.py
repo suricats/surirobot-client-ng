@@ -3,6 +3,8 @@ from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader, serv_emo
 from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core import ui
 from surirobot.core.common import State, Dir
+from surirobot.core.gui.progressbarupdater import progressBarUpdater
+
 import logging
 import json
 import re
@@ -78,6 +80,17 @@ class Manager(QObject):
         self.generateActions()
 
         self.loadScenarioFile("/scenario.json")
+
+        # Test
+        try:
+            self.knowUpdater = progressBarUpdater(ui.knowProgressBar, serv_fr.knownTimer, serv_fr.knowElaspedTimer, ui.knowProgressText)
+            self.knowUpdater.start()
+            self.unknowUpdater = progressBarUpdater(ui.unknowProgressBar, serv_fr.unknownTimer, serv_fr.unknowElaspedTimer, ui.unknowProgressText)
+            self.unknowUpdater.start()
+            self.nobodyUpdater = progressBarUpdater(ui.nobodyProgressBar, serv_fr.nobodyTimer, serv_fr.nobodyElaspedTimer, ui.nobodyProgressText)
+            self.nobodyUpdater.start()
+        except Exception as e :
+            print("Error - manager" + str(e))
 
     def generateTriggers(self):
         self.triggers["sound"] = {}

@@ -54,6 +54,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setAutoFillBackground(True)
         self.setPalette(pal)
 
+        self.knowProgressBar.hide()
+        self.knowProgressText.hide()
+        self.unknowProgressBar.hide()
+        self.unknowProgressText.hide()
+        self.nobodyProgressBar.hide()
+        self.nobodyProgressText.hide()
+
         # Others parameters
         self.activateManualButton.hide()
         self.manualLayoutContainer.hide()

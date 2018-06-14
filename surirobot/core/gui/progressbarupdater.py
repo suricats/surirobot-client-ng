@@ -25,9 +25,6 @@ class progressBarUpdater(QThread):
                     if self.text:
                         if self.text.isHidden():
                             self.text.show()
-                    # print("remaining : " + str(self.counter.elapsed()))
-                    # print("total : " + str((self.timer.interval())))
-                    # print((self.counter.remainingTime()/self.timer.interval())*100)
                     self.bar.setProperty("value", (self.counter.elapsed()/self.timer.interval())*100)
                 elif not self.bar.isHidden():
                     self.bar.hide()

@@ -55,7 +55,10 @@ class EmotionalRecognition(QThread):
     @pyqtSlot(int, dict)
     def emit_emotion_changed(self, state, data):
         self.isBusy = False
-        ui.setTextDown(str(data))
+        if data.get("emotion") is not None:
+            ui.setTextDown(str(data["emotion"]).upper())
+        else:
+            ui.setTextDown(str(data))
         self.updateState.emit(self.MODULE_NAME, state, data)
 
     @pyqtSlot(str, str)

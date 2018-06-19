@@ -26,9 +26,8 @@ class AudioPlayer(QThread):
     @pyqtSlot(str)
     def play(self, filename):
         try:
-            self.logger.info('Now playing' + str(filename) + '.')
             if platform.system() == "Darwin":
-                subprocess.call(["afplay", filename])
+                print('Audio is desactivated in MAC OS')
             else:
                 self.stop()
                 waveObj = sa.WaveObject.from_wave_file(filename)

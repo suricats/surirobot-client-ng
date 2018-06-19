@@ -222,7 +222,8 @@ class Manager(QObject):
                                     break
                 self.scopeChanged = False
         except Exception as e:
-            print("Error - checkScope : " + str(e))
+            print("Error - checkScope")
+            print(e)
 
     def updateState(self, sc):
         for trigger in sc["triggers"]:

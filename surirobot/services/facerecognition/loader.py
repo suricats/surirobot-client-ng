@@ -28,7 +28,7 @@ class FaceLoader(QThread):
 
     def run(self):
         self.load_from_external_db()
-        # self.load_from_db()
+        #self.load_from_db()
 
         while True:
             picture = self.q.get()

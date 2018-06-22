@@ -196,26 +196,32 @@ class FaceRecognition(QThread):
         self.signalPersonChanged.emit(name)
 
     def addPicture(self, picture):
-        if picture.user.id in self.data:
+        print(picture)
+        if picture['user']['id'] in self.data:
             pass
         else:
-            self.data[picture.user.id] = {
-                'name': picture.user.firstname + ' ' + picture.user.lastname,
-                'firstname': picture.user.firstname,
-                'lastname': picture.user.lastname
+            self.data[picture['user']['id']] = {
+                'name': picture['user']['firstname'] + ' ' + picture['user']['lastname'],
+                'firstname': picture['user']['firstname'],
+                'lastname': picture['user']['lastname']
             }
-
-        img = face_recognition.load_image_file(picture.path)
+        try:
+            img = face_recognition.load_image_file(picture['path'])
+            if face_recognition.face_encodings(img, None, 10):
+                print('E')
+                face = face_recognition.face_encodings(img, None, 10)[0]
+                self.faces.append(face)
+                self.linker.append(picture['user']['id'])
+            else:
+                print('F')
+                self.logger.info('No face on the picture')
+        except Exception as e:
+            self.logger.info("Can't load image")
+            self.logger.info(e)
         # self.logger.info("Face encoding .....")
-        if face_recognition.face_encodings(img, None, 10):
-            face = face_recognition.face_encodings(img, None, 10)[0]
-            self.faces.append(face)
-            self.linker.append(picture.user.id)
-        else:
-            self.logger.info('No face on the picture')
 
     def removePicture(self, picture):
-        key = self.linker.index(picture.user.id)
+        key = self.linker.index(picture['user']['id'])
         del self.faces[key]
         del self.linker[key]
 

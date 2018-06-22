@@ -8,7 +8,8 @@ from surirobot.management.mod_api.models import User, Picture
 from surirobot.services import serv_fr, serv_vc
 from surirobot.core.common import Dir
 import cv2
-
+import os
+import requests
 
 class FaceLoader(QThread):
     signalIndicator = pyqtSignal(str, str)
@@ -26,11 +27,33 @@ class FaceLoader(QThread):
         self.quit()
 
     def run(self):
-        self.load_from_db()
+        self.load_from_external_db()
+        # self.load_from_db()
 
         while True:
             picture = self.q.get()
             serv_fr.addPicture(picture)
+
+    def load_from_external_db(self):
+        try:
+            self.logger.info("Start loading faces ....")
+            token = os.environ.get('API_MEMORY_TOKEN', '')
+            url = os.environ.get('API_MEMORY_URL', '')
+            headers = {'Authorization': 'Token ' + token}
+            r1 = requests.get(url + '/memorize/users/', headers=headers)
+            users = r1.json()["results"]
+            for user in users:
+                r2 = requests.get(url + '/memorize/users/' + str(user.get("id")) + '/pictures', headers=headers)
+                pictures = r2.json()
+                if pictures:
+                    picture = pictures[0]
+                    picture["user"] = user
+                    # name = user.firstname + ' ' + user.lastname
+                    # self.logger.info("Load Face {}".format(name))
+                    serv_fr.addPicture(picture)
+                    self.signalIndicator.emit("face", "orange")
+        except Exception as e:
+            print("load from db : " + str(e))
 
     def load_from_db(self):
         self.logger.info("Start loading faces ....")

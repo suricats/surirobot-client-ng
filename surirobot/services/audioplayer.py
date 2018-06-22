@@ -34,4 +34,4 @@ class AudioPlayer(QThread):
                 self.logger.info('Now playing' + str(filename) + '.')
                 self.playObj = waveObj.play()
         except Exception as e:
-            self.logger.info('Error : .' + str(e))
+            self.logger.info('Error : ' + str(e))

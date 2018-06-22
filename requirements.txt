@@ -9,3 +9,4 @@ flask_restful
 flask_sqlalchemy
 simpleaudio
 pyinstaller
+requests

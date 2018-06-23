@@ -8,6 +8,7 @@ from surirobot.core.common import Dir
 import cv2
 import os
 import requests
+import face_recognition
 
 
 class FaceLoader(QThread):
@@ -32,45 +33,52 @@ class FaceLoader(QThread):
         self.load_from_db()
 
         while True:
-            picture = self.q.get()
-            serv_fr.addPicture(picture)
+            model = self.q.get()
+            serv_fr.addModel(model)
 
     def load_from_db(self):
         try:
-            self.logger.info("Start loading faces ....")
+            counter = 0
+            self.logger.info("Start loading models ....")
             r1 = requests.get(self.url + '/memorize/users/', headers=self.headers)
             users = r1.json()["results"]
             for user in users:
-                r2 = requests.get(self.url + '/memorize/users/' + str(user.get("id")) + '/pictures', headers=self.headers)
-                pictures = r2.json()
-                if pictures:
-                    picture = pictures[0]
-                    picture["user"] = user
+                r2 = requests.get(self.url + '/memorize/users/' + str(user.get("id")) + '/pictures/', headers=self.headers)
+                models = r2.json()
+                for model in models:
+                    counter += 1
+                    model["user"] = user
                     # name = user.firstname + ' ' + user.lastname
                     # self.logger.info("Load Face {}".format(name))
-                    serv_fr.addPicture(picture)
+                    serv_fr.addModel(model)
                     self.signalIndicator.emit("face", "orange")
+            self.logger.info(str(counter) + " model(s) loaded !")
         except Exception as e:
             print("load from db : " + str(e))
 
-    def add_user(self, firstname, lastname, email, picture_path):
+    def add_user(self, firstname, lastname, email, face):
         r1 = requests.post(self.url + '/memorize/users/', {"firstname": firstname, "lastname": lastname, "email": email}, headers=self.headers)
         user = r1.json()
-        new_path = Dir.PICTURES + format(uuid.uuid4()) + '.jpg'
-        shutil.copy(picture_path, new_path)
-        r2 = requests.post(self.url + '/memorize/pictures/', {"path": new_path, "user_id": user["id"]}, headers=self.headers)
-        picture = r2.json()
-        picture['user'] = user
-        self.q.put(picture)
+        r2 = requests.post(self.url + '/memorize/pictures/', {"path": " ".join(map(str, face)), "user_id": user["id"]}, headers=self.headers)
+        model = r2.json()
+        # model["path"] = list(model["path"])
+        model['user'] = user
+        self.q.put(model)
 
     @pyqtSlot(str, str)
     def take_picture_new_user(self, firstname, lastname):
         try:
-            print("take_picture_new_user")
             picture = serv_vc.get_frame()
             file_path = Dir.TMP + format(uuid.uuid4()) + '.jpeg'
             cv2.imwrite(file_path, picture)
+            img = face_recognition.load_image_file(file_path)
+            encodings = face_recognition.face_encodings(img, None, 10)
+            if encodings:
+                face = encodings[0]
+            else:
+                self.logger.info('No face on the model')
+                face = None
             self.new_user.emit(firstname)
-            self.add_user(firstname, lastname, '', file_path)
+            self.add_user(firstname, lastname, '', face)
         except Exception as e:
-            print(e)
+            print("take_picture" + str(e))

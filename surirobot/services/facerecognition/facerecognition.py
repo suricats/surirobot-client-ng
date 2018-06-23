@@ -6,7 +6,7 @@ import face_recognition
 from surirobot.core import ui
 from surirobot.services import serv_vc
 from surirobot.core.common import State
-
+from sys import getsizeof
 
 class FaceRecognition(QThread):
     updateState = pyqtSignal(str, int, dict)
@@ -94,6 +94,8 @@ class FaceRecognition(QThread):
                     self.stateChanged(State.FACE_MULTIPLES)
                 else:
                     # See if the face is a match for the known face(s)
+                    # print("size of array : " + str(getsizeof(self.faces)))
+                    # print("size of string : " + str(getsizeof(str(self.faces))))
                     match = face_recognition.compare_faces(self.faces, faceEncodings[0], self.tolerance)
                     id = self.UNKNOWN
                     # Transform in tuples of (index, value)
@@ -195,30 +197,24 @@ class FaceRecognition(QThread):
         print(name)
         self.signalPersonChanged.emit(name)
 
-    def addPicture(self, picture):
-        if picture['user']['id'] in self.data:
+    def addModel(self, model):
+        if model['user']['id'] in self.data:
             pass
         else:
-            self.data[picture['user']['id']] = {
-                'name': picture['user']['firstname'] + ' ' + picture['user']['lastname'],
-                'firstname': picture['user']['firstname'],
-                'lastname': picture['user']['lastname']
+            self.data[model['user']['id']] = {
+                'name': model['user']['firstname'] + ' ' + model['user']['lastname'],
+                'firstname': model['user']['firstname'],
+                'lastname': model['user']['lastname']
             }
-        try:
-            img = face_recognition.load_image_file(picture['path'])
-            if face_recognition.face_encodings(img, None, 10):
-                face = face_recognition.face_encodings(img, None, 10)[0]
-                self.faces.append(face)
-                self.linker.append(picture['user']['id'])
-            else:
-                self.logger.info('No face on the picture')
-        except Exception as e:
-            self.logger.info("Can't load image")
-            self.logger.info(e)
+        face = model["path"].split()
+        for i, el in enumerate(face):
+            face[i] = float(el)
+        self.faces.append(face)
+        self.linker.append(model['user']['id'])
         # self.logger.info("Face encoding .....")
 
-    def removePicture(self, picture):
-        key = self.linker.index(picture['user']['id'])
+    def removeModel(self, model):
+        key = self.linker.index(model['user']['id'])
         del self.faces[key]
         del self.linker[key]
 

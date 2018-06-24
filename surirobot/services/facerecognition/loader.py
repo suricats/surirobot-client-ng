@@ -2,7 +2,6 @@ from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal
 import logging
 import queue
 import uuid
-import shutil
 from surirobot.services import serv_fr, serv_vc
 from surirobot.core.common import Dir
 import cv2
@@ -81,4 +80,4 @@ class FaceLoader(QThread):
             self.new_user.emit(firstname)
             self.add_user(firstname, lastname, '', face)
         except Exception as e:
-            print("take_picture" + str(e))
+            print("take_picture : " + str(e))

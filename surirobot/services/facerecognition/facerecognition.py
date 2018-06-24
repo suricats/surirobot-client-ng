@@ -8,6 +8,7 @@ from surirobot.services import serv_vc
 from surirobot.core.common import State
 from sys import getsizeof
 
+
 class FaceRecognition(QThread):
     updateState = pyqtSignal(str, int, dict)
     # deprecated signal -> will be removed

@@ -8,6 +8,7 @@ from surirobot.services import serv_vc
 from surirobot.core.api.emotional import EmotionalAPICaller
 from surirobot.core.common import Dir
 from surirobot.core import ui
+import face_recognition
 
 
 class EmotionalRecognition(QThread):
@@ -47,8 +48,11 @@ class EmotionalRecognition(QThread):
                     if frame is not None:
                         file_path = Dir.TMP + format(uuid.uuid4()) + '.jpeg'
                         cv2.imwrite(file_path, frame)
-                        self.isBusy = True
-                        self.send_request.emit(file_path)
+                        img = face_recognition.load_image_file(file_path)
+                        encodings = face_recognition.face_encodings(img, None, 10)
+                        if encodings:
+                            self.isBusy = True
+                            self.send_request.emit(file_path)
             except Exception as e:
                 print('Emotional - Error : ' + str(e))
 

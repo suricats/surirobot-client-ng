@@ -204,25 +204,35 @@ class Manager(QObject):
     def checkScope(self):
         try:
             if not self.freeze:
+                print('A')
                 for scId in self.scope:
+                    print('B')
                     sc = self.scenarios[scId]
                     # print('Scenario : ' + str(scId))
                     if self.scopeChanged:
+                        print('C')
                         self.scopeChanged = False
                         break
                     if self.checkForTrigger(sc):
+                        print('D')
                         self.updateState(sc)
                         # print('\nScenario ' + str(sc["id"]) + " has been activated\n")
                         for index, action in enumerate(sc["actions"]):
+                            print('E')
                             input = self.retrieveData(action)
                             func = self.actions[action["name"]]
+                            print('F')
                             if func:
+                                print('G')
                                 func(input)
+                                print('H')
                                 # Special for wait action
                                 if self.freeze:
+                                    print('I')
                                     self.remainingActions = sc["actions"][index+1:]
                                     # print('Remaining actions - checkScope : ' + str(self.remainingActions))
                                     break
+                print('G')
                 self.scopeChanged = False
         except Exception as e:
             print("Error - checkScope")

@@ -157,6 +157,7 @@ class Manager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
+        print('update')
         # print('Update of scenarios from ' + name)
         # print('Data : ' + str(data))
         # print('\nScope : ' + str(self.scope))
@@ -166,6 +167,7 @@ class Manager(QObject):
         self.checkScope()
 
     def retrieveData(self, action):
+        print('retrieveData')
         input = {}
         for name, value in action.items():
             if name != "name":
@@ -190,6 +192,7 @@ class Manager(QObject):
         return input
 
     def checkForTrigger(self, sc):
+        print('checkForTrigger')
         active = True
         for trigger in sc["triggers"]:
             func = self.triggers[trigger["service"]][trigger["name"]]
@@ -202,37 +205,28 @@ class Manager(QObject):
         return active
 
     def checkScope(self):
+        print('checkScope')
         try:
             if not self.freeze:
-                print('A')
                 for scId in self.scope:
-                    print('B')
                     sc = self.scenarios[scId]
                     # print('Scenario : ' + str(scId))
                     if self.scopeChanged:
-                        print('C')
                         self.scopeChanged = False
                         break
                     if self.checkForTrigger(sc):
-                        print('D')
                         self.updateState(sc)
                         # print('\nScenario ' + str(sc["id"]) + " has been activated\n")
                         for index, action in enumerate(sc["actions"]):
-                            print('E')
                             input = self.retrieveData(action)
                             func = self.actions[action["name"]]
-                            print('F')
                             if func:
-                                print('G')
                                 func(input)
-                                print('H')
                                 # Special for wait action
                                 if self.freeze:
-                                    print('I')
                                     self.remainingActions = sc["actions"][index+1:]
                                     # print('Remaining actions - checkScope : ' + str(self.remainingActions))
                                     break
-                print('G')
                 self.scopeChanged = False
         except Exception as e:
             print("Error - checkScope")
@@ -241,6 +235,7 @@ class Manager(QObject):
             print(message)
 
     def updateState(self, sc):
+        print('updateState')
         for trigger in sc["triggers"]:
             # SOUND
             if self.services.get("sound"):

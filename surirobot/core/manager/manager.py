@@ -140,7 +140,10 @@ class Manager(QObject):
             self.scenarios[scenario["id"]] = scenario
         # Load groups of scenarios
         self.groups = jsonFile["groups"]
-
+        print("debug : ")
+        print(self.scenarios)
+        print(self.actions)
+        print(self.triggers)
         # Load initial scope
         for id in jsonFile["initial"]:
             if type(id) is int:

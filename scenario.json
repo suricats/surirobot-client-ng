@@ -42,12 +42,20 @@
         {
           "name": "giveTemperature"
         },
-				{
+        {
 					"name": "displayText",
 					"text": {
 						"type": "input",
-						"variable": "Il fait actuellement 25°C"
-					}
+						"variable": "Il fait actuellement {@last_temperature}°C."
+					},
+					"variables": [{
+							"last_temperature": {
+								"type": "service",
+								"name": "storage",
+								"variable": "@last_temperature"
+							}
+						}
+					]
 				},
 				{
 					"name": "speak",

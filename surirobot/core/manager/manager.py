@@ -4,6 +4,8 @@ from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core import ui
 from surirobot.core.common import State, Dir
 from surirobot.core.gui.progressbarupdater import progressBarUpdater
+from dateutil import parser
+
 
 import logging
 import json
@@ -11,7 +13,7 @@ import re
 import os
 import shutil
 import requests
-
+import time
 
 class Manager(QObject):
     __instance__ = None
@@ -531,8 +533,12 @@ class Manager(QObject):
         url = os.environ.get('API_MEMORY_URL', '')
         headers = {'Authorization': 'Token ' + token}
         r1 = requests.get(url + '/memorize/sensors/', headers=headers)
-        sensors_data = [x for x in sensors_data if x["type"] == "temperature"]
-        print(sensors_data)
+        sensors_data = [x for x in r1.json() if x["type"] == "temperature"]
+        if sensors_data:
+            sensors_data.sort(key = lambda x: time.mktime(parser.parse(x["created"]).timetuple()), reverse=True)
+            self.services["storage"]["@last_temperature"] = sensors_data[0]["data"]
+            print(sensors_data[0])
+
 
     def callScenarios(self, input):
         idTable = input["id"]

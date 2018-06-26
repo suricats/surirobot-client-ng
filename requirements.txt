@@ -10,3 +10,4 @@ flask_sqlalchemy
 simpleaudio
 pyinstaller
 requests
+python-dateutil

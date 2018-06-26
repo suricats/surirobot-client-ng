@@ -10,6 +10,7 @@ import json
 import re
 import os
 import shutil
+import requests
 
 
 class Manager(QObject):
@@ -130,6 +131,7 @@ class Manager(QObject):
         self.actions["changeSuriface"] = self.changeSuriface
         self.actions["activateKeyboardInput"] = self.activateKeyboardInput
         self.actions["updateMemory"] = self.converseUpdateMemory
+        self.actions["giveTemperature"] = self.giveTemperature
 
     def loadScenarioFile(self, filepath=None):
         jsonFile = json.load(open(Dir.BASE + filepath))
@@ -140,10 +142,6 @@ class Manager(QObject):
             self.scenarios[scenario["id"]] = scenario
         # Load groups of scenarios
         self.groups = jsonFile["groups"]
-        print("debug : ")
-        print(self.scenarios)
-        print(self.actions)
-        print(self.triggers)
         # Load initial scope
         for id in jsonFile["initial"]:
             if type(id) is int:
@@ -157,7 +155,6 @@ class Manager(QObject):
 
     @pyqtSlot(str, int, dict)
     def update(self, name, state, data):
-        print('update')
         # print('Update of scenarios from ' + name)
         # print('Data : ' + str(data))
         # print('\nScope : ' + str(self.scope))
@@ -167,7 +164,6 @@ class Manager(QObject):
         self.checkScope()
 
     def retrieveData(self, action):
-        print('retrieveData')
         input = {}
         for name, value in action.items():
             if name != "name":
@@ -192,7 +188,6 @@ class Manager(QObject):
         return input
 
     def checkForTrigger(self, sc):
-        print('checkForTrigger')
         active = True
         for trigger in sc["triggers"]:
             func = self.triggers[trigger["service"]][trigger["name"]]
@@ -205,7 +200,6 @@ class Manager(QObject):
         return active
 
     def checkScope(self):
-        print('checkScope')
         try:
             if not self.freeze:
                 for scId in self.scope:
@@ -235,7 +229,6 @@ class Manager(QObject):
             print(message)
 
     def updateState(self, sc):
-        print('updateState')
         for trigger in sc["triggers"]:
             # SOUND
             if self.services.get("sound"):
@@ -532,6 +525,14 @@ class Manager(QObject):
                 ui.manualEdit.setText('')
         else:
             self.logger.info('Action(activateKeyboardInput) : Missing parameters.')
+
+    def giveTemperature(self, input):
+        token = os.environ.get('API_MEMORY_TOKEN', '')
+        url = os.environ.get('API_MEMORY_URL', '')
+        headers = {'Authorization': 'Token ' + token}
+        r1 = requests.get(url + '/memorize/sensors/', headers=headers)
+        sensors_data = filter(lambda x: x["type"] == "temperature", r1.json())
+        print(sensors_data)
 
     def callScenarios(self, input):
         idTable = input["id"]

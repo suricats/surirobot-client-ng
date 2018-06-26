@@ -4,7 +4,7 @@
     "person-detection" : [3,4,9,40],
     "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
-    "converse" : [-3,43,2,1],
+    "converse" : [-4,-3,43,2,1],
     "person-detection-know-out" : [3,9],
     "face-working" : [41,42]
   },
@@ -15,6 +15,55 @@
     }
   ],
   "scenarios": [
+    {
+			"id": -4,
+			"description": "Ask for temperature",
+			"triggers": [{
+				"service": "converse",
+				"name": "new",
+				"parameters": {
+					"intent": "ask-temperature"
+				}
+			}],
+			"actions": [{
+					"name": "activateKeyboardInput",
+					"activate": {
+						"type": "input",
+						"variable": false
+					}
+				},
+        {
+					"name": "changeSuriface",
+					"image": {
+						"type": "input",
+						"variable": "basic"
+					}
+				},
+				{
+					"name": "displayText",
+					"text": {
+						"type": "input",
+						"variable": "Il fait actuellement 25°C"
+					}
+				},
+				{
+					"name": "speak",
+					"text": {
+						"type": "service",
+						"name": "storage",
+						"variable": "@text"
+					}
+				},
+				{
+					"name": "callScenarios",
+					"id": {
+						"type": "input",
+						"variable": ["converse", "person-detection", "emotion-detection"]
+					}
+				}
+			]
+
+		},
     {
 			"id": -3,
 			"description": "Ask for operations",

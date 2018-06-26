@@ -57,7 +57,6 @@ class TtsApiCaller(ApiCaller):
 
         url = QUrl(self.url)
         request = QNetworkRequest(url)
-        print('url : ' + str(url))
 
         request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
         self.networkManager.post(request, data)

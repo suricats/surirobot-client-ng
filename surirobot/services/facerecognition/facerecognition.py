@@ -80,7 +80,6 @@ class FaceRecognition(QThread):
 
     @pyqtSlot()
     def detect(self):
-        print('detect')
         faceLocations = []
         faceEncodings = []
         smallFrame = serv_vc.get_frame()
@@ -153,14 +152,12 @@ class FaceRecognition(QThread):
 
     @pyqtSlot()
     def nobodyTimeout(self):
-        print('nobodyTimeout')
         self.stateId = self.NOBODY
         self.personChanged(self.stateId)
         self.stateChanged(State.FACE_NOBODY, self.NOBODY)
 
     @pyqtSlot()
     def unknownTimeout(self):
-        print('unknownTimeout')
         self.signalIndicator.emit("face", "green")
         self.stateId = self.UNKNOWN
         self.personChanged(self.stateId)
@@ -168,7 +165,6 @@ class FaceRecognition(QThread):
 
     @pyqtSlot()
     def knownTimeout(self):
-        print('knownTimeout')
         self.signalIndicator.emit("face", "green")
         if (not self.pretendentId == self.NOBODY) and (not self.pretendentId == self.UNKNOWN):
             self.logger.info('Detection of ' + str(self.pretendentId))
@@ -203,7 +199,6 @@ class FaceRecognition(QThread):
         self.signalPersonChanged.emit(name)
 
     def addModel(self, model):
-        print('addModel')
         if model['user']['id'] in self.data:
             pass
         else:

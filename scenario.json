@@ -4,7 +4,7 @@
     "person-detection" : [3,4,9,40],
     "emotion-detection" : [10,16],
     "special-persons" : [1001,1002,1003],
-    "converse" : [-4,-3,43,2,1],
+    "converse" : [-5,-4,-3,43,2,1],
     "person-detection-know-out" : [3,9],
     "face-working" : [41,42]
   },
@@ -15,6 +15,66 @@
     }
   ],
   "scenarios": [
+    {
+			"id": -5,
+			"description": "Ask for humidity",
+			"triggers": [{
+				"service": "converse",
+				"name": "new",
+				"parameters": {
+					"intent": "ask-humidity"
+				}
+			}],
+			"actions": [{
+					"name": "activateKeyboardInput",
+					"activate": {
+						"type": "input",
+						"variable": false
+					}
+				},
+        {
+					"name": "changeSuriface",
+					"image": {
+						"type": "input",
+						"variable": "basic"
+					}
+				},
+        {
+          "name": "giveHumidity"
+        },
+        {
+					"name": "displayText",
+					"text": {
+						"type": "input",
+						"variable": "L'humidité est actuellement à {@last_humidity}%."
+					},
+					"variables": [{
+							"last_humidity": {
+								"type": "service",
+								"name": "storage",
+								"variable": "@last_humidity"
+							}
+						}
+					]
+				},
+				{
+					"name": "speak",
+					"text": {
+						"type": "service",
+						"name": "storage",
+						"variable": "@text"
+					}
+				},
+				{
+					"name": "callScenarios",
+					"id": {
+						"type": "input",
+						"variable": ["converse", "person-detection", "emotion-detection"]
+					}
+				}
+			]
+
+		},
     {
 			"id": -4,
 			"description": "Ask for temperature",

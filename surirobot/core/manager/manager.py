@@ -134,6 +134,7 @@ class Manager(QObject):
         self.actions["activateKeyboardInput"] = self.activateKeyboardInput
         self.actions["updateMemory"] = self.converseUpdateMemory
         self.actions["giveTemperature"] = self.giveTemperature
+        self.actions["giveHumidity"] = self.giveHumidity
 
     def loadScenarioFile(self, filepath=None):
         jsonFile = json.load(open(Dir.BASE + filepath))
@@ -535,10 +536,20 @@ class Manager(QObject):
         r1 = requests.get(url + '/memorize/sensors/', headers=headers)
         sensors_data = [x for x in r1.json() if x["type"] == "temperature"]
         if sensors_data:
-            sensors_data.sort(key = lambda x: time.mktime(parser.parse(x["created"]).timetuple()), reverse=True)
+            sensors_data.sort(key=lambda x: time.mktime(parser.parse(x["created"]).timetuple()), reverse=True)
             self.services["storage"]["@last_temperature"] = sensors_data[0]["data"]
             print(sensors_data[0])
 
+    def giveHumidity(self, input):
+        token = os.environ.get('API_MEMORY_TOKEN', '')
+        url = os.environ.get('API_MEMORY_URL', '')
+        headers = {'Authorization': 'Token ' + token}
+        r1 = requests.get(url + '/memorize/sensors/', headers=headers)
+        sensors_data = [x for x in r1.json() if x["type"] == "humidity"]
+        if sensors_data:
+            sensors_data.sort(key=lambda x: time.mktime(parser.parse(x["created"]).timetuple()), reverse=True)
+            self.services["storage"]["@last_humidity"] = sensors_data[0]["data"]
+            print(sensors_data[0])
 
     def callScenarios(self, input):
         idTable = input["id"]

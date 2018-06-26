@@ -531,7 +531,7 @@ class Manager(QObject):
         url = os.environ.get('API_MEMORY_URL', '')
         headers = {'Authorization': 'Token ' + token}
         r1 = requests.get(url + '/memorize/sensors/', headers=headers)
-        sensors_data = filter(lambda x: x["type"] == "temperature", r1.json())
+        sensors_data = [x for x in sensors_data if x["type"] == "temperature"]
         print(sensors_data)
 
     def callScenarios(self, input):

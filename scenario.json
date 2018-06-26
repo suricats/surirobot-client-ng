@@ -39,6 +39,9 @@
 						"variable": "basic"
 					}
 				},
+        {
+          "name": "giveTemperature"
+        },
 				{
 					"name": "displayText",
 					"text": {

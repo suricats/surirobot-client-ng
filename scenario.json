@@ -40,7 +40,15 @@
 					}
 				},
         {
-          "name": "giveHumidity"
+          "name": "giveSensorData",
+          "type": {
+            "type": "input",
+            "variable": "humidity"
+          },
+          "output": {
+            "type": "input",
+            "variable": "last_humidity"
+          }
         },
         {
 					"name": "displayText",
@@ -52,7 +60,7 @@
 							"last_humidity": {
 								"type": "service",
 								"name": "storage",
-								"variable": "@last_humidity"
+								"variable": "last_humidity"
 							}
 						}
 					]
@@ -100,7 +108,15 @@
 					}
 				},
         {
-          "name": "giveTemperature"
+          "name": "giveSensorData",
+          "type": {
+            "type": "input",
+            "variable": "temperature"
+          },
+          "output": {
+            "type": "input",
+            "variable": "last_temperature"
+          }
         },
         {
 					"name": "displayText",
@@ -112,7 +128,7 @@
 							"last_temperature": {
 								"type": "service",
 								"name": "storage",
-								"variable": "@last_temperature"
+								"variable": "last_temperature"
 							}
 						}
 					]

@@ -15,6 +15,7 @@ import shutil
 import requests
 import time
 
+
 class Manager(QObject):
     __instance__ = None
     # Signals
@@ -92,7 +93,7 @@ class Manager(QObject):
             self.unknowUpdater.start()
             self.nobodyUpdater = progressBarUpdater(ui.nobodyProgressBar, serv_fr.nobodyTimer, serv_fr.nobodyElaspedTimer, ui.nobodyProgressText)
             self.nobodyUpdater.start()
-        except Exception as e :
+        except Exception as e:
             print("Error - manager" + str(e))
 
     def generateTriggers(self):
@@ -133,8 +134,7 @@ class Manager(QObject):
         self.actions["changeSuriface"] = self.changeSuriface
         self.actions["activateKeyboardInput"] = self.activateKeyboardInput
         self.actions["updateMemory"] = self.converseUpdateMemory
-        self.actions["giveTemperature"] = self.giveTemperature
-        self.actions["giveHumidity"] = self.giveHumidity
+        self.actions["giveSensorData"] = self.giveSensorData
 
     def loadScenarioFile(self, filepath=None):
         jsonFile = json.load(open(Dir.BASE + filepath))

@@ -49,8 +49,7 @@ class EmotionalRecognition(QThread):
                         file_path = Dir.TMP + format(uuid.uuid4()) + '.jpeg'
                         cv2.imwrite(file_path, frame)
                         img = face_recognition.load_image_file(file_path)
-                        encodings = True
-                        # encodings = face_recognition.face_encodings(img, None, 10)
+                        encodings = face_recognition.face_encodings(img, None, 10)
                         if encodings:
                             self.isBusy = True
                             self.send_request.emit(file_path)

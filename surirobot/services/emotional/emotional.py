@@ -53,6 +53,8 @@ class EmotionalRecognition(QThread):
                         if encodings:
                             self.isBusy = True
                             self.send_request.emit(file_path)
+                        else:
+                            ui.setTextDown("NO FACE")
             except Exception as e:
                 print('Emotional - Error : ' + str(e))
 

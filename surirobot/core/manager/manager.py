@@ -5,7 +5,7 @@ from surirobot.core import ui
 from surirobot.core.common import State, Dir
 from surirobot.core.gui.progressbarupdater import progressBarUpdater
 from dateutil import parser
-
+import pyqtgraph as pg
 
 import logging
 import json
@@ -536,9 +536,18 @@ class Manager(QObject):
         r1 = requests.get(url + '/memorize/sensors/', headers=headers)
         sensors_data = [x for x in r1.json() if x["type"] == "temperature"]
         if sensors_data:
-            sensors_data.sort(key=lambda x: time.mktime(parser.parse(x["created"]).timetuple()), reverse=True)
+            x = []
+            y = []
+            for data in sensors_data:
+                data["created"] = time.mktime(parser.parse(data["created"]).timetuple())
+                x.append(data["created"])
+                y.append(float(data["data"]))
+            sensors_data.sort(key=lambda x: x["created"], reverse=True)
             self.services["storage"]["@last_temperature"] = sensors_data[0]["data"]
-            print(sensors_data[0])
+            pg.setConfigOptions(antialias=True)
+            pg.plot(x, y, pen='b')
+            #print("x :" + str(x) + "\ny :" + str(y))
+            pg.show()
 
     def giveHumidity(self, input):
         token = os.environ.get('API_MEMORY_TOKEN', '')
@@ -547,9 +556,19 @@ class Manager(QObject):
         r1 = requests.get(url + '/memorize/sensors/', headers=headers)
         sensors_data = [x for x in r1.json() if x["type"] == "humidity"]
         if sensors_data:
-            sensors_data.sort(key=lambda x: time.mktime(parser.parse(x["created"]).timetuple()), reverse=True)
+            x = []
+            y = []
+            for data in sensors_data:
+                data["created"] = time.mktime(parser.parse(data["created"]).timetuple())
+                x.append(data["created"])
+                y.append(float(data["data"]))
+            sensors_data.sort(key=lambda x: x["created"], reverse=True)
             self.services["storage"]["@last_humidity"] = sensors_data[0]["data"]
-            print(sensors_data[0])
+            pg.setConfigOptions(antialias=True)
+            pg.plot(x, y, pen='b')
+            #print("x :" + str(x) + "\ny :" + str(y))
+            pg.show()
+
 
     def callScenarios(self, input):
         idTable = input["id"]

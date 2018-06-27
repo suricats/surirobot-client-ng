@@ -40,7 +40,7 @@ class FaceLoader(QThread):
             counter = 0
             self.logger.info("Start loading models ....")
             r1 = requests.get(self.url + '/memorize/users/', headers=self.headers)
-            print(r1.json())
+            # print(r1.json())
             users = r1.json()
             for user in users:
                 r2 = requests.get(self.url + '/memorize/users/' + str(user.get("id")) + '/pictures/', headers=self.headers)

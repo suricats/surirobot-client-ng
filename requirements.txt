@@ -11,3 +11,4 @@ simpleaudio
 pyinstaller
 requests
 python-dateutil
+pyqtgraph

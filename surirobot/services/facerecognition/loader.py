@@ -43,7 +43,7 @@ class FaceLoader(QThread):
             # print(r1.json())
             users = r1.json()
             for user in users:
-                r2 = requests.get(self.url + '/memorize/users/' + str(user.get("id")) + '/pictures/', headers=self.headers)
+                r2 = requests.get(self.url + '/memorize/users/' + str(user.get("id")) + '/encodings/', headers=self.headers)
                 models = r2.json()
                 for model in models:
                     counter += 1

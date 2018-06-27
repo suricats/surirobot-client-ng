@@ -4,7 +4,9 @@ from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core import ui
 from surirobot.core.common import State, Dir
 from surirobot.core.gui.progressbarupdater import progressBarUpdater
+import dateutil
 from dateutil import parser
+import datetime
 import pyqtgraph as pg
 
 import logging
@@ -43,6 +45,7 @@ class Manager(QObject):
         self.scope = []
         self.groups = {}
         self.scenarios = {}
+        self.win = None
         self.freeze = False
         self.remainingActions = []
         logging.basicConfig(level=logging.INFO)
@@ -542,8 +545,11 @@ class Manager(QObject):
 
             # Display a nice plot of the last 24 hours
             time_to = int(time.time())
-            time_from = int(time_to-60*60*24)
-            print('url : ' + url + '/memorize/sensors/' + str(time_from) + '/' + str(time_to) + '/' + input["type"] + '/')
+            date_from = datetime.datetime.fromtimestamp(time_to)
+            date_from = date_from.replace(hour=0, minute=0, second=0)
+            date_to = date_from.replace(day=date_from.day+1)
+            time_from = int(date_from.timestamp())
+            time_to = int(date_to.timestamp())
             r2 = requests.get(url + '/memorize/sensors/' + str(time_from) + '/' + str(time_to) + '/' + input["type"] + '/', headers=headers)
             # sensors_data = [x for x in r1.json() if x["type"] == input["type"]]
             sensors_data = r2.json()
@@ -555,8 +561,15 @@ class Manager(QObject):
                     x.append(data["created"])
                     y.append(float(data["data"]))
                 sensors_data.sort(key=lambda x: x["created"], reverse=True)
+                self.win = pg.GraphicsWindow(title="Basic plotting examples")
+                self.win.resize(1000, 600)
+                self.win.setWindowTitle('pyqtgraph example: Plotting')
+
+                # Enable antialiasing for prettier plots
                 pg.setConfigOptions(antialias=True)
-                pg.plot(x, y, pen='b')
+                p1 = self.win.addPlot()
+                p1.plot(x, y, pen='b')
+                p1.setXRange(time_from, time_to)
                 # print("x :" + str(x) + "\ny :" + str(y))
                 # pg.show()
                 self.services["storage"][input["output"]] = sensors_data[0]["data"]

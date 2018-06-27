@@ -293,8 +293,7 @@ class Ui_MainWindow(object):
         self.labelUp.setText(_translate("MainWindow", "TextLabel"))
         self.labelDown.setText(_translate("MainWindow", "TextLabel"))
         self.labelDown_2.setText(_translate("MainWindow", "Restez appuyé sur C pour lui parler."))
-        self.labelDown_3.setText(_translate("MainWindow", "SI vous disparaissez de la caméra, il vous dira en revoir !"))
+        self.labelDown_3.setText(_translate("MainWindow", "Si vous disparaissez de la caméra, il vous dira au revoir !"))
         self.knowProgressText.setText(_translate("MainWindow", "Reconnaissance de personne connue en cours..."))
         self.nobodyProgressText.setText(_translate("MainWindow", "Attention, vous n\'êtes plus reconnu(e) !"))
         self.unknowProgressText.setText(_translate("MainWindow", "Vérification de la présence d\'une personne inconnue..."))
-

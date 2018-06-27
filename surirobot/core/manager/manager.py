@@ -534,14 +534,16 @@ class Manager(QObject):
             token = os.environ.get('API_MEMORY_TOKEN', '')
             url = os.environ.get('API_MEMORY_URL', '')
             headers = {'Authorization': 'Token ' + token}
-            r1 = requests.get(url + '/memorize/sensors/last' + input["type"] + '/', headers=headers)
+            r1 = requests.get(url + '/memorize/sensors/last/' + input["type"] + '/', headers=headers)
             last_sensor_data = r1.json()
+            print(last_sensor_data)
             if last_sensor_data:
                 self.services["storage"][input["output"]] = last_sensor_data["data"]
 
             # Display a nice plot of the last 24 hours
-            time_to = time.time()
-            time_from = time_to-60*60*24
+            time_to = int(time.time())
+            time_from = int(time_to-60*60*24)
+            print('url : ' + url + '/memorize/sensors/' + str(time_from) + '/' + str(time_to) + '/' + input["type"] + '/')
             r2 = requests.get(url + '/memorize/sensors/' + str(time_from) + '/' + str(time_to) + '/' + input["type"] + '/', headers=headers)
             # sensors_data = [x for x in r1.json() if x["type"] == input["type"]]
             sensors_data = r2.json()

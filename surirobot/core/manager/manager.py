@@ -570,7 +570,6 @@ class Manager(QObject):
                 p1 = self.win.addPlot()
                 p1.plot(x, y, pen='b')
                 p1.setXRange(time_from, time_to)
-                p1.showGrid(y=None)
                 # print("x :" + str(x) + "\ny :" + str(y))
                 # pg.show()
                 self.services["storage"][input["output"]] = sensors_data[0]["data"]

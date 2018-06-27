@@ -1,5 +1,5 @@
 {
-  "initial": [-6,"converse","emotion-detection","special-persons","face-working",3,4,40],
+  "initial": ["converse","emotion-detection","special-persons","face-working",3,4,40],
   "groups" : {
     "person-detection" : [3,4,9,40],
     "emotion-detection" : [10,16],
@@ -244,7 +244,7 @@
 						"type": "input",
 						"variable": "Voici vos dernières opérations :"
 					}
-				},
+				}, path
 				{
 					"name": "speak",
 					"text": {

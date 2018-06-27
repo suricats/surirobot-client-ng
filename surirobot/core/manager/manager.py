@@ -529,46 +529,37 @@ class Manager(QObject):
         else:
             self.logger.info('Action(activateKeyboardInput) : Missing parameters.')
 
-    def giveTemperature(self, input):
-        token = os.environ.get('API_MEMORY_TOKEN', '')
-        url = os.environ.get('API_MEMORY_URL', '')
-        headers = {'Authorization': 'Token ' + token}
-        r1 = requests.get(url + '/memorize/sensors/', headers=headers)
-        sensors_data = [x for x in r1.json() if x["type"] == "temperature"]
-        if sensors_data:
-            x = []
-            y = []
-            for data in sensors_data:
-                data["created"] = time.mktime(parser.parse(data["created"]).timetuple())
-                x.append(data["created"])
-                y.append(float(data["data"]))
-            sensors_data.sort(key=lambda x: x["created"], reverse=True)
-            self.services["storage"]["@last_temperature"] = sensors_data[0]["data"]
-            pg.setConfigOptions(antialias=True)
-            pg.plot(x, y, pen='b')
-            #print("x :" + str(x) + "\ny :" + str(y))
-            pg.show()
+    def giveSensorData(self, input):
+        if input["type"] and input["output"]:
+            token = os.environ.get('API_MEMORY_TOKEN', '')
+            url = os.environ.get('API_MEMORY_URL', '')
+            headers = {'Authorization': 'Token ' + token}
+            r1 = requests.get(url + '/memorize/sensors/last' + input["type"] + '/', headers=headers)
+            last_sensor_data = r1.json()
+            if last_sensor_data:
+                self.services["storage"][input["output"]] = last_sensor_data["data"]
 
-    def giveHumidity(self, input):
-        token = os.environ.get('API_MEMORY_TOKEN', '')
-        url = os.environ.get('API_MEMORY_URL', '')
-        headers = {'Authorization': 'Token ' + token}
-        r1 = requests.get(url + '/memorize/sensors/', headers=headers)
-        sensors_data = [x for x in r1.json() if x["type"] == "humidity"]
-        if sensors_data:
-            x = []
-            y = []
-            for data in sensors_data:
-                data["created"] = time.mktime(parser.parse(data["created"]).timetuple())
-                x.append(data["created"])
-                y.append(float(data["data"]))
-            sensors_data.sort(key=lambda x: x["created"], reverse=True)
-            self.services["storage"]["@last_humidity"] = sensors_data[0]["data"]
-            pg.setConfigOptions(antialias=True)
-            pg.plot(x, y, pen='b')
-            #print("x :" + str(x) + "\ny :" + str(y))
-            pg.show()
-
+            # Display a nice plot of the last 24 hours
+            time_to = time.time()
+            time_from = time_to-60*60*24
+            r2 = requests.get(url + '/memorize/sensors/' + str(time_from) + '/' + str(time_to) + '/' + input["type"] + '/', headers=headers)
+            # sensors_data = [x for x in r1.json() if x["type"] == input["type"]]
+            sensors_data = r2.json()
+            if sensors_data:
+                x = []
+                y = []
+                for data in sensors_data:
+                    data["created"] = time.mktime(parser.parse(data["created"]).timetuple())
+                    x.append(data["created"])
+                    y.append(float(data["data"]))
+                sensors_data.sort(key=lambda x: x["created"], reverse=True)
+                pg.setConfigOptions(antialias=True)
+                pg.plot(x, y, pen='b')
+                # print("x :" + str(x) + "\ny :" + str(y))
+                # pg.show()
+                self.services["storage"][input["output"]] = sensors_data[0]["data"]
+        else:
+            self.logger.info('Action(giveSensorData) : Missing parameters.')
 
     def callScenarios(self, input):
         idTable = input["id"]

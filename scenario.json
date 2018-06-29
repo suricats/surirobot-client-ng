@@ -1,5 +1,5 @@
 {
-  "initial": ["converse","emotion-detection","special-persons","face-working",3,4,40],
+  "initial": [-5,"converse","emotion-detection","special-persons","face-working",3,4,40],
   "groups" : {
     "person-detection" : [3,4,9,40],
     "emotion-detection" : [10,16],
@@ -81,13 +81,7 @@
     {
 			"id": -5,
 			"description": "Ask for humidity",
-			"triggers": [{
-				"service": "converse",
-				"name": "new",
-				"parameters": {
-					"intent": "ask-humidity"
-				}
-			}],
+			"triggers": [],
 			"actions": [{
 					"name": "activateKeyboardInput",
 					"activate": {

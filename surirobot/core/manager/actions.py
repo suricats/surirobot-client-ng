@@ -1,58 +1,77 @@
-from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader, serv_emo
-from PyQt5.QtCore import QTimer
+from surirobot.services import serv_ap, serv_fr, face_loader
 from surirobot.core import ui
+from surirobot.core.exceptions import ActionException
+
+from PyQt5.QtCore import QTimer
+import pyqtgraph as pg
+
+import os
+import requests
 import re
+import time
+from dateutil import parser
+import datetime
 
 
 class Actions:
     def __init__(self):
         self.actions = {}
-        self.generateActions()
 
     def generateActions(self):
-        self.actions["playSound"] = self.playSound
-        self.actions["converse"] = self.converse
-        self.actions["converseAnswer"] = self.converseAnswer
-        self.actions["callScenarios"] = self.callScenarios
-        self.actions["displayText"] = self.displayText
-        self.actions["speak"] = self.speak
-        self.actions["wait"] = self.waitFor
-        self.actions["takePicture"] = self.addPictureWithUser
-        self.actions["listen"] = self.listen
-        self.actions["store"] = self.store
-        self.actions["changeSuriface"] = self.changeSuriface
-        self.actions["activateKeyboardInput"] = self.activateKeyboardInput
-        self.actions["updateMemory"] = self.converseUpdateMemory
+        try:
+            self.actions["playSound"] = self.playSound
+            self.actions["converse"] = self.converse
+            self.actions["converseAnswer"] = self.converseAnswer
+            self.actions["callScenarios"] = self.callScenarios
+            self.actions["displayText"] = self.displayText
+            self.actions["speak"] = self.speak
+            self.actions["wait"] = self.waitFor
+            self.actions["takePicture"] = self.addPictureWithUser
+            self.actions["listen"] = self.listen
+            self.actions["store"] = self.store
+            self.actions["changeSuriface"] = self.changeSuriface
+            self.actions["activateKeyboardInput"] = self.activateKeyboardInput
+            self.actions["updateMemory"] = self.converseUpdateMemory
+            self.actions["giveSensorData"] = self.giveSensorData
+            return self.actions
+        except Exception as e:
+            print(str(e))
+            print(dict(e))
 
 # Actions
 
-    def waitFor(self, input):
+    @staticmethod
+    def waitFor(mgr, input):
         if input.get("time"):
-            self.freeze = True
-            QTimer.singleShot(input["time"], self.resumeManager)
+            mgr.freeze = True
+            QTimer.singleShot(input["time"], mgr.resumeManager)
         else:
-            self.logger.info('Action(wait) : Missing parameters.')
+            mgr.logger.info('Action(wait) : Missing parameters.')
 
-    def store(self, input):
+    @staticmethod
+    def store(mgr, input):
         if input.get("list"):
-            outputList = self.retrieveData(input["list"])
-            self.services["storage"].update(outputList)
+            outputList = mgr.retrieveData(input["list"])
+            mgr.services["storage"].update(outputList)
         else:
-            self.logger.info('Action(store) : Missing parameters.')
+            mgr.logger.info('Action(store) : Missing parameters.')
 
-    def addPictureWithUser(self, input):
+    @staticmethod
+    def addPictureWithUser(mgr, input):
         if input.get("firstname") and input.get("lastname"):
             face_loader.take_picture_new_user(input["firstname"], input["lastname"])
         else:
-            self.logger.info('Action(takePicture) : Missing parameters.')
+            mgr.logger.info('Action(takePicture) : Missing parameters.')
 
-    def playSound(self, input):
+    @staticmethod
+    def playSound(mgr, input):
         if input.get("filepath"):
             serv_ap.play(input["filepath"])
         else:
-            self.logger.info('Action(playSound) : Missing parameters.')
+            mgr.logger.info('Action(playSound) : Missing parameters.')
 
-    def displayText(self, input):
+    @staticmethod
+    def displayText(mgr, input):
         text = input.get("text")
         if text:
             if type(text) is str:
@@ -69,56 +88,63 @@ class Actions:
                 text = ""
                 text = text.join(list)
                 ui.setTextMiddle(text)
-                self.services["storage"]["@text"] = text
+                mgr.services["storage"]["@text"] = text
             else:
-                self.logger.info('Action(displayText) : Invalid type parameter.')
+                mgr.logger.info('Action(displayText) : Invalid type parameter.')
         else:
-            self.logger.info('Action(displayText) : Missing parameters.')
+            mgr.logger.info('Action(displayText) : Missing parameters.')
 
-    def speak(self, input):
+    @staticmethod
+    def speak(mgr, input):
         if input.get("text"):
-            self.signal_tts_request.emit(input["text"])
+            mgr.signal_tts_request.emit(input["text"])
         else:
-            self.logger.info('Action(speak) : Missing parameters.')
+            mgr.logger.info('Action(speak) : Missing parameters.')
 
-    def converse(self, input):
+    @staticmethod
+    def converse(mgr, input):
         if input.get("filepath"):
             if input.get("id"):
-                self.signal_converse_update_request.emit("username", serv_fr.idToName(input["id"]), input["id"])
-                self.signal_converse_request_with_id.emit(input["filepath"], input["id"])
+                mgr.signal_converse_update_request.emit("username", serv_fr.idToName(input["id"]), input["id"])
+                mgr.signal_converse_request_with_id.emit(input["filepath"], input["id"])
             else:
-                self.signal_converse_request.emit(input["filepath"])
+                mgr.signal_converse_request.emit(input["filepath"])
         else:
-            self.logger.info('Action(converse) : Missing parameters.')
+            mgr.logger.info('Action(converse) : Missing parameters.')
 
-    def converseAnswer(self, input):
+    @staticmethod
+    def converseAnswer(mgr, input):
         if input.get("intent"):
             if input.get("id"):
-                self.signal_nlp_request_with_id.emit(input["intent"], input["id"])
+                mgr.signal_nlp_request_with_id.emit(input["intent"], input["id"])
             else:
-                self.signal_nlp_request.emit(input["intent"])
+                mgr.signal_nlp_request.emit(input["intent"])
         else:
-            self.logger.info('Action(converseAnswer) : Missing parameters.')
+            mgr.logger.info('Action(converseAnswer) : Missing parameters.')
 
-    def converseUpdateMemory(self, input):
+    @staticmethod
+    def converseUpdateMemory(mgr, input):
         if input.get("field") and input.get("value") and input.get("id"):
-            self.signal_converse_update_request.emit(input["field"], input["value"], input["id"])
+            mgr.signal_converse_update_request.emit(input["field"], input["value"], input["id"])
         else:
-            self.logger.info('Action(converseUpdateMemory) : Missing parameters.')
+            mgr.logger.info('Action(converseUpdateMemory) : Missing parameters.')
 
-    def listen(self, input):
+    @staticmethod
+    def listen(mgr, input):
         if input.get("filepath"):
-            self.signal_stt_request.emit(input["filepath"])
+            mgr.signal_stt_request.emit(input["filepath"])
         else:
-            self.logger.info('Action(listen) : Missing parameters.')
+            mgr.logger.info('Action(listen) : Missing parameters.')
 
-    def changeSuriface(self, input):
+    @staticmethod
+    def changeSuriface(mgr, input):
         if input.get("image"):
-            self.signal_ui_suriface.emit(input["image"])
+            mgr.signal_ui_suriface.emit(input["image"])
         else:
-            self.logger.info('Action(changeSuriface) : Missing parameters.')
+            mgr.logger.info('Action(changeSuriface) : Missing parameters.')
 
-    def activateKeyboardInput(self, input):
+    @staticmethod
+    def activateKeyboardInput(mgr, input):
         if not (input.get("activate") is None):
             if input["activate"]:
                 ui.activateManualButton.show()
@@ -129,20 +155,66 @@ class Actions:
                 ui.manualLayoutContainer.hide()
                 ui.manualEdit.setText('')
         else:
-            self.logger.info('Action(activateKeyboardInput) : Missing parameters.')
+            mgr.logger.info('Action(activateKeyboardInput) : Missing parameters.')
 
-    def callScenarios(self, input):
+    @staticmethod
+    def callScenarios(mgr, input):
         idTable = input["id"]
-        self.scope = []
+        mgr.scope = []
         for id in idTable:
             if type(id) is int:
-                self.scope.append(id)
+                mgr.scope.append(id)
             elif type(id) is str:
-                self.scope += self.groups[id]
+                mgr.scope += mgr.groups[id]
             else:
                 print('ERROR : Scenario - callScenarios ')
-        print('Scope has changed : ' + str(self.scope))
-        self.scopeChanged = True
+        print('Scope has changed : ' + str(mgr.scope))
+        mgr.scopeChanged = True
+
+    @staticmethod
+    def giveSensorData(mgr, input):
+        if input["type"] and input["output"]:
+            token = os.environ.get('API_MEMORY_TOKEN', '')
+            url = os.environ.get('API_MEMORY_URL', '')
+            headers = {'Authorization': 'Token ' + token}
+            r1 = requests.get(url + '/memorize/sensors/last/' + input["type"] + '/', headers=headers)
+            last_sensor_data = r1.json()
+            print(last_sensor_data)
+            if last_sensor_data:
+                mgr.services["storage"][input["output"]] = last_sensor_data["data"]
+
+            # Display a nice plot of the last 24 hours
+            time_to = int(time.time())
+            date_from = datetime.datetime.fromtimestamp(time_to)
+            date_from = date_from.replace(hour=0, minute=0, second=0)
+            date_to = date_from.replace(day=date_from.day+1)
+            time_from = int(date_from.timestamp())
+            time_to = int(date_to.timestamp())
+            r2 = requests.get(url + '/memorize/sensors/' + str(time_from) + '/' + str(time_to) + '/' + input["type"] + '/', headers=headers)
+            # sensors_data = [x for x in r1.json() if x["type"] == input["type"]]
+            sensors_data = r2.json()
+            if sensors_data:
+                x = []
+                y = []
+                for data in sensors_data:
+                    data["created"] = time.mktime(parser.parse(data["created"]).timetuple())
+                    x.append(data["created"])
+                    y.append(float(data["data"]))
+                sensors_data.sort(key=lambda x: x["created"], reverse=True)
+                mgr.win = pg.GraphicsWindow(title="Basic plotting examples")
+                mgr.win.resize(1000, 600)
+                mgr.win.setWindowTitle('{} evolution over since midnight.'.format(input["type"]))
+
+                # Enable antialiasing for prettier plots
+                pg.setConfigOptions(antialias=True)
+                p1 = mgr.win.addPlot()
+                p1.plot(x, y, pen='b')
+                p1.setXRange(time_from, time_to)
+                # print("x :" + str(x) + "\ny :" + str(y))
+                # pg.show()
+                mgr.services["storage"][input["output"]] = sensors_data[0]["data"]
+        else:
+            mgr.logger.info('Action(giveSensorData) : Missing parameters.')
 
 
-actions_mg = Actions()
+mgr_actions = Actions()

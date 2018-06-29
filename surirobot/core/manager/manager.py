@@ -4,23 +4,18 @@ from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core import ui
 from surirobot.core.common import State, Dir
 from surirobot.core.gui.progressbarupdater import progressBarUpdater
-import dateutil
-from dateutil import parser
-import datetime
-import pyqtgraph as pg
-
+from .triggers import mgr_triggers
+from .actions import mgr_actions
 import logging
 import json
-import re
 import os
 import shutil
-import requests
-import time
 
 
 class Manager(QObject):
     __instance__ = None
     # Signals
+    services_list = ["face", "emotion", "converse", "sound", "storage", "keyboard"]
     signal_tts_request = pyqtSignal(str)
     signal_converse_request_with_id = pyqtSignal(str, int)
     signal_converse_request = pyqtSignal(str)
@@ -41,7 +36,10 @@ class Manager(QObject):
         QObject.__init__(self)
         self.triggers = {}
         self.actions = {}
-        self.services = {"face": {}, "emotion": {}, "converse": {}, "sound": {}, "storage": {}, "keyboard": {}}
+        self.services = {}
+        # Generate services
+        for service in self.services_list:
+            self.services[service] = {}
         self.scope = []
         self.groups = {}
         self.scenarios = {}
@@ -71,7 +69,7 @@ class Manager(QObject):
         self.signal_ui_suriface.connect(ui.setImage)
         self.signal_converse_update_request.connect(api_converse.updateMemory)
 
-        # Indicators
+        # OUTPUTS : Connect to interface
         self.signal_ui_indicator.connect(ui.changeIndicator)
         serv_fr.signalIndicator.connect(ui.changeIndicator)
         face_loader.signalIndicator.connect(ui.changeIndicator)
@@ -79,12 +77,14 @@ class Manager(QObject):
         api_converse.signalIndicator.connect(ui.changeIndicator)
         api_tts.signalIndicator.connect(ui.changeIndicator)
 
+        # Indicators default state
         self.signal_ui_indicator.emit("face", "grey")
         self.signal_ui_indicator.emit("emotion", "grey")
         self.signal_ui_indicator.emit("converse", "grey")
 
-        self.generateTriggers()
-        self.generateActions()
+        # Generate actions and triggers
+        self.triggers = mgr_triggers.generateTriggers(self.services)
+        self.actions = mgr_actions.generateActions()
 
         self.loadScenarioFile("/scenario.json")
 
@@ -98,46 +98,6 @@ class Manager(QObject):
             self.nobodyUpdater.start()
         except Exception as e:
             print("Error - manager" + str(e))
-
-    def generateTriggers(self):
-        self.triggers["sound"] = {}
-        self.triggers["converse"] = {}
-        self.triggers["face"] = {}
-        self.triggers["emotion"] = {}
-        self.triggers["storage"] = {}
-        self.triggers["keyboard"] = {}
-
-        self.triggers["sound"]["new"] = self.newSoundTrigger
-        self.triggers["sound"]["available"] = self.availableSoundTrigger
-
-        self.triggers["converse"]["new"] = self.newConverseTrigger
-
-        self.triggers["face"]["unknow"] = self.newPersonTrigger
-        self.triggers["face"]["know"] = self.knowPersonTrigger
-        self.triggers["face"]["nobody"] = self.nobodyTrigger
-        self.triggers["face"]["several"] = self.severalPersonTrigger
-        self.triggers["face"]["working"] = self.faceWorking
-
-        self.triggers["emotion"]["new"] = self.newEmotionTrigger
-        self.triggers["emotion"]["no"] = self.noEmotionTrigger
-
-        self.triggers["keyboard"]["new"] = self.newKeyboardInput
-
-    def generateActions(self):
-        self.actions["playSound"] = self.playSound
-        self.actions["converse"] = self.converse
-        self.actions["converseAnswer"] = self.converseAnswer
-        self.actions["callScenarios"] = self.callScenarios
-        self.actions["displayText"] = self.displayText
-        self.actions["speak"] = self.speak
-        self.actions["wait"] = self.waitFor
-        self.actions["takePicture"] = self.addPictureWithUser
-        self.actions["listen"] = self.listen
-        self.actions["store"] = self.store
-        self.actions["changeSuriface"] = self.changeSuriface
-        self.actions["activateKeyboardInput"] = self.activateKeyboardInput
-        self.actions["updateMemory"] = self.converseUpdateMemory
-        self.actions["giveSensorData"] = self.giveSensorData
 
     def loadScenarioFile(self, filepath=None):
         jsonFile = json.load(open(Dir.BASE + filepath))
@@ -199,7 +159,7 @@ class Manager(QObject):
             func = self.triggers[trigger["service"]][trigger["name"]]
             if func:
                 # print("TRIGGER : " + str(trigger))
-                triggerActive = func(trigger)
+                triggerActive = func(self, trigger)
             if not triggerActive:
                 active = False
                 break
@@ -221,7 +181,7 @@ class Manager(QObject):
                             input = self.retrieveData(action)
                             func = self.actions[action["name"]]
                             if func:
-                                func(input)
+                                func(self, input)
                                 # Special for wait action
                                 if self.freeze:
                                     self.remainingActions = sc["actions"][index+1:]
@@ -286,305 +246,3 @@ class Manager(QObject):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print(e)
-
-    # Triggers
-    def faceWorking(self, input):
-        if not (input["parameters"].get("value") is None):
-            if self.services.get("face"):
-                if self.services["face"]["datavalue"] == State.FACE_DATAVALUE_WORKING:
-                    return input["parameters"]["value"]
-                else:
-                    return not input["parameters"]["value"]
-        return False
-
-    def newPersonTrigger(self, input):
-        # TODO: add sepration new/available with input["parameters"]["new"]
-        if self.services.get("face"):
-            if self.services["face"]["state"] == State.FACE_UNKNOWN:
-                return True
-        return False
-
-    def severalPersonTrigger(self, input):
-        if self.services.get("face"):
-            if self.services["face"]["state"] == State.FACE_MULTIPLES:
-                return True
-        return False
-
-    def knowPersonTrigger(self, input):
-        # TODO: add sepration new/available with input["parameters"]["new"]
-        firstNameRegex = True
-        lastNameRegex = True
-        fullNameRegex = True
-        newCondition = False
-        if self.services.get("face"):
-            # Check new/available condition
-            newParameter = input["parameters"].get("new")
-            if newParameter is None or newParameter:
-                if self.services["face"]["state"] == State.FACE_KNOWN:
-                    newCondition = True
-            elif self.services["face"]["state"] == State.FACE_KNOWN or self.services["face"]["state"] == State.FACE_KNOWN_AVAILABLE:
-                newCondition = True
-
-            # Check if regex for name is activated
-            if input["parameters"].get("name"):
-                patternName = re.compile(input["parameters"]["name"])
-                if not self.services["face"].get("name"):
-                    fullNameRegex = False
-                elif patternName.match(self.services["face"]["name"]):
-                    fullNameRegex = True
-                else:
-                    fullNameRegex = False
-
-            # Check if regex for firstname is activated
-            if input["parameters"].get("firstname"):
-                patternFirstname = re.compile(input["parameters"]["firstname"])
-                if not self.services["face"].get("firstname"):
-                    firstNameRegex = False
-                elif patternFirstname.match(self.services["face"]["firstname"]):
-                    firstNameRegex = True
-                else:
-                    firstNameRegex = False
-
-            # Check if regex for lastname is activated
-            if input["parameters"].get("lastname"):
-                patternLastname = re.compile(input["parameters"]["lastname"])
-                if not self.services["face"].get("lastname"):
-                    lastNameRegex = False
-                elif patternLastname.match(self.services["face"]["lastname"]):
-                    lastNameRegex = True
-                else:
-                    lastNameRegex = False
-        return firstNameRegex and lastNameRegex and newCondition and fullNameRegex
-
-    def nobodyTrigger(self, input):
-        if self.services.get("face"):
-            # TODO: Implement regex parameters
-            if self.services["face"]["state"] == State.FACE_NOBODY:
-                return True
-        return False
-
-    def newEmotionTrigger(self, input):
-        if self.services.get("emotion"):
-            if self.services["emotion"]["state"] == State.EMOTION_NEW:
-                if input["parameters"].get("emotion"):
-                    if self.services["emotion"]["emotion"] == input["parameters"]["emotion"]:
-                        return True
-                    else:
-                        return False
-                else:
-                    return True
-        return False
-
-    def newKeyboardInput(self, input):
-        newCondition = False
-        if self.services.get("keyboard"):
-            # Check new/available condition
-            newParameter = input["parameters"].get("new")
-            if newParameter is None or newParameter:
-                if self.services["keyboard"]["state"] == State.KEYBOARD_NEW:
-                    newCondition = True
-            elif self.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE or self.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE:
-                newCondition = True
-        return newCondition
-
-    def noEmotionTrigger(self, input):
-        if self.services.get("emotion"):
-            # TODO: add emotion filter
-            if self.services["emotion"]["state"] == State.EMOTION_NO:
-                return True
-        return False
-
-    def newSoundTrigger(self, input):
-        if self.services.get("sound"):
-            if self.services["sound"]["state"] == State.SOUND_NEW:
-                return True
-        return False
-
-    def availableSoundTrigger(self, input):
-        if self.services.get("sound"):
-            if self.services["sound"]["state"] == State.SOUND_AVAILABLE or self.services["sound"]["state"] == State.SOUND_NEW:
-                return True
-        return False
-
-    def newConverseTrigger(self, input):
-        newCondition = False
-        intentCondition = False
-        if self.services.get("converse"):
-            # Check new/available condition
-            newParameter = input["parameters"].get("new")
-            if newParameter is None or newParameter:
-                if self.services["converse"]["state"] == State.CONVERSE_NEW:
-                    newCondition = True
-            elif self.services["converse"]["state"] == State.CONVERSE_NEW or self.services["converse"]["state"] == State.CONVERSE_AVAILABLE:
-                newCondition = True
-            if input["parameters"].get("intent"):
-                if self.services["converse"].get("intent"):
-                    if self.services["converse"]["intent"] == input["parameters"]["intent"]:
-                        intentCondition = True
-            else:
-                intentCondition = True
-        return newCondition and intentCondition
-
-    # Actions
-
-    def waitFor(self, input):
-        if input.get("time"):
-            self.freeze = True
-            QTimer.singleShot(input["time"], self.resumeManager)
-        else:
-            self.logger.info('Action(wait) : Missing parameters.')
-
-    def store(self, input):
-        if input.get("list"):
-            outputList = self.retrieveData(input["list"])
-            self.services["storage"].update(outputList)
-        else:
-            self.logger.info('Action(store) : Missing parameters.')
-
-    def addPictureWithUser(self, input):
-        if input.get("firstname") and input.get("lastname"):
-            face_loader.take_picture_new_user(input["firstname"], input["lastname"])
-        else:
-            self.logger.info('Action(takePicture) : Missing parameters.')
-
-    def playSound(self, input):
-        if input.get("filepath"):
-            serv_ap.play(input["filepath"])
-        else:
-            self.logger.info('Action(playSound) : Missing parameters.')
-
-    def displayText(self, input):
-        text = input.get("text")
-        if text:
-            if type(text) is str:
-                # Manage variables on text
-                text = input.get("text", "")
-                list = re.compile("[\{\}]").split(text)
-                for index, string in enumerate(list):
-                    if string.startswith("@"):
-                        string = string.split("@")[1]
-                        for element in input["variables"]:
-                            if type(element) is dict:
-                                if element["name"] == string:
-                                    list[index] = element["value"]
-                text = ""
-                text = text.join(list)
-                ui.setTextMiddle(text)
-                self.services["storage"]["@text"] = text
-            else:
-                self.logger.info('Action(displayText) : Invalid type parameter.')
-        else:
-            self.logger.info('Action(displayText) : Missing parameters.')
-
-    def speak(self, input):
-        if input.get("text"):
-            self.signal_tts_request.emit(input["text"])
-        else:
-            self.logger.info('Action(speak) : Missing parameters.')
-
-    def converse(self, input):
-        if input.get("filepath"):
-            if input.get("id"):
-                self.signal_converse_update_request.emit("username", serv_fr.idToName(input["id"]), input["id"])
-                self.signal_converse_request_with_id.emit(input["filepath"], input["id"])
-            else:
-                self.signal_converse_request.emit(input["filepath"])
-        else:
-            self.logger.info('Action(converse) : Missing parameters.')
-
-    def converseAnswer(self, input):
-        if input.get("intent"):
-            if input.get("id"):
-                self.signal_nlp_request_with_id.emit(input["intent"], input["id"])
-            else:
-                self.signal_nlp_request.emit(input["intent"])
-        else:
-            self.logger.info('Action(converseAnswer) : Missing parameters.')
-
-    def converseUpdateMemory(self, input):
-        if input.get("field") and input.get("value") and input.get("id"):
-            self.signal_converse_update_request.emit(input["field"], input["value"], input["id"])
-        else:
-            self.logger.info('Action(converseUpdateMemory) : Missing parameters.')
-
-    def listen(self, input):
-        if input.get("filepath"):
-            self.signal_stt_request.emit(input["filepath"])
-        else:
-            self.logger.info('Action(listen) : Missing parameters.')
-
-    def changeSuriface(self, input):
-        if input.get("image"):
-            self.signal_ui_suriface.emit(input["image"])
-        else:
-            self.logger.info('Action(changeSuriface) : Missing parameters.')
-
-    def activateKeyboardInput(self, input):
-        if not (input.get("activate") is None):
-            if input["activate"]:
-                ui.activateManualButton.show()
-                if input.get("text"):
-                    ui.manualLabel.setText(input["text"])
-            else:
-                ui.activateManualButton.hide()
-                ui.manualLayoutContainer.hide()
-                ui.manualEdit.setText('')
-        else:
-            self.logger.info('Action(activateKeyboardInput) : Missing parameters.')
-
-    def giveSensorData(self, input):
-        if input["type"] and input["output"]:
-            token = os.environ.get('API_MEMORY_TOKEN', '')
-            url = os.environ.get('API_MEMORY_URL', '')
-            headers = {'Authorization': 'Token ' + token}
-            r1 = requests.get(url + '/memorize/sensors/last/' + input["type"] + '/', headers=headers)
-            last_sensor_data = r1.json()
-            print(last_sensor_data)
-            if last_sensor_data:
-                self.services["storage"][input["output"]] = last_sensor_data["data"]
-
-            # Display a nice plot of the last 24 hours
-            time_to = int(time.time())
-            date_from = datetime.datetime.fromtimestamp(time_to)
-            date_from = date_from.replace(hour=0, minute=0, second=0)
-            date_to = date_from.replace(day=date_from.day+1)
-            time_from = int(date_from.timestamp())
-            time_to = int(date_to.timestamp())
-            r2 = requests.get(url + '/memorize/sensors/' + str(time_from) + '/' + str(time_to) + '/' + input["type"] + '/', headers=headers)
-            # sensors_data = [x for x in r1.json() if x["type"] == input["type"]]
-            sensors_data = r2.json()
-            if sensors_data:
-                x = []
-                y = []
-                for data in sensors_data:
-                    data["created"] = time.mktime(parser.parse(data["created"]).timetuple())
-                    x.append(data["created"])
-                    y.append(float(data["data"]))
-                sensors_data.sort(key=lambda x: x["created"], reverse=True)
-                self.win = pg.GraphicsWindow(title="Basic plotting examples")
-                self.win.resize(1000, 600)
-                self.win.setWindowTitle('pyqtgraph example: Plotting')
-
-                # Enable antialiasing for prettier plots
-                pg.setConfigOptions(antialias=True)
-                p1 = self.win.addPlot()
-                p1.plot(x, y, pen='b')
-                p1.setXRange(time_from, time_to)
-                # print("x :" + str(x) + "\ny :" + str(y))
-                # pg.show()
-                self.services["storage"][input["output"]] = sensors_data[0]["data"]
-        else:
-            self.logger.info('Action(giveSensorData) : Missing parameters.')
-
-    def callScenarios(self, input):
-        idTable = input["id"]
-        self.scope = []
-        for id in idTable:
-            if type(id) is int:
-                self.scope.append(id)
-            elif type(id) is str:
-                self.scope += self.groups[id]
-            else:
-                print('ERROR : Scenario - callScenarios ')
-        print('Scope has changed : ' + str(self.scope))
-        self.scopeChanged = True

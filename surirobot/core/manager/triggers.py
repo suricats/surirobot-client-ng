@@ -6,16 +6,13 @@ class Triggers:
 
     def __init__(self):
         self.triggers = {}
-        self.generateTriggers()
 
-    def generateTriggers(self):
-        self.triggers["sound"] = {}
-        self.triggers["converse"] = {}
-        self.triggers["face"] = {}
-        self.triggers["emotion"] = {}
-        self.triggers["storage"] = {}
-        self.triggers["keyboard"] = {}
+    def generateTriggers(self, services):
+        # Generate services domain for triggers
+        for service in services:
+            self.triggers[service] = {}
 
+        # Register triggers
         self.triggers["sound"]["new"] = self.newSoundTrigger
         self.triggers["sound"]["available"] = self.availableSoundTrigger
 
@@ -31,53 +28,56 @@ class Triggers:
         self.triggers["emotion"]["no"] = self.noEmotionTrigger
 
         self.triggers["keyboard"]["new"] = self.newKeyboardInput
+        return self.triggers
 
     # Triggers
-    def faceWorking(self, input):
+    @staticmethod
+    def faceWorking(mgr, input):
         if not (input["parameters"].get("value") is None):
-            if self.services.get("face"):
-                if self.services["face"]["datavalue"] == State.FACE_DATAVALUE_WORKING:
+            if mgr.services.get("face"):
+                if mgr.services["face"]["datavalue"] == State.FACE_DATAVALUE_WORKING:
                     return input["parameters"]["value"]
                 else:
                     return not input["parameters"]["value"]
         return False
 
-    def newPersonTrigger(self, input):
-        print(self.__name__)
-        # TODO: add sepration new/available with input["parameters"]["new"]
-        if self.services.get("face"):
-            if self.services["face"]["state"] == State.FACE_UNKNOWN:
+    @staticmethod
+    def newPersonTrigger(mgr, input):
+        # TODO: add separation new/available with input["parameters"]["new"]
+        if mgr.services.get("face"):
+            if mgr.services["face"]["state"] == State.FACE_UNKNOWN:
                 return True
         return False
 
-    def severalPersonTrigger(self, input):
-        if self.services.get("face"):
-            if self.services["face"]["state"] == State.FACE_MULTIPLES:
+    @staticmethod
+    def severalPersonTrigger(mgr, input):
+        if mgr.services.get("face"):
+            if mgr.services["face"]["state"] == State.FACE_MULTIPLES:
                 return True
         return False
 
-    def knowPersonTrigger(self, input):
-        print(self.__name__)
+    @staticmethod
+    def knowPersonTrigger(mgr, input):
         # TODO: add sepration new/available with input["parameters"]["new"]
         firstNameRegex = True
         lastNameRegex = True
         fullNameRegex = True
         newCondition = False
-        if self.services.get("face"):
+        if mgr.services.get("face"):
             # Check new/available condition
             newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
-                if self.services["face"]["state"] == State.FACE_KNOWN:
+                if mgr.services["face"]["state"] == State.FACE_KNOWN:
                     newCondition = True
-            elif self.services["face"]["state"] == State.FACE_KNOWN or self.services["face"]["state"] == State.FACE_KNOWN_AVAILABLE:
+            elif mgr.services["face"]["state"] == State.FACE_KNOWN or mgr.services["face"]["state"] == State.FACE_KNOWN_AVAILABLE:
                 newCondition = True
 
             # Check if regex for name is activated
             if input["parameters"].get("name"):
                 patternName = re.compile(input["parameters"]["name"])
-                if not self.services["face"].get("name"):
+                if not mgr.services["face"].get("name"):
                     fullNameRegex = False
-                elif patternName.match(self.services["face"]["name"]):
+                elif patternName.match(mgr.services["face"]["name"]):
                     fullNameRegex = True
                 else:
                     fullNameRegex = False
@@ -85,9 +85,9 @@ class Triggers:
             # Check if regex for firstname is activated
             if input["parameters"].get("firstname"):
                 patternFirstname = re.compile(input["parameters"]["firstname"])
-                if not self.services["face"].get("firstname"):
+                if not mgr.services["face"].get("firstname"):
                     firstNameRegex = False
-                elif patternFirstname.match(self.services["face"]["firstname"]):
+                elif patternFirstname.match(mgr.services["face"]["firstname"]):
                     firstNameRegex = True
                 else:
                     firstNameRegex = False
@@ -95,26 +95,28 @@ class Triggers:
             # Check if regex for lastname is activated
             if input["parameters"].get("lastname"):
                 patternLastname = re.compile(input["parameters"]["lastname"])
-                if not self.services["face"].get("lastname"):
+                if not mgr.services["face"].get("lastname"):
                     lastNameRegex = False
-                elif patternLastname.match(self.services["face"]["lastname"]):
+                elif patternLastname.match(mgr.services["face"]["lastname"]):
                     lastNameRegex = True
                 else:
                     lastNameRegex = False
         return firstNameRegex and lastNameRegex and newCondition and fullNameRegex
 
-    def nobodyTrigger(self, input):
-        if self.services.get("face"):
+    @staticmethod
+    def nobodyTrigger(mgr, input):
+        if mgr.services.get("face"):
             # TODO: Implement regex parameters
-            if self.services["face"]["state"] == State.FACE_NOBODY:
+            if mgr.services["face"]["state"] == State.FACE_NOBODY:
                 return True
         return False
 
-    def newEmotionTrigger(self, input):
-        if self.services.get("emotion"):
-            if self.services["emotion"]["state"] == State.EMOTION_NEW:
+    @staticmethod
+    def newEmotionTrigger(mgr, input):
+        if mgr.services.get("emotion"):
+            if mgr.services["emotion"]["state"] == State.EMOTION_NEW:
                 if input["parameters"].get("emotion"):
-                    if self.services["emotion"]["emotion"] == input["parameters"]["emotion"]:
+                    if mgr.services["emotion"]["emotion"] == input["parameters"]["emotion"]:
                         return True
                     else:
                         return False
@@ -122,55 +124,59 @@ class Triggers:
                     return True
         return False
 
-    def newKeyboardInput(self, input):
+    @staticmethod
+    def newKeyboardInput(mgr, input):
         newCondition = False
-        if self.services.get("keyboard"):
+        if mgr.services.get("keyboard"):
             # Check new/available condition
             newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
-                if self.services["keyboard"]["state"] == State.KEYBOARD_NEW:
+                if mgr.services["keyboard"]["state"] == State.KEYBOARD_NEW:
                     newCondition = True
-            elif self.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE or self.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE:
+            elif mgr.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE or mgr.services["keyboard"]["state"] == State.KEYBOARD_AVAILABLE:
                 newCondition = True
         return newCondition
 
-    def noEmotionTrigger(self, input):
-        if self.services.get("emotion"):
+    @staticmethod
+    def noEmotionTrigger(mgr, input):
+        if mgr.services.get("emotion"):
             # TODO: add emotion filter
-            if self.services["emotion"]["state"] == State.EMOTION_NO:
+            if mgr.services["emotion"]["state"] == State.EMOTION_NO:
                 return True
         return False
 
-    def newSoundTrigger(self, input):
-        if self.services.get("sound"):
-            if self.services["sound"]["state"] == State.SOUND_NEW:
+    @staticmethod
+    def newSoundTrigger(mgr, input):
+        if mgr.services.get("sound"):
+            if mgr.services["sound"]["state"] == State.SOUND_NEW:
                 return True
         return False
 
-    def availableSoundTrigger(self, input):
-        if self.services.get("sound"):
-            if self.services["sound"]["state"] == State.SOUND_AVAILABLE or self.services["sound"]["state"] == State.SOUND_NEW:
+    @staticmethod
+    def availableSoundTrigger(mgr, input):
+        if mgr.services.get("sound"):
+            if mgr.services["sound"]["state"] == State.SOUND_AVAILABLE or mgr.services["sound"]["state"] == State.SOUND_NEW:
                 return True
         return False
 
-    def newConverseTrigger(self, input):
+    @staticmethod
+    def newConverseTrigger(mgr, input):
         newCondition = False
         intentCondition = False
-        if self.services.get("converse"):
+        if mgr.services.get("converse"):
             # Check new/available condition
             newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
-                if self.services["converse"]["state"] == State.CONVERSE_NEW:
+                if mgr.services["converse"]["state"] == State.CONVERSE_NEW:
                     newCondition = True
-            elif self.services["converse"]["state"] == State.CONVERSE_NEW or self.services["converse"]["state"] == State.CONVERSE_AVAILABLE:
+            elif mgr.services["converse"]["state"] == State.CONVERSE_NEW or mgr.services["converse"]["state"] == State.CONVERSE_AVAILABLE:
                 newCondition = True
             if input["parameters"].get("intent"):
-                if self.services["converse"].get("intent"):
-                    if self.services["converse"]["intent"] == input["parameters"]["intent"]:
+                if mgr.services["converse"].get("intent"):
+                    if mgr.services["converse"]["intent"] == input["parameters"]["intent"]:
                         intentCondition = True
             else:
                 intentCondition = True
         return newCondition and intentCondition
 
-
-triggers_mg = Triggers()
+mgr_triggers = Triggers()

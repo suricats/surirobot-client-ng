@@ -1,25 +1,34 @@
 class ActionException(Exception):
-    def __init__(self, service='Unknown', name='Unknown', msg='Unexpected error'):
+    def __init__(self, name=None, msg=None):
         super().__init__(msg)
-        self.service = service
         self.name = name
         self.msg = msg
 
     def __str__(self):
-        return '{}: Unexpected error in {} action of {} service.'.format(type(self).__name__, self.name, self.service)
+        if self.name is None:
+            self.name = 'Unknown'
+        if self.msg is None:
+            self.msg = '{}: Unexpected error in {} action.'.format(type(self).__name__, self.name)
+        return self.msg
 
     def __iter__(self):
-        yield 'service', self.service
         yield 'name', self.name
         yield 'msg', self.msg
 
 
 class NotFoundActionException(ActionException):
-    def __init__(self, service=None, name=None):
+    def __init__(self, name=None):
         super().__init__(
-            service,
             name,
-            '{}: {} action of {} service is not found.'.format(type(self).__name__, name, service)
+            'Action "{}" is not found.'.format(name)
+        )
+
+
+class MissingParametersActionException(ActionException):
+    def __init__(self, name, parameters=None):
+        super().__init__(
+            name,
+            'Missing parameters "{}" on action "{}".'.format(parameters, name)
         )
 
 

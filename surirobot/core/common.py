@@ -1,6 +1,10 @@
 import os
 
 import struct
+import traceback
+from PyQt5.QtCore import pyqtSlot
+import types
+from functools import wraps
 
 
 def rawbytes(s):
@@ -17,6 +21,23 @@ def rawbytes(s):
             H = num & 0xFFFF
             outlist.append(struct.pack('>bH', b, H))
     return b''.join(outlist)
+
+
+def ehpyqtSlot(*args):
+    if len(args) == 0 or isinstance(args[0], types.FunctionType):
+        args = []
+
+    @pyqtSlot(*args)
+    def slotdecorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                func(*args)
+            except Exception as e:
+                print('{} occured in slot'.format(type(e).__name__))
+                traceback.print_exc()
+        return wrapper
+    return slotdecorator
 
 
 class Dir():

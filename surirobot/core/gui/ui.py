@@ -3,7 +3,7 @@ from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette, QColor, QIcon
 from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QMainWindow, QPushButton, QTextEdit
 from PyQt5.QtCore import Qt, QSize, QTimer, pyqtSlot, pyqtSignal
 from .mainwindow import Ui_MainWindow
-from surirobot.core.common import State
+from surirobot.core.common import State, ehpyqtSlot
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -81,22 +81,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #     displayFixer.timeout.connect(self.updateWidgets)
     #     displayFixer.start()
 
-    @pyqtSlot(str)
+    @ehpyqtSlot(str)
     def setTextUp(self, text):
         self.labelUp.setText(text)
         self.labelUp.adjustSize()
 
-    @pyqtSlot(str)
+    @ehpyqtSlot(str)
     def setTextMiddle(self, text):
         self.labelMiddle.setText(text)
         self.labelMiddle.adjustSize()
 
-    @pyqtSlot(str)
+    @ehpyqtSlot(str)
     def setTextDown(self, text):
         self.labelDown.setText(text)
         self.labelDown.adjustSize()
 
-    @pyqtSlot(str)
+    @ehpyqtSlot(str)
     def setImage(self, image_id):
         try:
             image = self.load_image(self.SURIFACES_DIR + '/' + image_id + self.JPG)
@@ -104,19 +104,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print('Error while opening image :' + str(e))
 
-    @pyqtSlot(QImage)
+    @ehpyqtSlot(QImage)
     def setCamera(self, qImg):
         self.camera.setPixmap(QPixmap.fromImage(qImg).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def setManualInput(self):
             self.manualLayoutContainer.show()
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def onClickValidateManualInput(self):
         self.updateState.emit("keyboard", State.KEYBOARD_NEW, {"text": self.manualEdit.displayText()})
 
-    @pyqtSlot(str, str)
+    @ehpyqtSlot(str, str)
     def changeIndicator(self, service, value):
         image = self.load_image(self.INDICATORS_DIR + '/' + service + '/' + value + self.PNG)
         if not image.isNull():
@@ -130,7 +130,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 print('Error - changeIndicator : Service unknown')
         else:
             print('Error - changeIndicator : Image can\'t be found')
-    # @pyqtSlot()
+    # @ehpyqtSlot()
     # def updateWidgets(self):
     #     self.labelTextUp.adjustSize()
     #     self.labelTextMiddle.adjustSize()

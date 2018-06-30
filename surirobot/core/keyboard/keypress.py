@@ -1,6 +1,8 @@
 from PyQt5.QtCore import QObject, QTimer, QEvent, Qt, pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 from surirobot.services import serv_ar, face_loader
+from surirobot.core.common import ehpyqtSlot
+
 
 class KeyPressEventHandler(QObject):
     startRecord = pyqtSignal()
@@ -29,7 +31,7 @@ class KeyPressEventHandler(QObject):
         # self.take_picture.connect(face_loader.take_picture_new_user)
 
     # Communication between 2 different threads
-    @pyqtSlot(bool)
+    @ehpyqtSlot(bool)
     def manageRecord(self, val):
         self.audioRecording = val
 

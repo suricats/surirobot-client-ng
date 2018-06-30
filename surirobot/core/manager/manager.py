@@ -2,10 +2,11 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QTimer
 from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader, serv_emo
 from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core import ui
-from surirobot.core.common import State, Dir
+from surirobot.core.common import State, Dir, ehpyqtSlot
 from surirobot.core.gui.progressbarupdater import progressBarUpdater
-from .triggers import mgr_triggers
-from .actions import mgr_actions
+from .triggers.triggers import mgr_triggers
+from .actions.actions import mgr_actions
+from .exceptions import ManagerException, InitialisationManagerException, BadEncodingScenarioFileException
 import logging
 import json
 import os
@@ -34,6 +35,7 @@ class Manager(QObject):
 
     def __init__(self):
         QObject.__init__(self)
+        self.debug = os.environ.get('DEBUG', True)
         self.triggers = {}
         self.actions = {}
         self.services = {}
@@ -49,44 +51,50 @@ class Manager(QObject):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.scopeChanged = False
+        try:
+            # INPUTS : Connect to services
+            serv_ar.updateState.connect(self.update)
+            api_converse.updateState.connect(self.update)
+            api_nlp.updateState.connect(self.update)
+            api_stt.updateState.connect(self.update)
+            serv_fr.updateState.connect(self.update)
+            ui.updateState.connect(self.update)
+            serv_emo.updateState.connect(self.update)
 
-        # INPUTS : Connect to services
-        serv_ar.updateState.connect(self.update)
-        api_converse.updateState.connect(self.update)
-        api_nlp.updateState.connect(self.update)
-        api_stt.updateState.connect(self.update)
-        serv_fr.updateState.connect(self.update)
-        ui.updateState.connect(self.update)
-        serv_emo.updateState.connect(self.update)
+            # OUTPUTS : Connect to services
+            self.signal_converse_request.connect(api_converse.sendRequest)
+            self.signal_converse_request_with_id.connect(api_converse.sendRequest)
+            self.signal_nlp_request_with_id.connect(api_nlp.sendRequest)
+            self.signal_nlp_request.connect(api_nlp.sendRequest)
+            self.signal_stt_request.connect(api_stt.sendRequest)
+            self.signal_tts_request.connect(api_tts.sendRequest)
+            self.signal_ui_suriface.connect(ui.setImage)
+            self.signal_converse_update_request.connect(api_converse.updateMemory)
 
-        # OUTPUTS : Connect to services
-        self.signal_converse_request.connect(api_converse.sendRequest)
-        self.signal_converse_request_with_id.connect(api_converse.sendRequest)
-        self.signal_nlp_request_with_id.connect(api_nlp.sendRequest)
-        self.signal_nlp_request.connect(api_nlp.sendRequest)
-        self.signal_stt_request.connect(api_stt.sendRequest)
-        self.signal_tts_request.connect(api_tts.sendRequest)
-        self.signal_ui_suriface.connect(ui.setImage)
-        self.signal_converse_update_request.connect(api_converse.updateMemory)
+            # OUTPUTS : Connect to interface
+            self.signal_ui_indicator.connect(ui.changeIndicator)
+            serv_fr.signalIndicator.connect(ui.changeIndicator)
+            face_loader.signalIndicator.connect(ui.changeIndicator)
+            serv_emo.signalIndicator.connect(ui.changeIndicator)
+            api_converse.signalIndicator.connect(ui.changeIndicator)
+            api_tts.signalIndicator.connect(ui.changeIndicator)
 
-        # OUTPUTS : Connect to interface
-        self.signal_ui_indicator.connect(ui.changeIndicator)
-        serv_fr.signalIndicator.connect(ui.changeIndicator)
-        face_loader.signalIndicator.connect(ui.changeIndicator)
-        serv_emo.signalIndicator.connect(ui.changeIndicator)
-        api_converse.signalIndicator.connect(ui.changeIndicator)
-        api_tts.signalIndicator.connect(ui.changeIndicator)
+            # Indicators default state
+            self.signal_ui_indicator.emit("face", "grey")
+            self.signal_ui_indicator.emit("emotion", "grey")
+            self.signal_ui_indicator.emit("converse", "grey")
 
-        # Indicators default state
-        self.signal_ui_indicator.emit("face", "grey")
-        self.signal_ui_indicator.emit("emotion", "grey")
-        self.signal_ui_indicator.emit("converse", "grey")
+            # Generate actions and triggers
+            self.triggers = mgr_triggers.generateTriggers(self.services)
+            self.actions = mgr_actions.generateActions()
+        except Exception as e:
+            raise InitialisationManagerException("connecting_signals[{}]".format(type(e).__name__))
 
-        # Generate actions and triggers
-        self.triggers = mgr_triggers.generateTriggers(self.services)
-        self.actions = mgr_actions.generateActions()
-
-        self.loadScenarioFile("/scenario.json")
+        scenario_filepath = os.environ.get("SCENARIO_PATH")
+        if scenario_filepath:
+            self.loadScenarioFile("/scenario.json")
+        else:
+            raise InitialisationManagerException("scenario_filepath")
 
         # Test
         try:
@@ -97,34 +105,44 @@ class Manager(QObject):
             self.nobodyUpdater = progressBarUpdater(ui.nobodyProgressBar, serv_fr.nobodyTimer, serv_fr.nobodyElaspedTimer, ui.nobodyProgressText)
             self.nobodyUpdater.start()
         except Exception as e:
-            print("Error - manager" + str(e))
+            raise InitialisationManagerException("progress_bar_updater[{}]".format(type(e).__name__))
 
     def loadScenarioFile(self, filepath=None):
-        jsonFile = json.load(open(Dir.BASE + filepath))
-        jsonScenarios = jsonFile["scenarios"]
-        self.scenarios = {}
-        # Load scenarios
-        for scenario in jsonScenarios:
-            self.scenarios[scenario["id"]] = scenario
-        # Load groups of scenarios
-        self.groups = jsonFile["groups"]
-        # Load initial scope
-        for id in jsonFile["initial"]:
-            if type(id) is int:
-                self.scope.append(id)
-            elif type(id) is str:
-                print("group : " + str(self.groups[id]))
-                self.scope += self.groups[id]
-            else:
-                print('ERROR : Scenario - loadScenarioFile ')
-        print('Scope : ' + str(self.scope))
+        try:
+            with open(Dir.BASE + filepath) as filepath:
+                jsonFile = json.load(filepath)
+                jsonScenarios = jsonFile["scenarios"]
+                self.scenarios = {}
+                if(self.debug):
+                    self.logger.info('Loaded {} scenarios.'.format(len(jsonScenarios)))
+                # Load scenarios
+                for scenario in jsonScenarios:
+                    self.scenarios[scenario["id"]] = scenario
+                # Load groups of scenarios
+                self.groups = jsonFile["groups"]
+                if(self.debug):
+                    self.logger.info('Loaded {} groups of scenarios.'.format(len(self.groups)))
+                # Load initial scope
+                for id in jsonFile["initial"]:
+                    if type(id) is int:
+                        self.scope.append(id)
+                    elif type(id) is str:
+                        self.scope += self.groups[id]
+                    else:
+                        raise InitialisationManagerException('invalid_type_scenario_file')
+                if(self.debug):
+                    self.logger.info('Scope : {}'.format(self.scope))
+        except Exception as e:
+            raise BadEncodingScenarioFileException()
 
-    @pyqtSlot(str, int, dict)
+    @ehpyqtSlot(str, int, dict)
     def update(self, name, state, data):
-        # print('Update of scenarios from ' + name)
-        # print('Data : ' + str(data))
-        # print('\nScope : ' + str(self.scope))
-        # self.services[name] = {}
+        if name not in self.services_list:
+            raise ManagerException('invalid_service_name', "The service {} doesn't exist.".format(name))
+        if(self.debug):
+            print('Update of scenarios from ' + name)
+            # print('Data : ' + str(data))
+            # print('\nScope : ' + str(self.scope))
         self.services[name]["state"] = state
         self.services[name].update(data)
         self.checkScope()
@@ -217,7 +235,7 @@ class Manager(QObject):
                 if trigger["service"] == "face" and trigger["name"] == "nobody" and self.services["face"]["state"] == State.FACE_NOBODY:
                     self.services["face"]["state"] = State.FACE_NOBODY_AVAILABLE
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def resumeManager(self):
         self.freeze = False
         actions = self.remainingActions[:]
@@ -234,7 +252,7 @@ class Manager(QObject):
         if not self.freeze:
             self.checkScope()
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def deleteTemporaryFiles(self):
         for the_file in os.listdir(Dir.TMP):
             if not the_file.startswith("."):

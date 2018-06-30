@@ -1,7 +1,7 @@
 from .base import ApiCaller
 from PyQt5.QtCore import QJsonDocument, pyqtSlot, pyqtSignal, QVariant, QFile, QIODevice, QUrl, QByteArray
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
-from surirobot.core.common import State
+from surirobot.core.common import State, ehpyqtSlot
 
 
 class SttApiCaller(ApiCaller):
@@ -14,7 +14,7 @@ class SttApiCaller(ApiCaller):
     def __del__(self):
         self.stop()
 
-    @pyqtSlot('QNetworkReply*')
+    @ehpyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = reply.readAll()
@@ -31,7 +31,7 @@ class SttApiCaller(ApiCaller):
 
         reply.deleteLater()
 
-    @pyqtSlot(str)
+    @ehpyqtSlot(str)
     def sendRequest(self, filepath):
         multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
         # Language

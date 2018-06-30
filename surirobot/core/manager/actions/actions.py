@@ -1,6 +1,6 @@
 from surirobot.services import serv_ap, serv_fr, face_loader
 from surirobot.core import ui
-from surirobot.core.exceptions import ActionException
+from .exceptions import ActionException, NotFoundActionException, MissingParametersActionException
 
 from PyQt5.QtCore import QTimer
 import pyqtgraph as pg
@@ -34,10 +34,10 @@ class Actions:
             self.actions["updateMemory"] = self.converseUpdateMemory
             self.actions["giveSensorData"] = self.giveSensorData
             return self.actions
-        except Exception as e:
-            print(str(e))
-            print(dict(e))
-
+        except AttributeError as e:
+            raise NotFoundActionException(e.args[0].split("'")[3])
+        except Exception:
+            raise ActionException()
 # Actions
 
     @staticmethod
@@ -46,7 +46,7 @@ class Actions:
             mgr.freeze = True
             QTimer.singleShot(input["time"], mgr.resumeManager)
         else:
-            mgr.logger.info('Action(wait) : Missing parameters.')
+            raise MissingParametersActionException("waitFor", 'time')
 
     @staticmethod
     def store(mgr, input):
@@ -54,21 +54,21 @@ class Actions:
             outputList = mgr.retrieveData(input["list"])
             mgr.services["storage"].update(outputList)
         else:
-            mgr.logger.info('Action(store) : Missing parameters.')
+            raise MissingParametersActionException("store", 'list')
 
     @staticmethod
     def addPictureWithUser(mgr, input):
         if input.get("firstname") and input.get("lastname"):
             face_loader.take_picture_new_user(input["firstname"], input["lastname"])
         else:
-            mgr.logger.info('Action(takePicture) : Missing parameters.')
+            raise MissingParametersActionException("addPictureWithUser", ['firstname', 'lastname'])
 
     @staticmethod
     def playSound(mgr, input):
         if input.get("filepath"):
             serv_ap.play(input["filepath"])
         else:
-            mgr.logger.info('Action(playSound) : Missing parameters.')
+            raise MissingParametersActionException("playSound", 'filepath')
 
     @staticmethod
     def displayText(mgr, input):
@@ -90,16 +90,16 @@ class Actions:
                 ui.setTextMiddle(text)
                 mgr.services["storage"]["@text"] = text
             else:
-                mgr.logger.info('Action(displayText) : Invalid type parameter.')
+                raise ActionException("displayText", "Type of argument 'text' is not str but {}.".format(type(text).__name__))
         else:
-            mgr.logger.info('Action(displayText) : Missing parameters.')
+            raise MissingParametersActionException("displayText", 'text')
 
     @staticmethod
     def speak(mgr, input):
         if input.get("text"):
             mgr.signal_tts_request.emit(input["text"])
         else:
-            mgr.logger.info('Action(speak) : Missing parameters.')
+            raise MissingParametersActionException("speak", 'text')
 
     @staticmethod
     def converse(mgr, input):
@@ -110,7 +110,7 @@ class Actions:
             else:
                 mgr.signal_converse_request.emit(input["filepath"])
         else:
-            mgr.logger.info('Action(converse) : Missing parameters.')
+            raise MissingParametersActionException("converse", 'id')
 
     @staticmethod
     def converseAnswer(mgr, input):
@@ -120,28 +120,28 @@ class Actions:
             else:
                 mgr.signal_nlp_request.emit(input["intent"])
         else:
-            mgr.logger.info('Action(converseAnswer) : Missing parameters.')
+            raise MissingParametersActionException("converseAnswer", 'intent')
 
     @staticmethod
     def converseUpdateMemory(mgr, input):
         if input.get("field") and input.get("value") and input.get("id"):
             mgr.signal_converse_update_request.emit(input["field"], input["value"], input["id"])
         else:
-            mgr.logger.info('Action(converseUpdateMemory) : Missing parameters.')
+            raise MissingParametersActionException("converseUpdateMemory", ['field', 'value', 'id'])
 
     @staticmethod
     def listen(mgr, input):
         if input.get("filepath"):
             mgr.signal_stt_request.emit(input["filepath"])
         else:
-            mgr.logger.info('Action(listen) : Missing parameters.')
+            raise MissingParametersActionException("listen", 'filepath')
 
     @staticmethod
     def changeSuriface(mgr, input):
         if input.get("image"):
             mgr.signal_ui_suriface.emit(input["image"])
         else:
-            mgr.logger.info('Action(changeSuriface) : Missing parameters.')
+            raise MissingParametersActionException("changeSuriface", 'image')
 
     @staticmethod
     def activateKeyboardInput(mgr, input):
@@ -155,7 +155,7 @@ class Actions:
                 ui.manualLayoutContainer.hide()
                 ui.manualEdit.setText('')
         else:
-            mgr.logger.info('Action(activateKeyboardInput) : Missing parameters.')
+            raise MissingParametersActionException("activateKeyboardInput", 'activate')
 
     @staticmethod
     def callScenarios(mgr, input):
@@ -167,7 +167,7 @@ class Actions:
             elif type(id) is str:
                 mgr.scope += mgr.groups[id]
             else:
-                print('ERROR : Scenario - callScenarios ')
+                raise ActionException("callScenarios", "Invalid id type {} in new scope.".format(type(id).__name__))
         print('Scope has changed : ' + str(mgr.scope))
         mgr.scopeChanged = True
 
@@ -214,7 +214,7 @@ class Actions:
                 # pg.show()
                 mgr.services["storage"][input["output"]] = sensors_data[0]["data"]
         else:
-            mgr.logger.info('Action(giveSensorData) : Missing parameters.')
+            raise MissingParametersActionException("giveSensorData", ['type', 'output'])
 
 
 mgr_actions = Actions()

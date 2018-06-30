@@ -4,7 +4,7 @@ from PyQt5.QtCore import QByteArray, QJsonDocument, QVariant, QFile, QIODevice, 
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest, QNetworkAccessManager
 import uuid
 from surirobot.services import serv_ap
-from surirobot.core.common import State,Dir
+from surirobot.core.common import State, Dir, ehpyqtSlot
 
 class ConverseApiCaller(ApiCaller):
     download = pyqtSignal(str)
@@ -27,7 +27,7 @@ class ConverseApiCaller(ApiCaller):
     def __del__(self):
         self.stop()
 
-    @pyqtSlot('QNetworkReply*')
+    @ehpyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = QByteArray(reply.readAll())
@@ -55,7 +55,7 @@ class ConverseApiCaller(ApiCaller):
             print('Converse - Error : Invalid response format.\n' + str(buffer))
         reply.deleteLater()
 
-    @pyqtSlot(str, str, int)
+    @ehpyqtSlot(str, str, int)
     def updateMemory(self, field, value, userId):
         # Create the json request
         jsonObject = {
@@ -70,8 +70,8 @@ class ConverseApiCaller(ApiCaller):
         self.isBusy = True
         self.networkManager.post(request, data)
 
-    @pyqtSlot(str, int)
-    @pyqtSlot(str)
+    @ehpyqtSlot(str, int)
+    @ehpyqtSlot(str)
     def sendRequest(self, filepath, id=1):
         multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
         # Language
@@ -109,7 +109,7 @@ class ConverseApiCaller(ApiCaller):
         self.fileDownloader.currentThread.quit()
         super().stop()
 
-    @pyqtSlot('QByteArray')
+    @ehpyqtSlot('QByteArray')
     def downloadFinished(self, data):
         print("Download finished.")
         filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"

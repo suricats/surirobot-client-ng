@@ -1,7 +1,7 @@
 from .base import ApiCaller
 from PyQt5.QtCore import QJsonDocument, QVariant, pyqtSlot, pyqtSignal, QUrl
 from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
-from surirobot.core.common import State
+from surirobot.core.common import State, ehpyqtSlot
 
 
 class NlpApiCaller(ApiCaller):
@@ -14,7 +14,7 @@ class NlpApiCaller(ApiCaller):
     def __del__(self):
         self.stop()
 
-    @pyqtSlot('QNetworkReply*')
+    @ehpyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = reply.readAll()
@@ -37,8 +37,8 @@ class NlpApiCaller(ApiCaller):
                 self.new_reply.emit("Can't find message.")
         reply.deleteLater()
 
-    @pyqtSlot(str, int)
-    @pyqtSlot(str)
+    @ehpyqtSlot(str, int)
+    @ehpyqtSlot(str)
     def sendRequest(self, text, id=None):
         if (text != ""):
             # Create the json request

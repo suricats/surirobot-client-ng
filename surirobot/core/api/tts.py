@@ -4,6 +4,7 @@ from PyQt5.QtCore import QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, py
 from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
 import uuid
 from surirobot.services import serv_ap
+from surirobot.core.common import ehpyqtSlot
 
 
 class TtsApiCaller(ApiCaller):
@@ -22,7 +23,7 @@ class TtsApiCaller(ApiCaller):
     def __del__(self):
         self.stop()
 
-    @pyqtSlot('QNetworkReply*')
+    @ehpyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = reply.readAll()
@@ -43,7 +44,7 @@ class TtsApiCaller(ApiCaller):
                 self.signalIndicator.emit("converse", "orange")
         reply.deleteLater()
 
-    @pyqtSlot(str)
+    @ehpyqtSlot(str)
     def sendRequest(self, text):
         self.isBusy = True
         # Json request
@@ -69,7 +70,7 @@ class TtsApiCaller(ApiCaller):
         self.fileDownloader.stop()
         ApiCaller.stop(self)
 
-    @pyqtSlot('QByteArray')
+    @ehpyqtSlot('QByteArray')
     def downloadFinished(self, data):
         print("Download finished.")
         # generate filename

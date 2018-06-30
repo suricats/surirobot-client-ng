@@ -3,7 +3,7 @@ import logging
 import queue
 import uuid
 from surirobot.services import serv_fr, serv_vc
-from surirobot.core.common import Dir
+from surirobot.core.common import Dir, ehpyqtSlot
 import cv2
 import os
 import requests
@@ -65,7 +65,7 @@ class FaceLoader(QThread):
         model['user'] = user
         self.q.put(model)
 
-    @pyqtSlot(str, str)
+    @ehpyqtSlot(str, str)
     def take_picture_new_user(self, firstname, lastname):
         try:
             picture = serv_vc.get_frame()

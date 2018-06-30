@@ -1,7 +1,7 @@
 from .base import ApiCaller
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QJsonDocument, QUrl, QVariant, QFile, QIODevice, QByteArray
-from surirobot.core.common import State
+from surirobot.core.common import State, ehpyqtSlot
 
 
 class EmotionalAPICaller(ApiCaller):
@@ -14,7 +14,7 @@ class EmotionalAPICaller(ApiCaller):
     def __del__(self):
         self.stop()
 
-    @pyqtSlot('QNetworkReply*')
+    @ehpyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
         buffer = reply.readAll()
         try:
@@ -46,7 +46,7 @@ class EmotionalAPICaller(ApiCaller):
         except Exception as e:
             print("Error : " + str(e) + "\n" + str(buffer))
 
-    @pyqtSlot(str)
+    @ehpyqtSlot(str)
     def sendRequest(self, text):
         try:
             file = QFile(text)

@@ -5,7 +5,7 @@ import time
 import face_recognition
 from surirobot.core import ui
 from surirobot.services import serv_vc
-from surirobot.core.common import State
+from surirobot.core.common import State, ehpyqtSlot
 from sys import getsizeof
 
 
@@ -78,7 +78,7 @@ class FaceRecognition(QThread):
         self.stateChanged(self.NOBODY, self.NOBODY)
         self.faceWorkLoop.start()
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def detect(self):
         faceLocations = []
         faceEncodings = []
@@ -150,20 +150,20 @@ class FaceRecognition(QThread):
                     self.knowElaspedTimer.start()
                     self.dataValueChanged(State.FACE_DATAVALUE_WORKING)
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def nobodyTimeout(self):
         self.stateId = self.NOBODY
         self.personChanged(self.stateId)
         self.stateChanged(State.FACE_NOBODY, self.NOBODY)
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def unknownTimeout(self):
         self.signalIndicator.emit("face", "green")
         self.stateId = self.UNKNOWN
         self.personChanged(self.stateId)
         self.stateChanged(State.FACE_UNKNOWN, self.UNKNOWN)
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def knownTimeout(self):
         self.signalIndicator.emit("face", "green")
         if (not self.pretendentId == self.NOBODY) and (not self.pretendentId == self.UNKNOWN):

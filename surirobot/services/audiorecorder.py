@@ -6,7 +6,7 @@ import uuid
 import logging
 from surirobot.core import ui
 
-from surirobot.core.common import State
+from surirobot.core.common import State, ehpyqtSlot
 
 
 class AudioRecorder(QThread):
@@ -55,12 +55,12 @@ class AudioRecorder(QThread):
             self.logger.info('Calling scenario manager...')
             self.updateState.emit("sound", State.SOUND_NEW, {"filepath": elm['filename']})
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def start_record(self):
         self.list.put({'filename': 'tmp/{}.wav'.format(uuid.uuid4())})
         self.update_suri_image.emit("listening2")
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def stop_record(self):
         self.recording = False
         self.update_suri_image.emit("basic")

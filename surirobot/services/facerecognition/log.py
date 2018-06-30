@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSlot
+from surirobot.core.common import ehpyqtSlot
 import logging
 # from surirobot.management.mod_api.models import LogRecognize
 # from surirobot.management import db
@@ -11,7 +12,7 @@ class FaceLogger(QObject):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-    @pyqtSlot(bool)
+    @ehpyqtSlot(bool)
     def log(self, value):
         pass
         # log = LogRecognize(value=value)

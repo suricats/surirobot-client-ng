@@ -6,7 +6,7 @@ import cv2
 import uuid
 from surirobot.services import serv_vc
 from surirobot.core.api.emotional import EmotionalAPICaller
-from surirobot.core.common import Dir
+from surirobot.core.common import Dir, ehpyqtSlot
 from surirobot.core import ui
 import face_recognition
 
@@ -58,7 +58,7 @@ class EmotionalRecognition(QThread):
             except Exception as e:
                 print('Emotional - Error : ' + str(e))
 
-    @pyqtSlot(int, dict)
+    @ehpyqtSlot(int, dict)
     def emit_emotion_changed(self, state, data):
         self.isBusy = False
         if data.get("emotion") is not None:
@@ -67,6 +67,6 @@ class EmotionalRecognition(QThread):
             ui.setTextDown(str(data))
         self.updateState.emit(self.MODULE_NAME, state, data)
 
-    @pyqtSlot(str, str)
+    @ehpyqtSlot(str, str)
     def relayer(self, a1, a2):
         self.signalIndicator.emit(a1, a2)

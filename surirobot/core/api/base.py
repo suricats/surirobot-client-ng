@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject, QThread, pyqtSlot, pyqtSignal
 from PyQt5.QtNetwork import QNetworkAccessManager
 from abc import abstractmethod
-from surirobot.core.common import Dir
+from surirobot.core.common import Dir, ehpyqtSlot
 
 
 class ApiCaller(QObject):
@@ -21,7 +21,7 @@ class ApiCaller(QObject):
     def __del__(self):
         self.stop()
 
-    @pyqtSlot('QNetworkReply*')
+    @ehpyqtSlot('QNetworkReply*')
     @abstractmethod
     def receiveReply(self, reply):
         pass

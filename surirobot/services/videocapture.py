@@ -7,6 +7,7 @@ import os
 import re
 import platform
 from surirobot.core import ui
+from surirobot.core.common import ehpyqtSlot
 
 
 class VideoCapture(QThread):
@@ -60,7 +61,7 @@ class VideoCapture(QThread):
         else:
             print('Error - Can\'t open camera')
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def detect(self):
         try:
             ret, frame = self.video_capture.read()
@@ -75,7 +76,7 @@ class VideoCapture(QThread):
             print('Error : ' + str(e))
         self.videoWorkLoop.setInterval(-time.time() % (1 / self.NB_IMG_PER_SECOND)*1000)
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def changeCamera(self):
         print('yolo')
         self.currentCam = (self.currentCam+1) % self.nbCam

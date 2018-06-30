@@ -3,7 +3,7 @@ import logging
 import simpleaudio as sa
 import subprocess
 import platform
-
+from surirobot.core.common import ehpyqtSlot
 
 class AudioPlayer(QThread):
     def __init__(self):
@@ -17,13 +17,13 @@ class AudioPlayer(QThread):
         self.stop()
         self.quit()
 
-    @pyqtSlot()
+    @ehpyqtSlot()
     def stop(self):
         if self.playObj:
             self.playObj.stop()
             self.logger.info('Stop playing.')
 
-    @pyqtSlot(str)
+    @ehpyqtSlot(str)
     def play(self, filename):
         try:
             if platform.system() == "Darwin":

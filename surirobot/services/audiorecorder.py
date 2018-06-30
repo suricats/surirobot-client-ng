@@ -14,7 +14,7 @@ class AudioRecorder(QThread):
     end_record = pyqtSignal(str)
 
     update_suri_image = pyqtSignal(str)
-    updateState = pyqtSignal(str, int, dict)
+    update_state = pyqtSignal(str, int, dict)
 
     def __init__(self, samplerate=44100, channels=1):
         QThread.__init__(self)
@@ -53,7 +53,7 @@ class AudioRecorder(QThread):
 
             # self.end_record.emit(elm['filename'])
             self.logger.info('Calling scenario manager...')
-            self.updateState.emit("sound", State.SOUND_NEW, {"filepath": elm['filename']})
+            self.update_state.emit("sound", State.SOUND_NEW, {"filepath": elm['filename']})
 
     @ehpyqtSlot()
     def start_record(self):

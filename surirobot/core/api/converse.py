@@ -6,14 +6,15 @@ import uuid
 from surirobot.services import serv_ap
 from surirobot.core.common import State, Dir, ehpyqtSlot
 
+
 class ConverseApiCaller(ApiCaller):
     download = pyqtSignal(str)
     play_sound = pyqtSignal(str)
     new_intent = pyqtSignal(int, 'QByteArray')
-    updateState = pyqtSignal(str, int, dict)
+    update_state = pyqtSignal(str, int, dict)
     signalIndicator = pyqtSignal(str, str)
 
-    def __init__(self, url='https://www.google.fr'):
+    def __init__(self, url):
         ApiCaller.__init__(self, url)
 
         self.fileDownloader = FileDownloader()
@@ -38,7 +39,7 @@ class ConverseApiCaller(ApiCaller):
             self.signalIndicator.emit("converse", "red")
             self.message = "Oh mince ! Je ne fonctionne plus très bien :("
             filename = Dir.DATA + "error.wav"
-            self.updateState.emit("converse", State.CONVERSE_NEW, {"intent": "error", "reply": self.message, "audiopath": filename})
+            self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": "error", "reply": self.message, "audiopath": filename})
             self.networkManager.clearAccessCache()
         jsonObject = QJsonDocument.fromJson(buffer).object()
         # Converse reply
@@ -121,7 +122,7 @@ class ConverseApiCaller(ApiCaller):
         print("Sound file generated at : " + filename)
         file.close()
         self.signalIndicator.emit("converse", "green")
-        self.updateState.emit("converse", State.CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": filename})
+        self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": filename})
         # Play the audio
         # Restart the audioplayer
         # self.play_sound.emit(filename)

@@ -6,7 +6,7 @@ from surirobot.core.common import State, ehpyqtSlot
 
 class NlpApiCaller(ApiCaller):
 
-    updateState = pyqtSignal(str, int, dict)
+    update_state = pyqtSignal(str, int, dict)
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
@@ -32,7 +32,7 @@ class NlpApiCaller(ApiCaller):
                     self.intent = intents[0]["slugs"]
                 else:
                     self.intent = "dont-understood"
-                self.updateState.emit("converse", State.CONVERSE_NEW, {"intent": self.intent.toString(), "reply": self.message.toString()})
+                self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": self.intent.toString(), "reply": self.message.toString()})
             else:
                 self.new_reply.emit("Can't find message.")
         reply.deleteLater()

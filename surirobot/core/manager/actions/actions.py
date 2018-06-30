@@ -44,14 +44,14 @@ class Actions:
     def waitFor(mgr, input):
         if input.get("time"):
             mgr.freeze = True
-            QTimer.singleShot(input["time"], mgr.resumeManager)
+            QTimer.singleShot(input["time"], mgr.resume_manager)
         else:
             raise MissingParametersActionException("waitFor", 'time')
 
     @staticmethod
     def store(mgr, input):
         if input.get("list"):
-            outputList = mgr.retrieveData(input["list"])
+            outputList = mgr.retrieve_data(input["list"])
             mgr.services["storage"].update(outputList)
         else:
             raise MissingParametersActionException("store", 'list')

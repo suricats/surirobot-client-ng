@@ -8,7 +8,7 @@ class ManagerException(Exception):
         if self.code is None:
             self.code = 'unknown-error'
         if self.msg is None:
-            self.msg = '{}: Unexpected error in manager.\nCode: {}'.format(type(self).__code__, self.code)
+            self.msg = '{}: Unexpected error in manager.\nCode: {}'.format(type(self).__name__, self.code)
         return self.msg
 
     def __iter__(self):
@@ -24,20 +24,17 @@ class InitialisationManagerException(ManagerException):
         )
 
 
+class TypeNotAllowedInDataRetrieverException(ManagerException):
+    def __init__(self, action_name=None, list=None, dic=None, element_name=None, element_value=None):
+        super().__init__(
+            'type_not_allowed',
+            'This type of variable is not allowed in the data retriever.\nName of parameter: {}\nParent list: {}\nParent dictionnary: {}\nElement[{}]: {}\n'.format(action_name, list, dic, element_name, element_value)
+        )
+
+
 class BadEncodingScenarioFileException(ManagerException):
     def __init__(self):
         super().__init__(
             'bad_encoding_file',
             'Scenario file is invalid or corrupted.'
-        )
-
-
-class BadParameterException(ManagerException):
-    def __init__(self, parameter, valid_values=None):
-        msg = '{} is not correct.'.format(parameter)
-        if valid_values:
-            msg = msg + ' Valid values are {}'.format(', '.join(valid_values))
-        super().__init__(
-            'bad_parameter',
-            msg
         )

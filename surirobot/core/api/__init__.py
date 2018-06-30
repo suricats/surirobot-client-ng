@@ -1,25 +1,34 @@
 import os
+from .exceptions import URLNotDefinedAPIException
 
-from surirobot.core.api.converse import ConverseApiCaller
-api_converse = ConverseApiCaller(
-    os.environ.get('API_CONVERSE_URL')
-)
-api_converse.start()
+from .converse import ConverseApiCaller
+converse_url = os.environ.get('API_CONVERSE_URL')
+if converse_url:
+    api_converse = ConverseApiCaller(converse_url)
+    api_converse.start()
+else:
+    raise URLNotDefinedAPIException('Converse')
 
-from surirobot.core.api.tts import TtsApiCaller
-api_tts = TtsApiCaller(
-    os.environ.get('API_TTS_URL')
-)
-api_tts.start()
+from .tts import TtsApiCaller
+tts_url = os.environ.get('API_TTS_URL')
+if tts_url:
+    api_tts = TtsApiCaller(tts_url)
+    api_tts.start()
+else:
+    raise URLNotDefinedAPIException('TTS')
 
-from surirobot.core.api.stt import SttApiCaller
-api_stt = SttApiCaller(
-    os.environ.get('API_STT_URL')
-)
-api_stt.start()
+from .stt import SttApiCaller
+stt_url = os.environ.get('API_STT_URL')
+if stt_url:
+    api_stt = SttApiCaller(stt_url)
+    api_stt.start()
+else:
+    raise URLNotDefinedAPIException('STT')
 
-from surirobot.core.api.nlp import NlpApiCaller
-api_nlp = NlpApiCaller(
-    os.environ.get('API_NLP_URL')
-)
-api_nlp.start()
+from .nlp import NlpApiCaller
+nlp_url = os.environ.get('API_NLP_URL')
+if nlp_url:
+    api_nlp = NlpApiCaller(nlp_url)
+    api_nlp.start()
+else:
+    raise URLNotDefinedAPIException('NLP')

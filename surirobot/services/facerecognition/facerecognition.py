@@ -10,7 +10,7 @@ from sys import getsizeof
 
 
 class FaceRecognition(QThread):
-    updateState = pyqtSignal(str, int, dict)
+    update_state = pyqtSignal(str, int, dict)
     # deprecated signal -> will be removed
     signalPersonChanged = pyqtSignal(str)
     signalIndicator = pyqtSignal(str, str)
@@ -185,13 +185,13 @@ class FaceRecognition(QThread):
                 'lastname': self.idToLastname(id),
                 'name': self.idToName(id)
             }
-        self.updateState.emit(self.MODULE_NAME, state, data)
+        self.update_state.emit(self.MODULE_NAME, state, data)
 
     def dataValueChanged(self, datavalue):
         data = {
             'datavalue':  datavalue
         }
-        self.updateState.emit(self.MODULE_NAME, State.NO_STATE, data)
+        self.update_state.emit(self.MODULE_NAME, State.NO_STATE, data)
 
     def personChanged(self, id):
         name = self.idToName(id)

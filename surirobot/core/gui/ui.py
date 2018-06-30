@@ -16,7 +16,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     SURI_BASIC = 0
     SURI_LISTENING = 1
 
-    updateState = pyqtSignal(str, int, dict)
+    update_state = pyqtSignal(str, int, dict)
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -114,7 +114,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @ehpyqtSlot()
     def onClickValidateManualInput(self):
-        self.updateState.emit("keyboard", State.KEYBOARD_NEW, {"text": self.manualEdit.displayText()})
+        self.update_state.emit("keyboard", State.KEYBOARD_NEW, {"text": self.manualEdit.displayText()})
 
     @ehpyqtSlot(str, str)
     def changeIndicator(self, service, value):

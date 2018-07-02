@@ -89,7 +89,7 @@ class Manager(QObject):
             self.triggers = mgr_triggers.generateTriggers(self.services)
             self.actions = mgr_actions.generateActions()
         except Exception as e:
-            raise InitialisationManagerException("connecting_signals[{}]".format(type(e).__name__))
+            raise InitialisationManagerException("connecting_signals[{}]".format(type(e).__name__)) from e
 
         scenario_filepath = os.environ.get("SCENARIO_PATH")
         if scenario_filepath:
@@ -106,7 +106,7 @@ class Manager(QObject):
             self.nobodyUpdater = progressBarUpdater(ui.nobodyProgressBar, serv_fr.nobodyTimer, serv_fr.nobodyElaspedTimer, ui.nobodyProgressText)
             self.nobodyUpdater.start()
         except Exception as e:
-            raise InitialisationManagerException("progress_bar_updater[{}]".format(type(e).__name__))
+            raise InitialisationManagerException("progress_bar_updater[{}]".format(type(e).__name__)) from e
 
     def load_scenario_file(self, filepath=None):
         try:
@@ -132,7 +132,7 @@ class Manager(QObject):
                 if(self.debug):
                     self.logger.info('Scope : {}'.format(self.scope))
         except Exception as e:
-            raise BadEncodingScenarioFileException()
+            raise BadEncodingScenarioFileException() from e
 
     @ehpyqtSlot(str, int, dict)
     def update(self, name, state, data):
@@ -233,7 +233,7 @@ class Manager(QObject):
                                     break
                 self.scopeChanged = False
         except Exception as e:
-            raise ManagerException('check_scope_error', 'An unexpected error occured while checking scope\n{}.'.format(e))
+            raise ManagerException('check_scope_error', 'An unexpected error occured while checking scope\n{}.'.format(e)) from e
 
     def update_state(self, sc):
         for trigger in sc["triggers"]:

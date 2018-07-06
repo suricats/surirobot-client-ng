@@ -33,7 +33,7 @@ class ConverseApiCaller(ApiCaller):
         self.isBusy = False
         buffer = QByteArray(reply.readAll())
         # print('\nConverse : Receive reply : ' + str(buffer))
-        if (reply.error() != QNetworkReply.NoError):
+        if reply.error() != QNetworkReply.NoError:
             print("Converse - Error  " + str(reply.error()) + " : ")
             print("HTTP " + str(reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute)) + ' : ' + buffer.data().decode('utf8'))
             self.signalIndicator.emit("converse", "red")
@@ -43,17 +43,32 @@ class ConverseApiCaller(ApiCaller):
             self.networkManager.clearAccessCache()
         jsonObject = QJsonDocument.fromJson(buffer).object()
         # Converse reply
-        if jsonObject.get("intent") and jsonObject.get("answerText") and jsonObject.get("answerAudioLink"):
+        jsonObject = reply.rawHeader(QByteArray().append("JSON"))
+        if jsonObject:
+            jsonObject = QJsonDocument.fromJson(jsonObject).object()
+            # Intent
             self.intent = jsonObject["intent"].toString()
             print("intent : " + self.intent)
-            self.message = jsonObject["answerText"].toString()
-            url = jsonObject["answerAudioLink"].toString()
-            self.download.emit(url)
-        elif jsonObject.get("field") and jsonObject.get("value") and jsonObject.get("userId"):
-            print('Converse - updateMemory responded.')
+            # Message
+            self.message = jsonObject["message"].toString()
+            # Audio
+            filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"
+            file = QFile(filename)
+            if (not file.open(QIODevice.WriteOnly)):
+                print("Could not create file : " + filename)
+                return
+            file.write(buffer)
+            print("Sound file generated at : " + filename)
+            file.close()
+            self.signalIndicator.emit("converse", "green")
+            self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": filename})
         else:
-            self.signalIndicator.emit("converse", "orange")
-            print('Converse - Error : Invalid response format.\n' + str(buffer))
+            jsonObject = QJsonDocument.fromJson(buffer).object()
+            if jsonObject.get("field") and jsonObject.get("value") and jsonObject.get("userId"):
+                print('Converse - updateMemory responded.')
+            else:
+                self.signalIndicator.emit("converse", "orange")
+                print('Converse - Error : Invalid response format.\n' + str(buffer))
         reply.deleteLater()
 
     @ehpyqtSlot(str, str, int)
@@ -62,23 +77,23 @@ class ConverseApiCaller(ApiCaller):
         jsonObject = {
             'field': field,
             'value': value,
-            'userId': str(userId)
+            'user_id': 'SURI{}'.format(userId)
         }
         jsonData = QJsonDocument(jsonObject)
         data = jsonData.toJson()
-        request = QNetworkRequest(QUrl(self.url + '/updateMemory'))
+        request = QNetworkRequest(QUrl(self.url + '/nlp/memory'))
         request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
         self.isBusy = True
         self.networkManager.post(request, data)
 
     @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
-    def sendRequest(self, filepath, id=1):
+    def sendRequest(self, filepath, id=None):
         multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
         # Language
         textPart = QHttpPart()
         textPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"language\""))
-        textPart.setBody(QByteArray().append(self.DEFAULT_LANGUAGE))
+        textPart.setBody(QByteArray().append(self.DEFAULT_LANGUAGE_EXT))
         # Audio
         audioPart = QHttpPart()
         audioPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"audio\"; filename=\"audio.wav\""))
@@ -91,12 +106,14 @@ class ConverseApiCaller(ApiCaller):
 
         # Id
         idPart = QHttpPart()
-        idPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"userId\""))
+        idPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"user_id\""))
         idPart.setBody(QByteArray().append(str(id)))
         multiPart.append(audioPart)
         multiPart.append(textPart)
         multiPart.append(idPart)
-        request = QNetworkRequest(QUrl(self.url+'/converse'))
+        url = self.url+'/converse/audio'
+        print(url)
+        request = QNetworkRequest(QUrl(self.url+'/converse/audio'))
         print("Sended to Converse API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + "Ko")
         self.isBusy = True
         reply = self.networkManager.post(request, multiPart)

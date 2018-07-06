@@ -612,7 +612,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [-2,0,"converse","special-persons","person-detection","emotion-detection", { "hey": "brother"}]
+            "variable": [-2,0,"converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]

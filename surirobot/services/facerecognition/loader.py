@@ -39,6 +39,7 @@ class FaceLoader(QThread):
         try:
             counter = 0
             self.logger.info("Start loading models ....")
+            self.signalIndicator.emit("face", "orange")
             r1 = requests.get(self.url + '/memorize/users/', headers=self.headers)
             # print(r1.json())
             users = r1.json()
@@ -51,10 +52,11 @@ class FaceLoader(QThread):
                     # name = user.firstname + ' ' + user.lastname
                     # self.logger.info("Load Face {}".format(name))
                     serv_fr.addModel(model)
-                    self.signalIndicator.emit("face", "orange")
             self.logger.info(str(counter) + " model(s) loaded !")
+            self.signalIndicator.emit("face", "green")
         except Exception as e:
             print("load from db : " + str(e))
+            self.signalIndicator.emit("face", "red")
 
     def add_user(self, firstname, lastname, email, face):
         r1 = requests.post(self.url + '/memorize/users/', {"firstname": firstname, "lastname": lastname, "email": email}, headers=self.headers)

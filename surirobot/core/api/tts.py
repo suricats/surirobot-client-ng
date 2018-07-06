@@ -33,15 +33,17 @@ class TtsApiCaller(ApiCaller):
             self.signalIndicator.emit("converse", "red")
             self.networkManager.clearAccessCache()
         else:
-            jsonObject = QJsonDocument.fromJson(buffer).object()
-            if jsonObject.get("downloadLink"):
-                url = jsonObject["downloadLink"].toString("")
-                print("Downloading the sound : " + url)
-                self.download.emit(url)
-            else:
-                print('TTS - Error : No url')
-                print('Data : ' + str(buffer))
-                self.signalIndicator.emit("converse", "orange")
+            # Audio
+            filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"
+            file = QFile(filename)
+            if (not file.open(QIODevice.WriteOnly)):
+                print("Could not create file : " + filename)
+                return
+            file.write(buffer)
+            print("Sound file generated at : " + filename)
+            file.close()
+            # Play the audio
+            self.play_sound.emit(filename)
         reply.deleteLater()
 
     @ehpyqtSlot(str)
@@ -56,7 +58,7 @@ class TtsApiCaller(ApiCaller):
         jsonData = QJsonDocument(jsonObject)
         data = jsonData.toJson()
 
-        url = QUrl(self.url)
+        url = QUrl(self.url+'/tts/speak')
         request = QNetworkRequest(url)
 
         request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))

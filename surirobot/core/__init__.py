@@ -1,7 +1,9 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow
-from .gui.ui import MainWindow
+
+from PyQt5.QtWidgets import QApplication
+
 from .gui.mainwindow import Ui_MainWindow
+from .gui.ui import MainWindow
 
 # Load QT
 app = QApplication(sys.argv)

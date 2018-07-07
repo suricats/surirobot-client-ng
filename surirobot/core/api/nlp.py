@@ -1,7 +1,8 @@
-from .base import ApiCaller
-from PyQt5.QtCore import QJsonDocument, QVariant, pyqtSlot, pyqtSignal, QUrl
+from PyQt5.QtCore import QJsonDocument, QVariant, pyqtSignal, QUrl
 from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
+
 from surirobot.core.common import State, ehpyqtSlot
+from .base import ApiCaller
 
 
 class NlpApiCaller(ApiCaller):
@@ -10,6 +11,8 @@ class NlpApiCaller(ApiCaller):
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
+        self.message = None
+        self.intent = None
 
     def __del__(self):
         self.stop()
@@ -18,13 +21,11 @@ class NlpApiCaller(ApiCaller):
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = reply.readAll()
-        if (reply.error() != QNetworkReply.NoError):
+        if reply.error() != QNetworkReply.NoError:
             print("NLP - Error  " + str(reply.error()) + " : " + buffer.data().decode('utf8'))
             self.networkManager.clearAccessCache()
         else:
             jsonObject = QJsonDocument.fromJson(buffer).object()
-            # print("Received from NLP API : " + str(buffer))
-            # getAnswer reply
             if jsonObject["results"] and jsonObject["message"]:
                 self.message = jsonObject["results"]["messages"][0]["content"]
                 intents = jsonObject["results"]["conversation"]["intents"]
@@ -40,7 +41,7 @@ class NlpApiCaller(ApiCaller):
     @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
     def sendRequest(self, text, id=None):
-        if (text != ""):
+        if text != "":
             # Create the json request
             jsonObject = {
                 'text': text,

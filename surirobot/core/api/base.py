@@ -1,6 +1,8 @@
-from PyQt5.QtCore import QObject, QThread, pyqtSlot, pyqtSignal
-from PyQt5.QtNetwork import QNetworkAccessManager
 from abc import abstractmethod
+
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5.QtNetwork import QNetworkAccessManager
+
 from surirobot.core.common import Dir, ehpyqtSlot
 
 
@@ -17,6 +19,7 @@ class ApiCaller(QObject):
         self.networkManager.finished.connect(self.receiveReply)
         self.currentThread = QThread()
         self.moveToThread(self.currentThread)
+        self.isBusy = False
 
     def __del__(self):
         self.stop()

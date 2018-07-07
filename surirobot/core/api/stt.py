@@ -1,7 +1,8 @@
-from .base import ApiCaller
-from PyQt5.QtCore import QJsonDocument, pyqtSlot, pyqtSignal, QVariant, QFile, QIODevice, QUrl, QByteArray
+from PyQt5.QtCore import QJsonDocument, pyqtSignal, QVariant, QFile, QIODevice, QUrl, QByteArray
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
+
 from surirobot.core.common import State, ehpyqtSlot
+from .base import ApiCaller
 
 
 class SttApiCaller(ApiCaller):
@@ -18,7 +19,7 @@ class SttApiCaller(ApiCaller):
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = reply.readAll()
-        if (reply.error() != QNetworkReply.NoError):
+        if reply.error() != QNetworkReply.NoError:
             print("STT - Error  " + str(reply.error()))
             self.networkManager.clearAccessCache()
         else:

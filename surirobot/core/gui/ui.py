@@ -1,9 +1,9 @@
-from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette, QColor, QIcon
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette
+from PyQt5.QtWidgets import QMainWindow
 
-from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QMainWindow, QPushButton, QTextEdit
-from PyQt5.QtCore import Qt, QSize, QTimer, pyqtSlot, pyqtSignal
-from .mainwindow import Ui_MainWindow
 from surirobot.core.common import State, ehpyqtSlot
+from .mainwindow import Ui_MainWindow
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -65,7 +65,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.activateManualButton.hide()
         self.manualLayoutContainer.hide()
 
-    def load_image(self, image_path):
+    @staticmethod
+    def load_image(image_path):
         image = QImage()
         # print('image_path :' + str(image_path))
         image.load(image_path)

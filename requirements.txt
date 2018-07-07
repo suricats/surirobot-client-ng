@@ -11,4 +11,5 @@ simpleaudio
 pyinstaller
 requests
 python-dateutil
+mu-editor
 pyqtgraph

@@ -1,12 +1,13 @@
-from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal, QTimer, QElapsedTimer
-import os
 import logging
+import os
 import time
+
 import face_recognition
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer, QElapsedTimer
+
 from surirobot.core import ui
-from surirobot.services import serv_vc
 from surirobot.core.common import State, ehpyqtSlot
-from sys import getsizeof
+from surirobot.services import serv_vc
 
 
 class FaceRecognition(QThread):
@@ -71,7 +72,7 @@ class FaceRecognition(QThread):
     def __del__(self):
         self.quit()
 
-    def start(self):
+    def start(self, **kwargs):
         QThread.start(self)
         time.sleep(3)
         self.personChanged(self.NOBODY)

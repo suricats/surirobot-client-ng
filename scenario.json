@@ -16,7 +16,7 @@
   ],
 
   "scenarios": [
-      {
+	  {
   			"id": -6,
   			"description": "Ask for humidity - CHEAT",
   			"triggers": [],
@@ -307,7 +307,7 @@
 					"name": "callScenarios",
 					"id": {
 						"type": "input",
-						"variable": [-2, 0, "converse", "person-detection", "emotion-detection"]
+						"variable": [-2, "converse", "person-detection", "emotion-detection"]
 					}
 				}
 			]
@@ -392,38 +392,6 @@
   					"id": {
   						"type": "input",
   						"variable": ["face-working", "converse", "person-detection", "emotion-detection"]
-  					}
-  				}
-  			]
-  		},
-      {
-  			"id": 0,
-  			"description": "[MEET UP] : Wait for audio - take appointment",
-  			"triggers": [{
-  				"service": "sound",
-  				"name": "new",
-  				"parameters": {}
-  			}],
-  			"actions": [{
-  					"name": "converse",
-  					"filepath": {
-  						"type": "service",
-  						"name": "sound",
-  						"variable": "filepath"
-  					}
-  				},
-  				{
-  					"name": "changeSuriface",
-  					"image": {
-  						"type": "input",
-  						"variable": "computing2"
-  					}
-  				},
-  				{
-  					"name": "callScenarios",
-  					"id": {
-  						"type": "input",
-  						"variable": [-1, "converse"]
   					}
   				}
   			]
@@ -609,10 +577,27 @@
           }
         },
         {
+          "name": "updateMemory",
+          "field" : {
+            "type" : "input",
+            "variable": "username"
+          },
+          "value": {
+            "type": "service",
+            "name": "face",
+            "variable": "name"
+          },
+          "id" : {
+            "type": "service",
+            "name": "face",
+            "variable": "id"
+          }
+        },
+        {
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [-2,0,"converse","special-persons","person-detection","emotion-detection"]
+            "variable": [-2,"converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]

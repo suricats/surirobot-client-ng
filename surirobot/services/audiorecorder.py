@@ -1,11 +1,12 @@
-from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal
-import sounddevice as sd
-import soundfile as sf
+import logging
 import queue
 import uuid
-import logging
-from surirobot.core import ui
 
+import sounddevice as sd
+import soundfile as sf
+from PyQt5.QtCore import QThread, pyqtSignal
+
+from surirobot.core import ui
 from surirobot.core.common import State, ehpyqtSlot
 
 
@@ -35,7 +36,7 @@ class AudioRecorder(QThread):
         self.quit()
 
     def run(self):
-        while(True):
+        while True:
             elm = self.list.get()
             self.recording = True
             self.logger.info('Now starting record')

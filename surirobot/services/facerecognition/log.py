@@ -1,10 +1,6 @@
-import logging
-
-from PyQt5.QtCore import QObject
-
+from PyQt5.QtCore import QObject, pyqtSlot
 from surirobot.core.common import ehpyqtSlot
-
-
+import logging
 # from surirobot.management.mod_api.models import LogRecognize
 # from surirobot.management import db
 

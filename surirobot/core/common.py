@@ -40,14 +40,14 @@ def ehpyqtSlot(*args):
     return slotdecorator
 
 
-class Dir:
+class Dir():
     BASE = os.getcwd()
     TMP = BASE + '/tmp/'
     DATA = BASE + '/data/'
     PICTURES = DATA + 'pictures/'
 
 
-class State:
+class State():
     NO_STATE = -9999
     FACE_NOBODY = -2
     FACE_NOBODY_AVAILABLE = -3
@@ -59,6 +59,10 @@ class State:
     FACE_MULTIPLES_AVAILABLE = 4
     FACE_DATAVALUE_WORKING = 5
     FACE_DATAVALUE_NOT_WORKING = 6
+    SOUND_NEW = 6
+    SOUND_AVAILABLE = 7
+    CONVERSE_NEW = 8
+    CONVERSE_AVAILABLE = 9
     SOUND_NEW = 10
     CONVERSE_NEW = 11
     SOUND_AVAILABLE = 12

@@ -7,7 +7,7 @@ class Triggers:
     def __init__(self):
         self.triggers = {}
 
-    def generate_triggers(self, services):
+    def generateTriggers(self, services):
         # Generate services domain for triggers
         for service in services:
             self.triggers[service] = {}
@@ -18,11 +18,11 @@ class Triggers:
 
         self.triggers["converse"]["new"] = self.newConverseTrigger
 
-        self.triggers["face"]["unknow"] = self.new_person_trigger
-        self.triggers["face"]["know"] = self.know_person_trigger
-        self.triggers["face"]["nobody"] = self.nobody_trigger
-        self.triggers["face"]["several"] = self.several_person_trigger
-        self.triggers["face"]["working"] = self.face_working
+        self.triggers["face"]["unknow"] = self.newPersonTrigger
+        self.triggers["face"]["know"] = self.knowPersonTrigger
+        self.triggers["face"]["nobody"] = self.nobodyTrigger
+        self.triggers["face"]["several"] = self.severalPersonTrigger
+        self.triggers["face"]["working"] = self.faceWorking
 
         self.triggers["emotion"]["new"] = self.newEmotionTrigger
         self.triggers["emotion"]["no"] = self.noEmotionTrigger
@@ -32,7 +32,7 @@ class Triggers:
 
     # Triggers
     @staticmethod
-    def face_working(mgr, input):
+    def faceWorking(mgr, input):
         if not (input["parameters"].get("value") is None):
             if mgr.services.get("face"):
                 if mgr.services["face"]["datavalue"] == State.FACE_DATAVALUE_WORKING:
@@ -42,7 +42,7 @@ class Triggers:
         return False
 
     @staticmethod
-    def new_person_trigger(mgr, input):
+    def newPersonTrigger(mgr, input):
         # TODO: add separation new/available with input["parameters"]["new"]
         if mgr.services.get("face"):
             if mgr.services["face"]["state"] == State.FACE_UNKNOWN:
@@ -50,14 +50,14 @@ class Triggers:
         return False
 
     @staticmethod
-    def several_person_trigger(mgr, input):
+    def severalPersonTrigger(mgr, input):
         if mgr.services.get("face"):
             if mgr.services["face"]["state"] == State.FACE_MULTIPLES:
                 return True
         return False
 
     @staticmethod
-    def know_person_trigger(mgr, input):
+    def knowPersonTrigger(mgr, input):
         # TODO: add sepration new/available with input["parameters"]["new"]
         firstNameRegex = True
         lastNameRegex = True
@@ -101,11 +101,10 @@ class Triggers:
                     lastNameRegex = True
                 else:
                     lastNameRegex = False
-        # print('{},{},{},{}'.format(firstNameRegex, lastNameRegex, newCondition, fullNameRegex))
         return firstNameRegex and lastNameRegex and newCondition and fullNameRegex
 
     @staticmethod
-    def nobody_trigger(mgr, input):
+    def nobodyTrigger(mgr, input):
         if mgr.services.get("face"):
             # TODO: Implement regex parameters
             if mgr.services["face"]["state"] == State.FACE_NOBODY:

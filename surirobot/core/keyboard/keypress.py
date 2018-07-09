@@ -1,8 +1,7 @@
-from PyQt5.QtCore import QObject, QTimer, QEvent, Qt, pyqtSignal
+from PyQt5.QtCore import QObject, QTimer, QEvent, Qt, pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
-
+from surirobot.services import serv_ar, face_loader
 from surirobot.core.common import ehpyqtSlot
-from surirobot.services import serv_ar
 
 
 class KeyPressEventHandler(QObject):
@@ -38,33 +37,33 @@ class KeyPressEventHandler(QObject):
 
     def eventFilter(self, obj, event):
         # Key pressed
-        if event.type() == QEvent.KeyPress:
+        if(event.type() == QEvent.KeyPress):
             keyP = event
-            if (keyP.key() == Qt.Key_Escape) or (keyP.key() == Qt.Key_Return):
+            if((keyP.key() == Qt.Key_Escape) or (keyP.key() == Qt.Key_Return)):
                 print('Leaving app...')
                 QApplication.quit()
-            elif keyP.key() == Qt.Key_C:
+            elif(keyP.key() == Qt.Key_C):
                 # Expiration timer is set to prevent keyboard error
-                if self.expirationTimer.isActive():
+                if(self.expirationTimer.isActive()):
                     self.expirationTimer.stop()
-                if not serv_ar.is_recording():
+                if(not serv_ar.is_recording()):
                     self.startRecord.emit()
                 return True
-            elif keyP.key() == Qt.Key_B:
+            elif(keyP.key() == Qt.Key_B):
                 # Expiration timer is set to prevent keyboard error
-                if self.yoloTimer.isActive():
+                if(self.yoloTimer.isActive()):
                     self.yoloTimer.stop()
                 return True
             else:
                 return QObject.eventFilter(self, obj, event)
 
         # Key released
-        elif event.type() == QEvent.KeyRelease:
+        elif(event.type() == QEvent.KeyRelease):
             keyR = event
-            if (keyR.key() == Qt.Key_C) and (not self.expirationTimer.isActive()):
+            if((keyR.key() == Qt.Key_C) and (not self.expirationTimer.isActive())):
                 self.expirationTimer.start()
                 return True
-            if (keyR.key() == Qt.Key_B) and (not self.yoloTimer.isActive()):
+            if((keyR.key() == Qt.Key_B) and (not self.yoloTimer.isActive())):
                 #self.take_picture.emit()
                 self.yoloTimer.start()
                 return True

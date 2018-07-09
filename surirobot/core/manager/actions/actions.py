@@ -1,16 +1,16 @@
-import datetime
+from surirobot.services import serv_ap, serv_fr, face_loader
+from surirobot.core import ui
+from .exceptions import ActionException, NotFoundActionException, MissingParametersActionException
+
+from PyQt5.QtCore import QTimer
+import pyqtgraph as pg
+
 import os
+import requests
 import re
 import time
-
-import pyqtgraph as pg
-import requests
-from PyQt5.QtCore import QTimer
 from dateutil import parser
-
-from surirobot.core import ui
-from surirobot.services import serv_ap, face_loader
-from .exceptions import ActionException, NotFoundActionException, MissingParametersActionException
+import datetime
 
 
 class Actions:
@@ -105,7 +105,7 @@ class Actions:
     def converse(mgr, input):
         if input.get("filepath"):
             if input.get("id"):
-                # mgr.signal_converse_update_request.emit("username", serv_fr.idToName(input["id"]), input["id"])
+                mgr.signal_converse_update_request.emit("username", serv_fr.idToName(input["id"]), input["id"])
                 mgr.signal_converse_request_with_id.emit(input["filepath"], input["id"])
             else:
                 mgr.signal_converse_request.emit(input["filepath"])

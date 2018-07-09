@@ -1,8 +1,7 @@
-from PyQt5.QtCore import pyqtSignal, QJsonDocument, QUrl, QVariant, QFile, QIODevice
-from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
-
-from surirobot.core.common import State, ehpyqtSlot
 from .base import ApiCaller
+from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QJsonDocument, QUrl, QVariant, QFile, QIODevice, QByteArray
+from surirobot.core.common import State, ehpyqtSlot
 
 
 class EmotionalAPICaller(ApiCaller):
@@ -19,7 +18,7 @@ class EmotionalAPICaller(ApiCaller):
     def receiveReply(self, reply):
         buffer = reply.readAll()
         try:
-            if reply.error() != QNetworkReply.NoError:
+            if (reply.error() != QNetworkReply.NoError):
                 print("EMOTIONAL - Error " + str(reply.error()))
                 if reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute):
                     print("HTTP " + str(reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute) + ' : ' + str(buffer)))

@@ -1,17 +1,15 @@
+from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal
 import logging
-import os
 import time
-import uuid
-
+import os
 import cv2
-import face_recognition
-from PyQt5.QtCore import QThread, pyqtSignal
-
-from surirobot.core import ui
+import uuid
+from surirobot.services import serv_vc
 from surirobot.core.api.emotional import EmotionalAPICaller
 from surirobot.core.api.exceptions import URLNotDefinedAPIException
 from surirobot.core.common import Dir, ehpyqtSlot
-from surirobot.services import serv_vc
+from surirobot.core import ui
+import face_recognition
 
 
 class EmotionalRecognition(QThread):
@@ -46,7 +44,7 @@ class EmotionalRecognition(QThread):
 
     def run(self):
         time.sleep(5)
-        while False:
+        while(True):
             try:
                 time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
                 if not self.isBusy:

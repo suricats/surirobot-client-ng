@@ -1,16 +1,13 @@
-from PyQt5.QtCore import QUrl, pyqtSignal
-from PyQt5.QtNetwork import QNetworkRequest
-
-from surirobot.core.common import ehpyqtSlot
 from .base import ApiCaller
-
+from PyQt5.QtNetwork import QNetworkRequest
+from PyQt5.QtCore import QUrl, pyqtSlot, pyqtSignal
+from surirobot.core.common import ehpyqtSlot
 
 class FileDownloader(ApiCaller):
     new_file = pyqtSignal('QByteArray')
 
     def __init__(self):
         ApiCaller.__init__(self)
-        self.isBusy = False
 
     def __del__(self):
         self.stop()

@@ -1,13 +1,11 @@
+from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal, QTimer
+from PyQt5.Qt import QImage
+import cv2
+import time
 import logging
 import os
-import platform
 import re
-import time
-
-import cv2
-from PyQt5.Qt import QImage
-from PyQt5.QtCore import QThread, pyqtSignal, QTimer
-
+import platform
 from surirobot.core import ui
 from surirobot.core.common import ehpyqtSlot
 
@@ -38,7 +36,7 @@ class VideoCapture(QThread):
         cv2.destroyAllWindows()
         self.quit()
 
-    def start(self, **kwargs):
+    def start(self):
         if platform.system() == "Darwin":
             self.video_capture = cv2.VideoCapture(0)
             self.nbCam = 1

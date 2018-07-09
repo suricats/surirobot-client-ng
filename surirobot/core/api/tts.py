@@ -1,12 +1,10 @@
-import uuid
-
-from PyQt5.QtCore import QJsonDocument, QVariant, QFile, QIODevice, pyqtSignal, QUrl
-from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
-
-from surirobot.core.common import ehpyqtSlot
-from surirobot.services import serv_ap
 from .base import ApiCaller
 from .filedownloader import FileDownloader
+from PyQt5.QtCore import QJsonDocument, QVariant, QFile, QIODevice, pyqtSlot, pyqtSignal, QUrl
+from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
+import uuid
+from surirobot.services import serv_ap
+from surirobot.core.common import ehpyqtSlot
 
 
 class TtsApiCaller(ApiCaller):
@@ -29,7 +27,7 @@ class TtsApiCaller(ApiCaller):
     def receiveReply(self, reply):
         self.isBusy = False
         buffer = reply.readAll()
-        if reply.error() != QNetworkReply.NoError:
+        if (reply.error() != QNetworkReply.NoError):
             print("TTS - Error  " + str(reply.error()))
             print("Data : " + str(buffer))
             self.signalIndicator.emit("converse", "red")
@@ -38,7 +36,7 @@ class TtsApiCaller(ApiCaller):
             # Audio
             filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"
             file = QFile(filename)
-            if not file.open(QIODevice.WriteOnly):
+            if (not file.open(QIODevice.WriteOnly)):
                 print("Could not create file : " + filename)
                 return
             file.write(buffer)
@@ -80,7 +78,7 @@ class TtsApiCaller(ApiCaller):
         # generate filename
         filename = self.TMP_DIR + format(uuid.uuid4()) + ".wav"
         file = QFile(filename)
-        if not file.open(QIODevice.WriteOnly):
+        if (not file.open(QIODevice.WriteOnly)):
             print("Could not create file : " + filename)
             return
         file.write(data)

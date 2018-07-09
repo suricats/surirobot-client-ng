@@ -1,15 +1,13 @@
+from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal
 import logging
-import os
 import queue
 import uuid
-
-import cv2
-import face_recognition
-import requests
-from PyQt5.QtCore import QThread, pyqtSignal
-
-from surirobot.core.common import Dir, ehpyqtSlot
 from surirobot.services import serv_fr, serv_vc
+from surirobot.core.common import Dir, ehpyqtSlot
+import cv2
+import os
+import requests
+import face_recognition
 
 
 class FaceLoader(QThread):

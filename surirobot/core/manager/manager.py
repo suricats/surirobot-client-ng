@@ -1,20 +1,17 @@
-import json
-import logging
-import numbers
-import os
-import shutil
-
-from PyQt5.QtCore import QObject, pyqtSignal
-
-from surirobot.core import ui
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QTimer
+from surirobot.services import serv_ap, serv_fr, serv_ar, face_loader, serv_emo
 from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
+from surirobot.core import ui
 from surirobot.core.common import State, Dir, ehpyqtSlot
 from surirobot.core.gui.progressbarupdater import progressBarUpdater
-from surirobot.services import serv_fr, serv_ar, face_loader, serv_emo
-from .actions.actions import mgr_actions
-from .exceptions import ManagerException, InitialisationManagerException, BadEncodingScenarioFileException, \
-    TypeNotAllowedInDataRetrieverException
 from .triggers.triggers import mgr_triggers
+from .actions.actions import mgr_actions
+from .exceptions import ManagerException, InitialisationManagerException, BadEncodingScenarioFileException, TypeNotAllowedInDataRetrieverException
+import logging
+import json
+import os
+import shutil
+import numbers
 
 
 class Manager(QObject):
@@ -27,6 +24,7 @@ class Manager(QObject):
     signal_converse_update_request = pyqtSignal(str, str, int)
     signal_nlp_request_with_id = pyqtSignal(str, int)
     signal_nlp_request = pyqtSignal(str)
+    signal_tts_request = pyqtSignal(str)
     signal_stt_request = pyqtSignal(str)
     signal_ui_suriface = pyqtSignal(str)
     signal_ui_indicator = pyqtSignal(str, str)
@@ -88,7 +86,7 @@ class Manager(QObject):
             self.signal_ui_indicator.emit("converse", "grey")
 
             # Generate actions and triggers
-            self.triggers = mgr_triggers.generate_triggers(self.services)
+            self.triggers = mgr_triggers.generateTriggers(self.services)
             self.actions = mgr_actions.generateActions()
         except Exception as e:
             raise InitialisationManagerException("connecting_signals[{}]".format(type(e).__name__)) from e
@@ -113,25 +111,25 @@ class Manager(QObject):
     def load_scenario_file(self, filepath=None):
         try:
             with open(Dir.BASE + filepath) as filepath:
-                json_file = json.load(filepath)
-                json_scenarios = json_file["scenarios"]
+                jsonFile = json.load(filepath)
+                jsonScenarios = jsonFile["scenarios"]
                 self.scenarios = {}
-                self.logger.info('Loaded {} scenarios.'.format(len(json_scenarios)))
+                self.logger.info('Loaded {} scenarios.'.format(len(jsonScenarios)))
                 # Load scenarios
-                for scenario in json_scenarios:
+                for scenario in jsonScenarios:
                     self.scenarios[scenario["id"]] = scenario
                 # Load groups of scenarios
-                self.groups = json_file["groups"]
+                self.groups = jsonFile["groups"]
                 self.logger.info('Loaded {} groups of scenarios.'.format(len(self.groups)))
                 # Load initial scope
-                for id in json_file["initial"]:
+                for id in jsonFile["initial"]:
                     if type(id) is int:
                         self.scope.append(id)
                     elif type(id) is str:
                         self.scope += self.groups[id]
                     else:
                         raise InitialisationManagerException('invalid_type_scenario_file')
-                if self.debug:
+                if(self.debug):
                     self.logger.info('Scope : {}'.format(self.scope))
         except Exception as e:
             raise BadEncodingScenarioFileException() from e
@@ -140,9 +138,8 @@ class Manager(QObject):
     def update(self, name, state, data):
         if name not in self.services_list:
             raise ManagerException('invalid_service_name', "The service {} doesn't exist.".format(name))
-        if self.debug:
-            pass
-            #self.logger.info('Update of scenarios from ' + name)
+        if(self.debug):
+            self.logger.info('Update of scenarios from ' + name)
             # self.logger.info('Data : {}'.format(data))
             # self.logger.info('Scope : {}'.format(self.scope))
         self.services[name]["state"] = state
@@ -191,7 +188,7 @@ class Manager(QObject):
                 # Case : the parameter is something else
                 else:
                     raise TypeNotAllowedInDataRetrieverException(name, None, None, None, value)
-                    # input[name] = value
+                    input[name] = value
             # Case : it's the name of the action
             else:
                 pass
@@ -202,7 +199,7 @@ class Manager(QObject):
         for trigger in sc["triggers"]:
             func = self.triggers[trigger["service"]][trigger["name"]]
             if func:
-                # self.logger.info("Trigger: {}".format(trigger))
+                # self.logger.info("Trigger: {}".format(trigger)
                 active = func(self, trigger)
             if not active:
                 break
@@ -220,7 +217,6 @@ class Manager(QObject):
                     if self.check_for_triggers(sc):
                         self.update_state(sc)
                         if self.debug:
-                            pass
                             self.logger.info('Scenario {} has been activated\n'.format(sc["id"]))
                         for index, action in enumerate(sc["actions"]):
                             input = self.retrieve_data(action)
@@ -262,8 +258,7 @@ class Manager(QObject):
                 if trigger["service"] == "face" and trigger["name"] == "nobody" and self.services["face"]["state"] == State.FACE_NOBODY:
                     self.services["face"]["state"] = State.FACE_NOBODY_AVAILABLE
 
-    @staticmethod
-    def is_parameter_encoder(element):
+    def is_parameter_encoder(self, element):
         if type(element) is dict:
             if element.get("type") is not None and element.get("variable") is not None:
                 if element.get("type") == "service" and element.get("name") is not None:
@@ -280,10 +275,10 @@ class Manager(QObject):
         self.freeze = False
         actions = self.remainingActions[:]
         for index, action in enumerate(actions):
-            data = self.retrieve_data(action)
+            input = self.retrieve_data(action)
             func = self.actions[action["name"]]
             if func:
-                func(data)
+                func(input)
                 # Store remaining actions while scope is frozen
                 if self.freeze:
                     self.remainingActions = actions[index+1:]

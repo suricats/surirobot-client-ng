@@ -8,4 +8,5 @@ simpleaudio==1.0.2
 pyinstaller==3.3.1
 requests==2.19.1
 python-dateutil==2.7.3
+mu-editor
 pyqtgraph==0.10.0

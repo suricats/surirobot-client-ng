@@ -1,9 +1,11 @@
-from PyQt5.QtCore import QThread, pyqtSlot
 import logging
-import simpleaudio as sa
-import subprocess
 import platform
+
+import simpleaudio as sa
+from PyQt5.QtCore import QThread
+
 from surirobot.core.common import ehpyqtSlot
+
 
 class AudioPlayer(QThread):
     def __init__(self):

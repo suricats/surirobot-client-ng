@@ -40,11 +40,11 @@ class FaceLoader(QThread):
             counter = 0
             self.logger.info("Start loading models ....")
             self.signalIndicator.emit("face", "orange")
-            r1 = requests.get(self.url + '/memorize/users/', headers=self.headers)
+            r1 = requests.get(self.url + '/api/memory/users/', headers=self.headers)
             # print(r1.json())
             users = r1.json()
             for user in users:
-                r2 = requests.get(self.url + '/memorize/users/' + str(user.get("id")) + '/encodings/', headers=self.headers)
+                r2 = requests.get(self.url + '/api/memory/users/' + str(user.get("id")) + '/encodings/', headers=self.headers)
                 models = r2.json()
                 for model in models:
                     counter += 1
@@ -59,9 +59,9 @@ class FaceLoader(QThread):
             self.signalIndicator.emit("face", "red")
 
     def add_user(self, firstname, lastname, email, face):
-        r1 = requests.post(self.url + '/memorize/users/', {"firstname": firstname, "lastname": lastname, "email": email}, headers=self.headers)
+        r1 = requests.post(self.url + '/api/memory/users/', {"firstname": firstname, "lastname": lastname, "email": email}, headers=self.headers)
         user = r1.json()
-        r2 = requests.post(self.url + '/memorize/pictures/', {"path": " ".join(map(str, face)), "user_id": user["id"]}, headers=self.headers)
+        r2 = requests.post(self.url + '/api/memory/encodings/', {"value": " ".join(map(str, face)), "user": user["id"]}, headers=self.headers)
         model = r2.json()
         # model["path"] = list(model["path"])
         model['user'] = user

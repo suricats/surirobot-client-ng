@@ -207,7 +207,7 @@ class FaceRecognition(QThread):
                 'firstname': model['user']['firstname'],
                 'lastname': model['user']['lastname']
             }
-        face = model["path"].split()
+        face = model["value"].split()
         for i, el in enumerate(face):
             face[i] = float(el)
         self.faces.append(face)

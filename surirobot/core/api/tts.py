@@ -5,7 +5,8 @@ from PyQt5.QtNetwork import QNetworkReply, QNetworkRequest
 import uuid
 from surirobot.services import serv_ap
 from surirobot.core.common import ehpyqtSlot
-
+import os
+from gtts import gTTS
 
 class TtsApiCaller(ApiCaller):
     download = pyqtSignal(str)
@@ -15,6 +16,7 @@ class TtsApiCaller(ApiCaller):
     def __init__(self, text):
         ApiCaller.__init__(self, text)
 
+        self.local_voice = os.environ.get('LOCAL_VOICE', False)
         self.fileDownloader = FileDownloader()
         self.fileDownloader.new_file.connect(self.downloadFinished)
         self.download.connect(self.fileDownloader.sendRequest)
@@ -25,7 +27,6 @@ class TtsApiCaller(ApiCaller):
 
     @ehpyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
-        self.isBusy = False
         buffer = reply.readAll()
         if (reply.error() != QNetworkReply.NoError):
             print("TTS - Error  " + str(reply.error()))
@@ -48,21 +49,29 @@ class TtsApiCaller(ApiCaller):
 
     @ehpyqtSlot(str)
     def sendRequest(self, text):
-        self.isBusy = True
-        # Json request
-        jsonObject = {
-            'text': text,
-            'language': "fr-FR"
-        }
+        if self.local_voice:
+            print('prout')
+            # Play the audio directly
+            audio_file = self.TMP_DIR + format(uuid.uuid4()) + ".wav"
+            tts = gTTS(text=text, lang="fr", slow=False)
+            tts.save(audio_file)
+            print('AH BON')
+            self.play_sound.emit(audio_file)
+        else:
+            # Json request
+            jsonObject = {
+                'text': text,
+                'language': "fr-FR"
+            }
 
-        jsonData = QJsonDocument(jsonObject)
-        data = jsonData.toJson()
+            jsonData = QJsonDocument(jsonObject)
+            data = jsonData.toJson()
 
-        url = QUrl(self.url+'/tts/speak')
-        request = QNetworkRequest(url)
+            url = QUrl(self.url+'/tts/speak')
+            request = QNetworkRequest(url)
 
-        request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
-        self.networkManager.post(request, data)
+            request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
+            self.networkManager.post(request, data)
 
     def start(self):
         ApiCaller.start(self)

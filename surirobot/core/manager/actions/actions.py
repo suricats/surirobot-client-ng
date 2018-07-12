@@ -96,6 +96,7 @@ class Actions:
 
     @staticmethod
     def speak(mgr, input):
+        print('han ouais')
         if input.get("text"):
             mgr.signal_tts_request.emit(input["text"])
         else:

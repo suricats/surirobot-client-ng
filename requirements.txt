@@ -1,3 +1,4 @@
+pyttsx3
 python-dotenv
 face_recognition
 opencv-python

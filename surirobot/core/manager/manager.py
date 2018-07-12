@@ -36,7 +36,8 @@ class Manager(QObject):
 
     def __init__(self):
         QObject.__init__(self)
-        self.debug = int(os.environ.get('DEBUG', True))
+        self.debug = os.environ.get('DEBUG', True)
+        self.local_voice = os.environ.get('LOCAL_VOICE', False)
         self.triggers = {}
         self.actions = {}
         self.services = {}

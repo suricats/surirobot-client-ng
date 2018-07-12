@@ -1,6 +1,6 @@
 
 from dotenv import load_dotenv, find_dotenv
-
+import os
 # Load .env
 load_dotenv(find_dotenv())
 
@@ -11,7 +11,8 @@ import surirobot.core.keyboard
 
 import surirobot.core.api
 from surirobot.core.manager import manager
-app.aboutToQuit.connect(manager.delete_temporary_files)
+if not os.environ.get('TEMPORARY_FILES', True):
+    app.aboutToQuit.connect(manager.delete_temporary_files)
 app.exec_()
 # Launch Flask
 # from surirobot.management import app

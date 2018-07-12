@@ -4,6 +4,11 @@ import simpleaudio as sa
 import subprocess
 import platform
 from surirobot.core.common import ehpyqtSlot
+import os
+# Local TTS engine
+# import pyttsx3
+# import asyncio
+
 
 class AudioPlayer(QThread):
     def __init__(self):
@@ -12,6 +17,11 @@ class AudioPlayer(QThread):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.playObj = None
+
+        self.local_voice = os.environ.get('LOCAL_VOICE', False)
+        # self.engine = pyttsx3.init(driverName='espeak')
+        # self.engine.setProperty('rate', 150)
+        # self.engine.setProperty('voice', 'french')  # changes the voice
 
     def __del__(self):
         self.stop()
@@ -25,6 +35,8 @@ class AudioPlayer(QThread):
 
     @ehpyqtSlot(str)
     def play(self, filename):
+        print('salut')
+        print(filename)
         try:
             if platform.system() == "Darwin":
                 print('Audio is desactivated in MAC OS')
@@ -35,3 +47,4 @@ class AudioPlayer(QThread):
                 self.playObj = waveObj.play()
         except Exception as e:
             self.logger.info('Error : ' + str(e))
+

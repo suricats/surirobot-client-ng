@@ -5,6 +5,10 @@ from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRe
 import uuid
 from surirobot.services import serv_ap
 from surirobot.core.common import State, Dir, ehpyqtSlot
+import os
+import json
+from gtts import gTTS
+
 
 
 class ConverseApiCaller(ApiCaller):
@@ -17,6 +21,8 @@ class ConverseApiCaller(ApiCaller):
     def __init__(self, url):
         ApiCaller.__init__(self, url)
 
+        self.local_voice = os.environ.get('LOCAL_VOICE', False)
+
         self.fileDownloader = FileDownloader()
         self.fileDownloader.new_file.connect(self.downloadFinished)
         self.download.connect(self.fileDownloader.sendRequest)
@@ -25,12 +31,13 @@ class ConverseApiCaller(ApiCaller):
         self.intent = ""
         self.message = ""
 
+
+
     def __del__(self):
         self.stop()
 
     @ehpyqtSlot('QNetworkReply*')
     def receiveReply(self, reply):
-        self.isBusy = False
         buffer = QByteArray(reply.readAll())
         # print('\nConverse : Receive reply : ' + str(buffer))
         if reply.error() != QNetworkReply.NoError:
@@ -41,34 +48,54 @@ class ConverseApiCaller(ApiCaller):
             filename = Dir.DATA + "error.wav"
             self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": "error", "reply": self.message, "audiopath": filename})
             self.networkManager.clearAccessCache()
-        jsonObject = QJsonDocument.fromJson(buffer).object()
         # Converse reply
-        jsonObject = reply.rawHeader(QByteArray().append("JSON"))
-        if jsonObject:
-            jsonObject = QJsonDocument.fromJson(jsonObject).object()
-            # Intent
-            self.intent = jsonObject["intent"].toString()
-            print("intent : " + self.intent)
-            # Message
-            self.message = jsonObject["message"].toString()
-            # Audio
-            filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"
-            file = QFile(filename)
-            if (not file.open(QIODevice.WriteOnly)):
-                print("Could not create file : " + filename)
-                return
-            file.write(buffer)
-            print("Sound file generated at : " + filename)
-            file.close()
-            self.signalIndicator.emit("converse", "green")
-            self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": filename})
-        else:
-            jsonObject = QJsonDocument.fromJson(buffer).object()
-            if jsonObject.get("field") and jsonObject.get("value") and jsonObject.get("userId"):
+        if self.local_voice:
+            json_object = json.loads(str(buffer.data().decode()).strip())
+            print(json_object)
+            if json_object.get('message'):
+                self.intent = json_object.get('intent', 'no-understand')
+                self.message = json_object.get('message', '.')
+                self.signalIndicator.emit("converse", "green")
+
+                # Create new audio file
+                audio_file = self.TMP_DIR + format(uuid.uuid4()) + ".wav"
+                tts = gTTS(text=self.message, lang=self.DEFAULT_LANGUAGE, slow=False)
+                tts.save(audio_file)
+                self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": audio_file})
+            elif json_object.get('memory'):
                 print('Converse - updateMemory responded.')
+                print(json_object)
             else:
                 self.signalIndicator.emit("converse", "orange")
                 print('Converse - Error : Invalid response format.\n' + str(buffer))
+
+        else:
+            json_header = reply.rawHeader(QByteArray().append("JSON"))
+            if json_header:
+                json_header = json.loads(str(json_header.data().decode()).strip())
+                # Intent
+                self.intent = json_header["intent"]
+                print("intent : " + self.intent)
+                # Message
+                self.message = json_header["message"]
+                # Audio
+                filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"
+                file = QFile(filename)
+                if (not file.open(QIODevice.WriteOnly)):
+                    print("Could not create file : " + filename)
+                    return
+                file.write(buffer)
+                print("Sound file generated at : " + filename)
+                file.close()
+                self.signalIndicator.emit("converse", "green")
+                self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": filename})
+            else:
+                json_object = json.loads(str(buffer.data().decode()).strip())
+                if json_object.get('memory'):
+                    print('Converse - updateMemory responded.')
+                else:
+                    self.signalIndicator.emit("converse", "orange")
+                    print('Converse - Error : Invalid response format.\n' + str(buffer))
         reply.deleteLater()
 
     @ehpyqtSlot(str, str, int)
@@ -83,7 +110,6 @@ class ConverseApiCaller(ApiCaller):
         data = jsonData.toJson()
         request = QNetworkRequest(QUrl(self.url + '/nlp/memory'))
         request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("application/json"))
-        self.isBusy = True
         self.networkManager.post(request, data)
 
     @ehpyqtSlot(str, int)
@@ -111,11 +137,13 @@ class ConverseApiCaller(ApiCaller):
         multiPart.append(audioPart)
         multiPart.append(textPart)
         multiPart.append(idPart)
-        url = self.url+'/converse/audio'
+        if self.local_voice:
+            url = self.url+'/converse/text'
+        else:
+            url = self.url+'/converse/audio'
         print(url)
-        request = QNetworkRequest(QUrl(self.url+'/converse/audio'))
+        request = QNetworkRequest(QUrl(url))
         print("Sended to Converse API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + "Ko")
-        self.isBusy = True
         reply = self.networkManager.post(request, multiPart)
         multiPart.setParent(reply)
 

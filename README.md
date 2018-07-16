@@ -1,6 +1,6 @@
-# Surirobot [WIP]
+# Surirobot v1.2
 
-Full client.
+Client part of the Surirobot, a multi-users smart assistant.
 
 ## Installation under macOS using homebrew
 
@@ -20,13 +20,14 @@ cd .. && rm -rf dlib
 ## Installation under ubuntu
 
 ```bash
-apt-get install -y --fix-missing \
+sudo apt-get install -y --fix-missing \
     build-essential \
     cmake \
     gfortran \
     git \
     wget \
     curl \
+    virtualenv \
     graphicsmagick \
     libgraphicsmagick1-dev \
     libatlas-dev \
@@ -48,7 +49,7 @@ apt-get install -y --fix-missing \
 
 Install required python3 modules: `pip3 install -r requirements.txt`
 
-For Ubuntu 18
+For Ubuntu 18 (not supported)
 - change libatlas-dev by libatlas-base-dev
 - add portaudio19-dev
 - If you have issues with HTTPS request see : https://stackoverflow.com/questions/50201988/pyqt5-ubuntu-18-04-error-99-on-qnetworkreply-when-request-to-https-url/50720834#50720834
@@ -63,21 +64,30 @@ cd .. && rm -rf dlib
 ```
 
 
-## Get the suricats face pack
+## Launch the program 
 
-```bash
+* Clone repository 
+* Create virtualenv
+```shell
+mkvirtualenv surirobot && workon surirobot
+```
+
+* Install dependencies
+```shell
+pip install -r requirements.txt
+```
+
+* Configure .env 
+```shell
 cp .env.example .env
-nano .env
 ```
 
-Fill the login & password fields
-
-```bash
-tools/get-people-data.sh
+* Run the program
+```shell
+python start.py
 ```
 
-## Launch the program
+#TODO
 
-`cd <project_dir>`
+#CHANGELOG
 
-`python3 start.py`

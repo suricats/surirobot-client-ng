@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+if [ -f ${SCRIPTPATH}/../.env ]; then
+    . ${SCRIPTPATH}/../.env
+fi
+echo ${SCRIPTPATH}/../.env
+curl --user ${REMOTE_DATA_LOGIN}:${REMOTE_DATA_PASSWD} https://files.api.suricats-consulting.com/credentials/client/.env -o ${SCRIPTPATH}/../.env

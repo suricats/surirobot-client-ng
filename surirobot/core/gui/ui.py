@@ -1,9 +1,9 @@
-from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette, QColor, QIcon
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette
+from PyQt5.QtWidgets import QMainWindow
 
-from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QMainWindow, QPushButton, QTextEdit
-from PyQt5.QtCore import Qt, QSize, QTimer, pyqtSlot, pyqtSignal
-from .mainwindow import Ui_MainWindow
 from surirobot.core.common import State, ehpyqtSlot
+from .mainwindow import Ui_MainWindow
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -24,10 +24,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ui = Ui_MainWindow()
         self.setupUi(self)
 
-        self.setImage("basic")
+        self.set_image("basic")
         # Signals
-        self.activateManualButton.clicked.connect(self.setManualInput)
-        self.validateButton.clicked.connect(self.onClickValidateManualInput)
+        self.activateManualButton.clicked.connect(self.set_manual_input)
+        self.validateButton.clicked.connect(self.on_click_validate_manual_input)
         # Font
         f = QFont('Roboto', 12, QFont.Bold)
 
@@ -71,33 +71,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         image.load(image_path)
         return image
 
-    # def smartShow(self):
-    #     self.showFullScreen()
-    #     self.updateWidgets()
-    #     # Timer display fixer
-    #     displayFixer = QTimer(self)
-    #     displayFixer.setInterval(1000)
-    #     displayFixer.setSingleShot(True)
-    #     displayFixer.timeout.connect(self.updateWidgets)
-    #     displayFixer.start()
-
     @ehpyqtSlot(str)
-    def setTextUp(self, text):
+    def set_text_up(self, text):
         self.labelUp.setText(text)
         self.labelUp.adjustSize()
 
     @ehpyqtSlot(str)
-    def setTextMiddle(self, text):
+    def set_text_middle(self, text):
         self.labelMiddle.setText(text)
         self.labelMiddle.adjustSize()
 
     @ehpyqtSlot(str)
-    def setTextDown(self, text):
+    def set_text_down(self, text):
         self.labelDown.setText(text)
         self.labelDown.adjustSize()
 
     @ehpyqtSlot(str)
-    def setImage(self, image_id):
+    def set_image(self, image_id):
         try:
             image = self.load_image(self.SURIFACES_DIR + '/' + image_id + self.JPG)
             self.image.setPixmap(QPixmap.fromImage(image).scaled(self.imageWidget.width(), self.imageWidget.height(), Qt.KeepAspectRatio))
@@ -105,19 +95,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             print('Error while opening image :' + str(e))
 
     @ehpyqtSlot(QImage)
-    def setCamera(self, qImg):
+    def set_camera(self, qImg):
         self.camera.setPixmap(QPixmap.fromImage(qImg).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
 
     @ehpyqtSlot()
-    def setManualInput(self):
+    def set_manual_input(self):
             self.manualLayoutContainer.show()
 
     @ehpyqtSlot()
-    def onClickValidateManualInput(self):
+    def on_click_validate_manual_input(self):
         self.update_state.emit("keyboard", State.KEYBOARD_NEW, {"text": self.manualEdit.displayText()})
 
     @ehpyqtSlot(str, str)
-    def changeIndicator(self, service, value):
+    def change_indicator(self, service, value):
         image = self.load_image(self.INDICATORS_DIR + '/' + service + '/' + value + self.PNG)
         if not image.isNull():
             if service == "face":
@@ -127,9 +117,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif service == "emotion":
                 self.emotionIndicator.setPixmap(QPixmap.fromImage(image))
             else:
-                print('Error - changeIndicator : Service unknown')
+                print('Error - change_indicator : Service unknown')
         else:
-            print('Error - changeIndicator : Image can\'t be found')
+            print('Error - change_indicator : Image can\'t be found')
     # @ehpyqtSlot()
     # def updateWidgets(self):
     #     self.labelTextUp.adjustSize()

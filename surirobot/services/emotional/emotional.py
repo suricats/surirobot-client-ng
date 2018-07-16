@@ -61,7 +61,7 @@ class EmotionalRecognition(QThread):
                             self.isBusy = True
                             self.send_request.emit(file_path)
                         else:
-                            ui.setTextDown("NO FACE")
+                            ui.set_text_down("NO FACE")
             except Exception as e:
                 print('Emotional - Error : ' + str(e))
 
@@ -69,9 +69,9 @@ class EmotionalRecognition(QThread):
     def emit_emotion_changed(self, state, data):
         self.isBusy = False
         if data.get("emotion") is not None:
-            ui.setTextDown(str(data["emotion"]).upper())
+            ui.set_text_down(str(data["emotion"]).upper())
         else:
-            ui.setTextDown(str(data))
+            ui.set_text_down(str(data))
         self.update_state.emit(self.MODULE_NAME, state, data)
 
     @ehpyqtSlot(str, str)

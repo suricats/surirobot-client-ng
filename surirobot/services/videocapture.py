@@ -24,7 +24,7 @@ class VideoCapture(QThread):
         self.nbCam = 0
         self.currentCam = 0
         self.video_capture = None
-        self.signal_change_camera.connect(ui.setCamera)
+        self.signal_change_camera.connect(ui.set_camera)
         ui.nextCamera.pressed.connect(self.changeCamera)
 
         self.videoWorkLoop = QTimer()

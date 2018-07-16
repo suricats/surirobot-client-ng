@@ -28,7 +28,7 @@ class AudioRecorder(QThread):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-        self.update_suri_image.connect(ui.setImage)
+        self.update_suri_image.connect(ui.set_image)
 
     def __del__(self):
         self.wait()

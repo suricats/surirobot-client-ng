@@ -1,6 +1,5 @@
 from .base import ApiCaller
-from PyQt5.QtCore import QJsonDocument, pyqtSlot, pyqtSignal, QVariant, QFile, QIODevice, QUrl, QByteArray
-from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
+from PyQt5.QtCore import pyqtSignal
 from surirobot.core.common import State, ehpyqtSlot
 import requests
 import logging
@@ -8,7 +7,11 @@ import os
 
 
 class SttApiCaller(ApiCaller):
+    """
+    API class for STT API
 
+    https://github.com/suricats/surirobot-api-converse
+    """
     update_state = pyqtSignal(str, int, dict)
 
     def __init__(self, url):
@@ -20,6 +23,21 @@ class SttApiCaller(ApiCaller):
 
     @ehpyqtSlot(str)
     def recognize(self, file_path):
+        """
+        Recognize an audio file and give the corresponding text.
+
+        Retrieve path of audio file and send a signal that includes state, intent("@STT") and reply
+
+        Parameters
+        ----------
+        file_path : str
+            path of audio file
+
+        Returns
+        -------
+        None
+            This function only send a signal
+        """
         with open(file_path, 'rb') as file:
             # Send request
             url = self.url+'/stt/recognize'

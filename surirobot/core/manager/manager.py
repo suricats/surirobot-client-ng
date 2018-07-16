@@ -54,6 +54,7 @@ class Manager(QObject):
         self.scopeChanged = False
         try:
             # INPUTS : Connect to services
+            api_converse.converse_audio
             serv_ar.update_state.connect(self.update)
             api_converse.update_state.connect(self.update)
             api_nlp.update_state.connect(self.update)
@@ -69,16 +70,16 @@ class Manager(QObject):
             self.signal_nlp_answer.connect(api_nlp.answer)
             self.signal_stt_request.connect(api_stt.recognize)
             self.signal_tts_request.connect(api_tts.speak)
-            self.signal_ui_suriface.connect(ui.setImage)
+            self.signal_ui_suriface.connect(ui.set_image)
             self.signal_nlp_memory.connect(api_nlp.memory)
 
             # OUTPUTS : Connect to interface
-            self.signal_ui_indicator.connect(ui.changeIndicator)
-            serv_fr.signal_indicator.connect(ui.changeIndicator)
-            face_loader.signal_indicator.connect(ui.changeIndicator)
-            serv_emo.signal_indicator.connect(ui.changeIndicator)
-            api_converse.signal_indicator.connect(ui.changeIndicator)
-            api_tts.signal_indicator.connect(ui.changeIndicator)
+            self.signal_ui_indicator.connect(ui.change_indicator)
+            serv_fr.signal_indicator.connect(ui.change_indicator)
+            face_loader.signal_indicator.connect(ui.change_indicator)
+            serv_emo.signal_indicator.connect(ui.change_indicator)
+            api_converse.signal_indicator.connect(ui.change_indicator)
+            api_tts.signal_indicator.connect(ui.change_indicator)
 
             # Indicators default state
             self.signal_ui_indicator.emit("face", "grey")

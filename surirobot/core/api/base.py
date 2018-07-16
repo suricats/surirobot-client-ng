@@ -1,12 +1,12 @@
-from PyQt5.QtCore import QObject, QThread, pyqtSlot, pyqtSignal
-from surirobot.core.common import Dir, ehpyqtSlot
+from PyQt5.QtCore import QObject, QThread
+from surirobot.core.common import Dir
 
 
+# Base class for API callers
 class ApiCaller(QObject):
     TMP_DIR = Dir.TMP
     DEFAULT_LANGUAGE = 'fr'
     DEFAULT_LANGUAGE_EXT = 'fr-FR'
-    new_reply = pyqtSignal(str)
 
     def __init__(self, url='https://www.google.fr'):
         QObject.__init__(self)
@@ -18,7 +18,13 @@ class ApiCaller(QObject):
         self.stop()
 
     def start(self):
+        """
+        Start the thread of the API caller
+        """
         self.currentThread.start()
 
     def stop(self):
+        """
+        Stop the thread of the API caller
+        """
         self.currentThread.quit()

@@ -10,6 +10,11 @@ import logging
 
 
 class TtsApiCaller(ApiCaller):
+    """
+    API class for TTS API
+
+    https://github.com/suricats/surirobot-api-converse
+    """
     play_sound = pyqtSignal(str)
     signal_indicator = pyqtSignal(str, str)
 
@@ -25,6 +30,21 @@ class TtsApiCaller(ApiCaller):
     @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
     def speak(self, text):
+        """
+        Transform a text into audio
+
+        Retrieve text and send a signal to :class:`surirobot.services.audioplayer.AudioPlayer`
+        'LOCAL_VOICE' environment variable influences the behaviour of this function
+        Parameters
+        ----------
+        text : str
+            Well.. the text.
+
+        Returns
+        -------
+        None
+            This function only send a signal
+        """
         if self.local_voice:
             # Play the audio directly
             # audio_file = self.TMP_DIR + format(uuid.uuid4()) + ".wav"

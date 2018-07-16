@@ -31,7 +31,7 @@ class FaceRecognition(QThread):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-        self.signalPersonChanged.connect(ui.setTextUp)
+        self.signalPersonChanged.connect(ui.set_text_up)
 
         self.data = {}
         self.faces = []

@@ -11,6 +11,11 @@ import logging
 
 
 class ConverseApiCaller(ApiCaller):
+    """
+    API class for Converse API
+
+    https://github.com/suricats/surirobot-api-converse
+    """
     play_sound = pyqtSignal(str)
     update_state = pyqtSignal(str, int, dict)
     signal_indicator = pyqtSignal(str, str)
@@ -26,7 +31,24 @@ class ConverseApiCaller(ApiCaller):
 
     @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
-    def converse_audio(self, file_path, id=None):
+    def converse_audio(self, file_path, user_id=None):
+        """
+        Send audio to Converse API and retrieve a audio or text response.
+
+        Retrieve path of audio file and send a signal that includes state, nlp reply and audio file path
+
+        Parameters
+        ----------
+        file_path : str
+            path of audio file
+        user_id : str
+            id of the conversation
+
+        Returns
+        -------
+        None
+            This function only send a signal
+        """
         with open(file_path, 'rb') as file:
             # Send request
             if self.local_voice:
@@ -34,8 +56,8 @@ class ConverseApiCaller(ApiCaller):
             else:
                 url = self.url+'/converse/audio'
             data = {'language': self.DEFAULT_LANGUAGE_EXT}
-            if id:
-                data['id'] = id
+            if user_id:
+                data['id'] = user_id
             self.logger.info("Sent to Converse API : File - {} : {}Ko".format(file_path, os.fstat(file.fileno()).st_size / 1000))
             r = requests.post(url, files={'audio': file}, data=data)
             # Receive response
@@ -67,7 +89,7 @@ class ConverseApiCaller(ApiCaller):
                     # Audio
                     filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"
                     file = QFile(filename)
-                    if (not file.open(QIODevice.WriteOnly)):
+                    if not file.open(QIODevice.WriteOnly):
                         print("Could not create file : " + filename)
                         return
                     file.write(r.content)
@@ -78,6 +100,7 @@ class ConverseApiCaller(ApiCaller):
                                            {"intent": intent, "reply": message, "audiopath": filename})
 
     def start(self):
+        self.converse_audio()
         ApiCaller.start(self)
 
     def stop(self):

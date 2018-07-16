@@ -87,7 +87,7 @@ class Actions:
                                     list[index] = element["value"]
                 text = ""
                 text = text.join(list)
-                ui.setTextMiddle(text)
+                ui.set_text_middle(text)
                 mgr.services["storage"]["@text"] = text
             else:
                 raise ActionException("displayText", "Type of argument 'text' is not str but {}.".format(type(text).__name__))

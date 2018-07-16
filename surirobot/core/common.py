@@ -23,7 +23,11 @@ def rawbytes(s):
     return b''.join(outlist)
 
 
+
 def ehpyqtSlot(*args):
+    """
+    Decorator that replicates the behaviour of 'pyqtSlot' but display errors that has been raised.
+    """
     if len(args) == 0 or isinstance(args[0], types.FunctionType):
         args = []
 
@@ -36,7 +40,9 @@ def ehpyqtSlot(*args):
             except Exception as e:
                 print('{} occured in slot'.format(type(e).__name__))
                 traceback.print_exc()
+
         return wrapper
+
     return slotdecorator
 
 
@@ -48,6 +54,9 @@ class Dir():
 
 
 class State():
+    """
+    List all the states that services can have
+    """
     NO_STATE = -9999
     FACE_NOBODY = -2
     FACE_NOBODY_AVAILABLE = -3
@@ -63,10 +72,6 @@ class State():
     SOUND_AVAILABLE = 7
     CONVERSE_NEW = 8
     CONVERSE_AVAILABLE = 9
-    SOUND_NEW = 10
-    CONVERSE_NEW = 11
-    SOUND_AVAILABLE = 12
-    CONVERSE_AVAILABLE = 13
     EMOTION_NEW = 15
     EMOTION_NO = 16
     KEYBOARD_NEW = 17

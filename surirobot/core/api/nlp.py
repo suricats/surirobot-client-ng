@@ -6,7 +6,11 @@ import logging
 
 
 class NlpApiCaller(ApiCaller):
+    """
+    API class for NLP API
 
+    https://github.com/suricats/surirobot-api-converse
+    """
     update_state = pyqtSignal(str, int, dict)
 
     def __init__(self, text):
@@ -18,6 +22,24 @@ class NlpApiCaller(ApiCaller):
 
     @ehpyqtSlot(str, str, int)
     def memory(self, field, value, user_id):
+        """
+        Update the memory of a conversation.
+
+        Update a specific field in the memory of a conversation
+        Parameters
+        ----------
+        field : str
+            field that need to be updated
+        value : str
+            new value of the field
+        user_id : str
+            ID of the conversation
+
+        Returns
+        -------
+        None
+            This function only display the result
+        """
         # Create the json request
         data = {
             'field': field,
@@ -35,15 +57,31 @@ class NlpApiCaller(ApiCaller):
 
     @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
-    def answer(self, text, id=None):
+    def answer(self, text, user_id=None):
+        """
+        Give the NLP answer of a text
+
+        Take a text and analyze it to give a signal that contains state, intent and reply
+        Parameters
+        ----------
+        text : str
+            The input text. Isn't that obvious ?
+        user_id : str
+            ID of the conversation
+
+        Returns
+        -------
+        None
+            This function send a signal
+        """
         # Create the json request
         data = {
             'text': text,
             'language': self.DEFAULT_LANGUAGE,
 
         }
-        if id:
-            data['user_id'] = id
+        if user_id:
+            data['user_id'] = user_id
         r = requests.post(self.url + '/nlp/answer', data=data)
         # Receive response
         if r.status_code != 200:
@@ -59,7 +97,23 @@ class NlpApiCaller(ApiCaller):
 
     @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
-    def intent(self, text, id=None):
+    def intent(self, text, user_id=None):
+        """
+        Give the intent of a text
+
+        Take a text and analyze it to give a signal that contains state, intent and reply
+        Parameters
+        ----------
+        text : str
+            The input text. Isn't that obvious ?
+        user_id : str
+            ID of the conversation
+
+        Returns
+        -------
+        None
+            This function send a signal
+        """
         # Create the json request
         data = {
             'text': text,
@@ -67,7 +121,7 @@ class NlpApiCaller(ApiCaller):
 
         }
         if id:
-            data['user_id'] = id
+            data['user_id'] = user_id
         r = requests.post(self.url + '/nlp/intent', data=data)
         # Receive response
         if r.status_code != 200:
@@ -76,7 +130,5 @@ class NlpApiCaller(ApiCaller):
             self.signal_indicator.emit("converse", "orange")
         else:
             json_object = r.json()
-            message = json_object["messages"][0]["content"]
-            intent = json_object["nlp"]["intents"][0]["slug"]
-            self.update_state.emit("converse", State.CONVERSE_NEW,
-                                   {"intent": intent, "reply": message})
+            intent = json_object["intents"][0]["slug"]
+            self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": intent, "reply": "?"})

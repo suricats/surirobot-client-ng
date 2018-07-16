@@ -11,7 +11,7 @@ import face_recognition
 
 
 class FaceLoader(QThread):
-    signalIndicator = pyqtSignal(str, str)
+    signal_indicator = pyqtSignal(str, str)
     new_user = pyqtSignal(str)
     token = os.environ.get('API_MEMORY_TOKEN', '')
     url = os.environ.get('API_MEMORY_URL', '')
@@ -39,7 +39,7 @@ class FaceLoader(QThread):
         try:
             counter = 0
             self.logger.info("Start loading models ....")
-            self.signalIndicator.emit("face", "orange")
+            self.signal_indicator.emit("face", "orange")
             r1 = requests.get(self.url + '/api/memory/users/', headers=self.headers)
             # print(r1.json())
             users = r1.json()
@@ -53,10 +53,10 @@ class FaceLoader(QThread):
                     # self.logger.info("Load Face {}".format(name))
                     serv_fr.addModel(model)
             self.logger.info(str(counter) + " model(s) loaded !")
-            self.signalIndicator.emit("face", "green")
+            self.signal_indicator.emit("face", "green")
         except Exception as e:
             print("load from db : " + str(e))
-            self.signalIndicator.emit("face", "red")
+            self.signal_indicator.emit("face", "red")
 
     def add_user(self, firstname, lastname, email, face):
         r1 = requests.post(self.url + '/api/memory/users/', {"firstname": firstname, "lastname": lastname, "email": email}, headers=self.headers)

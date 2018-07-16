@@ -2,6 +2,9 @@ from .base import ApiCaller
 from PyQt5.QtCore import QJsonDocument, pyqtSlot, pyqtSignal, QVariant, QFile, QIODevice, QUrl, QByteArray
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
 from surirobot.core.common import State, ehpyqtSlot
+import requests
+import logging
+import os
 
 
 class SttApiCaller(ApiCaller):
@@ -10,49 +13,28 @@ class SttApiCaller(ApiCaller):
 
     def __init__(self, url):
         ApiCaller.__init__(self, url)
+        self.logger = logging.getLogger(__name__)
 
     def __del__(self):
         self.stop()
 
-    @ehpyqtSlot('QNetworkReply*')
-    def receiveReply(self, reply):
-        self.isBusy = False
-        buffer = reply.readAll()
-        if (reply.error() != QNetworkReply.NoError):
-            print("STT - Error  " + str(reply.error()))
-            self.networkManager.clearAccessCache()
-        else:
-            jsonObject = QJsonDocument.fromJson(buffer).object()
-            if jsonObject.get("code") and jsonObject.get("msg") and jsonObject.get("data") and jsonObject.get("confidence"):
-                self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": "@STT", "reply": jsonObject["data"]["text"][0].toString()})
-            else:
-                print('STT - Error : Invalid response format : ' + str(buffer))
-                self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": "dont-understand", "reply": "Je n'ai pas compris."})
-
-        reply.deleteLater()
-
     @ehpyqtSlot(str)
-    def sendRequest(self, filepath):
-        multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
-        # Language
-        textPart = QHttpPart()
-        textPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"language\""))
-        textPart.setBody(QByteArray().append(self.DEFAULT_LANGUAGE_EXT))
-        # Audio
-        audioPart = QHttpPart()
-        audioPart.setHeader(QNetworkRequest.ContentDispositionHeader, QVariant("form-data; name=\"audio\"; filename=\"audio.wav\""))
-        audioPart.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("audio/x-wav"))
-        file = QFile(filepath)
-        file.open(QIODevice.ReadOnly)
-
-        audioPart.setBodyDevice(file)
-        file.setParent(multiPart)  # we cannot delete the file now, so delete it with the multiPart
-
-        multiPart.append(audioPart)
-        multiPart.append(textPart)
-
-        request = QNetworkRequest(QUrl(self.url))
-        print("Sended to TTS API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + "Ko")
-        self.isBusy = True
-        reply = self.networkManager.post(request, multiPart)
-        multiPart.setParent(reply)
+    def recognize(self, file_path):
+        with open(file_path, 'rb') as file:
+            # Send request
+            url = self.url+'/stt/recognize'
+            data = {'language': self.DEFAULT_LANGUAGE_EXT}
+            if id:
+                data['id'] = id
+            self.logger.info("Sent to STT API : File - {} : {}Ko".format(file_path, os.fstat(file.fileno()).st_size / 1000))
+            r = requests.post(url, files={'audio': file}, data=data)
+            # Receive response
+            if r.status_code != 200:
+                self.logger.error('HTTP {} error occurred while retrieving text.'.format(r.status_code))
+                print(r.content)
+                # self.signal_indicator.emit("converse", "orange")
+                # self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": "dont-understand", "reply": "Je n'ai pas compris."})
+            else:
+                json_object = r.json()
+                self.update_state.emit("converse", State.CONVERSE_NEW,
+                                       {"intent": "@STT", "reply": json_object["text"]})

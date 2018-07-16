@@ -19,12 +19,11 @@ class Manager(QObject):
     # Signals
     services_list = ["face", "emotion", "converse", "sound", "storage", "keyboard"]
     signal_tts_request = pyqtSignal(str)
-    signal_converse_request_with_id = pyqtSignal(str, int)
-    signal_converse_request = pyqtSignal(str)
-    signal_converse_update_request = pyqtSignal(str, str, int)
-    signal_nlp_request_with_id = pyqtSignal(str, int)
-    signal_nlp_request = pyqtSignal(str)
-    signal_tts_request = pyqtSignal(str)
+    signal_converse_audio_with_id = pyqtSignal(str, int)
+    signal_converse_audio = pyqtSignal(str)
+    signal_nlp_memory = pyqtSignal(str, str, int)
+    signal_nlp_answer_with_id = pyqtSignal(str, int)
+    signal_nlp_answer = pyqtSignal(str)
     signal_stt_request = pyqtSignal(str)
     signal_ui_suriface = pyqtSignal(str)
     signal_ui_indicator = pyqtSignal(str, str)
@@ -64,22 +63,22 @@ class Manager(QObject):
             serv_emo.update_state.connect(self.update)
 
             # OUTPUTS : Connect to services
-            self.signal_converse_request.connect(api_converse.sendRequest)
-            self.signal_converse_request_with_id.connect(api_converse.sendRequest)
-            self.signal_nlp_request_with_id.connect(api_nlp.sendRequest)
-            self.signal_nlp_request.connect(api_nlp.sendRequest)
-            self.signal_stt_request.connect(api_stt.sendRequest)
-            self.signal_tts_request.connect(api_tts.sendRequest)
+            self.signal_converse_audio.connect(api_converse.converse_audio)
+            self.signal_converse_audio_with_id.connect(api_converse.converse_audio)
+            self.signal_nlp_answer_with_id.connect(api_nlp.answer)
+            self.signal_nlp_answer.connect(api_nlp.answer)
+            self.signal_stt_request.connect(api_stt.recognize)
+            self.signal_tts_request.connect(api_tts.speak)
             self.signal_ui_suriface.connect(ui.setImage)
-            self.signal_converse_update_request.connect(api_converse.updateMemory)
+            self.signal_nlp_memory.connect(api_nlp.memory)
 
             # OUTPUTS : Connect to interface
             self.signal_ui_indicator.connect(ui.changeIndicator)
-            serv_fr.signalIndicator.connect(ui.changeIndicator)
-            face_loader.signalIndicator.connect(ui.changeIndicator)
-            serv_emo.signalIndicator.connect(ui.changeIndicator)
-            api_converse.signalIndicator.connect(ui.changeIndicator)
-            api_tts.signalIndicator.connect(ui.changeIndicator)
+            serv_fr.signal_indicator.connect(ui.changeIndicator)
+            face_loader.signal_indicator.connect(ui.changeIndicator)
+            serv_emo.signal_indicator.connect(ui.changeIndicator)
+            api_converse.signal_indicator.connect(ui.changeIndicator)
+            api_tts.signal_indicator.connect(ui.changeIndicator)
 
             # Indicators default state
             self.signal_ui_indicator.emit("face", "grey")

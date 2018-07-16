@@ -106,10 +106,10 @@ class Actions:
     def converse(mgr, input):
         if input.get("filepath"):
             if input.get("id"):
-                mgr.signal_converse_update_request.emit("username", serv_fr.idToName(input["id"]), input["id"])
-                mgr.signal_converse_request_with_id.emit(input["filepath"], input["id"])
+                mgr.signal_nlp_memory.emit("username", serv_fr.idToName(input["id"]), input["id"])
+                mgr.signal_converse_audio_with_id.emit(input["filepath"], input["id"])
             else:
-                mgr.signal_converse_request.emit(input["filepath"])
+                mgr.signal_converse_audio.emit(input["filepath"])
         else:
             raise MissingParametersActionException("converse", 'id')
 
@@ -117,16 +117,16 @@ class Actions:
     def converseAnswer(mgr, input):
         if input.get("intent"):
             if input.get("id"):
-                mgr.signal_nlp_request_with_id.emit(input["intent"], input["id"])
+                mgr.signal_nlp_answer_with_id.emit(input["intent"], input["id"])
             else:
-                mgr.signal_nlp_request.emit(input["intent"])
+                mgr.signal_nlp_answer.emit(input["intent"])
         else:
             raise MissingParametersActionException("converseAnswer", 'intent')
 
     @staticmethod
     def converseUpdateMemory(mgr, input):
         if input.get("field") and input.get("value") and input.get("id"):
-            mgr.signal_converse_update_request.emit(input["field"], input["value"], input["id"])
+            mgr.signal_nlp_memory.emit(input["field"], input["value"], input["id"])
         else:
             raise MissingParametersActionException("converseUpdateMemory", ['field', 'value', 'id'])
 

@@ -13,7 +13,7 @@ class FaceRecognition(QThread):
     update_state = pyqtSignal(str, int, dict)
     # deprecated signal -> will be removed
     signalPersonChanged = pyqtSignal(str)
-    signalIndicator = pyqtSignal(str, str)
+    signal_indicator = pyqtSignal(str, str)
     NB_IMG_PER_SECOND = 2
     MODULE_NAME = 'face'
 
@@ -84,7 +84,7 @@ class FaceRecognition(QThread):
         faceEncodings = []
         smallFrame = serv_vc.get_frame()
         if smallFrame is None:
-            self.signalIndicator.emit("face", "red")
+            self.signal_indicator.emit("face", "red")
         else:
             # Find all the faces and face encodings in the current frame of video
             faceLocations = face_recognition.face_locations(smallFrame)
@@ -158,14 +158,14 @@ class FaceRecognition(QThread):
 
     @ehpyqtSlot()
     def unknownTimeout(self):
-        self.signalIndicator.emit("face", "green")
+        self.signal_indicator.emit("face", "green")
         self.stateId = self.UNKNOWN
         self.personChanged(self.stateId)
         self.stateChanged(State.FACE_UNKNOWN, self.UNKNOWN)
 
     @ehpyqtSlot()
     def knownTimeout(self):
-        self.signalIndicator.emit("face", "green")
+        self.signal_indicator.emit("face", "green")
         if (not self.pretendentId == self.NOBODY) and (not self.pretendentId == self.UNKNOWN):
             self.logger.info('Detection of ' + str(self.pretendentId))
             self.stateId = self.pretendentId

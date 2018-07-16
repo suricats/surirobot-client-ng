@@ -2,59 +2,38 @@ from .base import ApiCaller
 from PyQt5.QtNetwork import QNetworkReply, QHttpMultiPart, QHttpPart, QNetworkRequest
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QJsonDocument, QUrl, QVariant, QFile, QIODevice, QByteArray
 from surirobot.core.common import State, ehpyqtSlot
+import requests
+import logging
 
 
 class EmotionalAPICaller(ApiCaller):
     received_reply = pyqtSignal(int, dict)
-    signalIndicator = pyqtSignal(str, str)
+    signal_indicator = pyqtSignal(str, str)
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
+        self.logger = logging.getLogger(__name__)
 
     def __del__(self):
         self.stop()
 
-    @ehpyqtSlot('QNetworkReply*')
-    def receiveReply(self, reply):
-        buffer = reply.readAll()
-        try:
-            if (reply.error() != QNetworkReply.NoError):
-                print("EMOTIONAL - Error " + str(reply.error()))
-                if reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute):
-                    print("HTTP " + str(reply.attribute(QNetworkRequest.HttpReasonPhraseAttribute) + ' : ' + str(buffer)))
-                self.signalIndicator.emit("emotion", "red")
-                self.networkManager.clearAccessCache()
-                self.received_reply.emit(
-                    State.EMOTION_NO, {'emotion': []}
-                )
+    @ehpyqtSlot(str)
+    def analyse(self, file_path):
+        with open(file_path, 'rb') as file:
+            r = requests.post(self.url + '/microsoft/analyse', data=file.read(), headers={'Content-Type': 'image/jpeg'})
+            if r.status_code != 200:
+                self.logger.error('HTTP {} error occurred.'.format(r.status_code))
+                self.signal_indicator.emit("emotion", "red")
             else:
-                jsonObject = QJsonDocument.fromJson(buffer).object()
-                emotion = jsonObject["emotion"]
+                json_object = r.json()
+                emotion = json_object["emotion"]
                 # percent = jsonObject["percent"]
-
-                self.signalIndicator.emit("emotion", "green")
                 if emotion:
                     self.received_reply.emit(
-                        State.EMOTION_NEW, {'emotion': emotion.toString()}
-                        # State.EMOTION_NEW, {'emotion': 'angry'}
+                        State.EMOTION_NEW, {'emotion': emotion}
                     )
                 else:
                     self.received_reply.emit(
                         State.EMOTION_NO, {'emotion': []}
                     )
-            reply.deleteLater()
-        except Exception as e:
-            print("Error : " + str(e) + "\n" + str(buffer))
-
-    @ehpyqtSlot(str)
-    def sendRequest(self, text):
-        try:
-            file = QFile(text)
-            file.open(QIODevice.ReadOnly)
-            body = file.readAll()
-            request = QNetworkRequest(QUrl(self.url))
-            request.setHeader(QNetworkRequest.ContentTypeHeader, QVariant("image/jpeg"))
-            print("Sended to Emotional API : " + "File - " + file.fileName() + " - " + str(file.size() / 1000) + " Ko")
-            self.networkManager.post(request, body)
-        except Exception as e:
-            print(e)
+                self.signal_indicator.emit("emotion", "green")

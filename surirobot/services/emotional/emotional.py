@@ -14,7 +14,7 @@ import face_recognition
 
 class EmotionalRecognition(QThread):
     update_state = pyqtSignal(str, int, dict)
-    signalIndicator = pyqtSignal(str, str)
+    signal_indicator = pyqtSignal(str, str)
 
     send_request = pyqtSignal(str)
 
@@ -30,14 +30,14 @@ class EmotionalRecognition(QThread):
             self.api_emotion.start()
         else:
             raise URLNotDefinedAPIException('Emotion')
-        self.send_request.connect(self.api_emotion.sendRequest)
+        self.send_request.connect(self.api_emotion.analyse)
         self.api_emotion.received_reply.connect(self.emit_emotion_changed)
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.isBusy = False
 
-        self.api_emotion.signalIndicator.connect(self.relayer)
+        self.api_emotion.signal_indicator.connect(self.relayer)
 
     def __del__(self):
         self.quit()
@@ -76,4 +76,4 @@ class EmotionalRecognition(QThread):
 
     @ehpyqtSlot(str, str)
     def relayer(self, a1, a2):
-        self.signalIndicator.emit(a1, a2)
+        self.signal_indicator.emit(a1, a2)

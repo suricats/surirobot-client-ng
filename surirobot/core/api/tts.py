@@ -50,13 +50,12 @@ class TtsApiCaller(ApiCaller):
     @ehpyqtSlot(str)
     def sendRequest(self, text):
         if self.local_voice:
-            print('prout')
             # Play the audio directly
-            audio_file = self.TMP_DIR + format(uuid.uuid4()) + ".wav"
-            tts = gTTS(text=text, lang="fr", slow=False)
-            tts.save(audio_file)
-            print('AH BON')
-            self.play_sound.emit(audio_file)
+            #audio_file = self.TMP_DIR + format(uuid.uuid4()) + ".wav"
+            #tts = gTTS(text=text, lang="fr", slow=False)
+            #tts.save(audio_file)
+            #self.play_sound.emit(audio_file)
+            self.play_sound.emit(text)
         else:
             # Json request
             jsonObject = {

@@ -44,7 +44,10 @@ class EmotionalRecognition(QThread):
 
     def run(self):
         time.sleep(5)
-        while(True):
+        emo_activated = int(os.environ.get('EMO', '1'))
+        if not emo_activated:
+            self.logger.info('Emotion service is deactivated.')
+        while emo_activated:
             try:
                 time.sleep(-time.time() % (1 / self.NB_IMG_PER_SECOND))
                 if not self.isBusy:

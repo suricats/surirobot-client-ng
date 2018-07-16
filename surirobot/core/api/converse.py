@@ -58,10 +58,12 @@ class ConverseApiCaller(ApiCaller):
                 self.signalIndicator.emit("converse", "green")
 
                 # Create new audio file
-                audio_file = self.TMP_DIR + format(uuid.uuid4()) + ".wav"
-                tts = gTTS(text=self.message, lang=self.DEFAULT_LANGUAGE, slow=False)
-                tts.save(audio_file)
-                self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": audio_file})
+                # audio_file = self.TMP_DIR + format(uuid.uuid4()) + ".wav"
+                # tts = gTTS(text=self.message, lang=self.DEFAULT_LANGUAGE, slow=False)
+                # tts.save(audio_file)
+                # self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": self.intent, "reply": self.message, "audiopath": audio_file})
+                self.update_state.emit("converse", State.CONVERSE_NEW,
+                                       {"intent": self.intent, "reply": self.message, "audiopath": self.message})
             elif json_object.get('memory'):
                 print('Converse - updateMemory responded.')
                 print(json_object)

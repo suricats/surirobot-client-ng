@@ -16,72 +16,10 @@
   ],
 
   "scenarios": [
-      {
-  			"id": -6,
-  			"description": "Ask for humidity - CHEAT",
-  			"triggers": [],
-  			"actions": [{
-  					"name": "activateKeyboardInput",
-  					"activate": {
-  						"type": "input",
-  						"variable": false
-  					}
-  				},
-          {
-  					"name": "changeSuriface",
-  					"image": {
-  						"type": "input",
-  						"variable": "basic"
-  					}
-  				},
-          {
-            "name": "giveSensorData",
-            "type": {
-              "type": "input",
-              "variable": "humidity"
-            },
-            "output": {
-              "type": "input",
-              "variable": "last_humidity"
-            }
-          },
-          {
-  					"name": "displayText",
-  					"text": {
-  						"type": "input",
-  						"variable": "L'humidité est actuellement à {@last_humidity}%."
-  					},
-  					"variables": [{
-  							"last_humidity": {
-  								"type": "service",
-  								"name": "storage",
-  								"variable": "last_humidity"
-  							}
-  						}
-  					]
-  				},
-  				{
-  					"name": "speak",
-  					"text": {
-  						"type": "service",
-  						"name": "storage",
-  						"variable": "@text"
-  					}
-  				},
-  				{
-  					"name": "callScenarios",
-  					"id": {
-  						"type": "input",
-  						"variable": ["converse", "person-detection", "emotion-detection"]
-  					}
-  				}
-  			]
-
-  		},
-    {
+	{
 			"id": -5,
 			"description": "Ask for humidity",
-      "triggers": [{
+			"triggers": [{
 				"service": "converse",
 				"name": "new",
 				"parameters": {
@@ -95,25 +33,25 @@
 						"variable": false
 					}
 				},
-        {
+		{
 					"name": "changeSuriface",
 					"image": {
 						"type": "input",
 						"variable": "basic"
 					}
 				},
-        {
-          "name": "giveSensorData",
-          "type": {
-            "type": "input",
-            "variable": "humidity"
-          },
-          "output": {
-            "type": "input",
-            "variable": "last_humidity"
-          }
-        },
-        {
+		{
+		  "name": "giveSensorData",
+		  "type": {
+			"type": "input",
+			"variable": "humidity"
+		  },
+		  "output": {
+			"type": "input",
+			"variable": "last_humidity"
+		  }
+		},
+		{
 					"name": "displayText",
 					"text": {
 						"type": "input",
@@ -146,7 +84,7 @@
 			]
 
 		},
-    {
+	{
 			"id": -4,
 			"description": "Ask for temperature",
 			"triggers": [{
@@ -163,25 +101,25 @@
 						"variable": false
 					}
 				},
-        {
+		{
 					"name": "changeSuriface",
 					"image": {
 						"type": "input",
 						"variable": "basic"
 					}
 				},
-        {
-          "name": "giveSensorData",
-          "type": {
-            "type": "input",
-            "variable": "temperature"
-          },
-          "output": {
-            "type": "input",
-            "variable": "last_temperature"
-          }
-        },
-        {
+		{
+		  "name": "giveSensorData",
+		  "type": {
+			"type": "input",
+			"variable": "temperature"
+		  },
+		  "output": {
+			"type": "input",
+			"variable": "last_temperature"
+		  }
+		},
+		{
 					"name": "displayText",
 					"text": {
 						"type": "input",
@@ -214,7 +152,7 @@
 			]
 
 		},
-    {
+	{
 			"id": -3,
 			"description": "Ask for operations",
 			"triggers": [{
@@ -231,7 +169,7 @@
 						"variable": false
 					}
 				},
-        {
+		{
 					"name": "changeSuriface",
 					"image": {
 						"type": "input",
@@ -313,121 +251,121 @@
 			]
 
 		},
-    {
-  			"id": -2,
-  			"description": "[MEET UP] :  Angry",
-  			"triggers": [{
-  				"service": "emotion",
-  				"name": "new",
-  				"parameters": {
-  					"emotion": "anger"
-  				}
-  			}],
-  			"actions": [{
-  					"name": "changeSuriface",
-  					"image": {
-  						"type": "input",
-  						"variable": "worried"
-  					}
-  				},
-  				{
-  					"name": "displayText",
-  					"text": {
-  						"type": "input",
-  						"variable": "Voulez vous que j'appelle un conseiller pour venir vous aider ?"
-  					}
-  				},
-  				{
-  					"name": "callScenarios",
-  					"id": {
-  						"type": "input",
-  						"variable": [5, 9, 3]
-  					}
-  				},
-  				{
-  					"name": "speak",
-  					"text": {
-  						"type": "service",
-  						"name": "storage",
-  						"variable": "@text"
-  					}
-  				}
-  			]
-  		},
-  		{
-  			"id": -1,
-  			"description": "[MEET UP] :  Wait for converse -take appointment",
-  			"triggers": [{
-  				"service": "converse",
-  				"name": "new",
-  				"parameters": {
-  					"intent": "appointment"
-  				}
-  			}],
-  			"actions": [
-          {
-  					"name": "changeSuriface",
-  					"image": {
-  						"type": "input",
-  						"variable": "basic"
-  					}
-  				},
-          {
-  					"name": "displayText",
-  					"text": {
-  						"type": "input",
-  						"variable": "Vendredi 15 Juin à 17h.\nLundi 18 Juin à 14h.\nMercredi 20 Juin à 9h30."
-  					}
-  				},
-  				{
-  					"name": "speak",
-  					"text": {
-  						"type": "input",
-  						"name": "storage",
-  						"variable": "Votre conseiller participe actuellement à un mite eupe. Voici ses disponibilité."
-  					}
-  				},
-  				{
-  					"name": "callScenarios",
-  					"id": {
-  						"type": "input",
-  						"variable": ["face-working", "converse", "person-detection", "emotion-detection"]
-  					}
-  				}
-  			]
-  		},
-      {
-  			"id": 0,
-  			"description": "[MEET UP] : Wait for audio - take appointment",
-  			"triggers": [{
-  				"service": "sound",
-  				"name": "new",
-  				"parameters": {}
-  			}],
-  			"actions": [{
-  					"name": "converse",
-  					"filepath": {
-  						"type": "service",
-  						"name": "sound",
-  						"variable": "filepath"
-  					}
-  				},
-  				{
-  					"name": "changeSuriface",
-  					"image": {
-  						"type": "input",
-  						"variable": "computing2"
-  					}
-  				},
-  				{
-  					"name": "callScenarios",
-  					"id": {
-  						"type": "input",
-  						"variable": [-1, "converse"]
-  					}
-  				}
-  			]
-  		},
+	{
+			"id": -2,
+			"description": "[MEET UP] :  Angry",
+			"triggers": [{
+				"service": "emotion",
+				"name": "new",
+				"parameters": {
+					"emotion": "anger"
+				}
+			}],
+			"actions": [{
+					"name": "changeSuriface",
+					"image": {
+						"type": "input",
+						"variable": "worried"
+					}
+				},
+				{
+					"name": "displayText",
+					"text": {
+						"type": "input",
+						"variable": "Voulez vous que j'appelle un conseiller pour venir vous aider ?"
+					}
+				},
+				{
+					"name": "callScenarios",
+					"id": {
+						"type": "input",
+						"variable": [5, 9, 3]
+					}
+				},
+				{
+					"name": "speak",
+					"text": {
+						"type": "service",
+						"name": "storage",
+						"variable": "@text"
+					}
+				}
+			]
+		},
+	{
+		"id": -1,
+		"description": "[MEET UP] :  Wait for converse -take appointment",
+		"triggers": [{
+			"service": "converse",
+			"name": "new",
+			"parameters": {
+				"intent": "appointment"
+			}
+		}],
+		"actions": [
+	  {
+				"name": "changeSuriface",
+				"image": {
+					"type": "input",
+					"variable": "basic"
+				}
+			},
+	  {
+				"name": "displayText",
+				"text": {
+					"type": "input",
+					"variable": "Vendredi 15 Juin à 17h.\nLundi 18 Juin à 14h.\nMercredi 20 Juin à 9h30."
+				}
+			},
+			{
+				"name": "speak",
+				"text": {
+					"type": "input",
+					"name": "storage",
+					"variable": "Votre conseiller participe actuellement à un mite eupe. Voici ses disponibilité."
+				}
+			},
+			{
+				"name": "callScenarios",
+				"id": {
+					"type": "input",
+					"variable": ["face-working", "converse", "person-detection", "emotion-detection"]
+				}
+			}
+		]
+	},
+	  {
+			"id": 0,
+			"description": "[MEET UP] : Wait for audio - take appointment",
+			"triggers": [{
+				"service": "sound",
+				"name": "new",
+				"parameters": {}
+			}],
+			"actions": [{
+					"name": "converse",
+					"filepath": {
+						"type": "service",
+						"name": "sound",
+						"variable": "filepath"
+					}
+				},
+				{
+					"name": "changeSuriface",
+					"image": {
+						"type": "input",
+						"variable": "computing2"
+					}
+				},
+				{
+					"name": "callScenarios",
+					"id": {
+						"type": "input",
+						"variable": [-1, "converse"]
+					}
+				}
+			]
+		},
     {
       "id": 1,
       "description": "Wait for audio",

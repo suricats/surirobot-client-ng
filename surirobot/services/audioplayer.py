@@ -6,8 +6,8 @@ import platform
 from surirobot.core.common import ehpyqtSlot
 import os
 # Local TTS engine
-# import pyttsx3
-# import asyncio
+import pyttsx3
+import asyncio
 
 
 class AudioPlayer(QThread):
@@ -19,9 +19,9 @@ class AudioPlayer(QThread):
         self.playObj = None
 
         self.local_voice = os.environ.get('LOCAL_VOICE', False)
-        # self.engine = pyttsx3.init(driverName='espeak')
-        # self.engine.setProperty('rate', 150)
-        # self.engine.setProperty('voice', 'french')  # changes the voice
+        self.engine = pyttsx3.init(driverName='espeak')
+        self.engine.setProperty('rate', 150)
+        self.engine.setProperty('voice', 'french')  # changes the voice
 
     def __del__(self):
         self.stop()
@@ -34,17 +34,19 @@ class AudioPlayer(QThread):
             self.logger.info('Stop playing.')
 
     @ehpyqtSlot(str)
-    def play(self, filename):
-        print('salut')
-        print(filename)
-        try:
-            if platform.system() == "Darwin":
-                print('Audio is desactivated in MAC OS')
-            else:
-                self.stop()
-                waveObj = sa.WaveObject.from_wave_file(filename)
-                self.logger.info('Now playing' + str(filename) + '.')
-                self.playObj = waveObj.play()
-        except Exception as e:
-            self.logger.info('Error : ' + str(e))
+    def play(self, data):
+        if self.local_voice:
+           self.engine.say(data)
+           self.engine.runAndWait()
+        else:
+            try:
+                if platform.system() == "Darwin":
+                    print('Audio is desactivated in MAC OS')
+                else:
+                    self.stop()
+                    waveObj = sa.WaveObject.from_wave_file(data)
+                    self.logger.info('Now playing' + str(data) + '.')
+                    self.playObj = waveObj.play()
+            except Exception as e:
+                self.logger.info('Error : ' + str(e))
 

@@ -25,7 +25,7 @@ class VideoCapture(QThread):
         self.currentCam = 0
         self.video_capture = None
         self.signal_change_camera.connect(ui.set_camera)
-        ui.nextCamera.pressed.connect(self.changeCamera)
+        ui.nextCamera.pressed.connect(self.change_camera)
 
         self.videoWorkLoop = QTimer()
         self.videoWorkLoop.timeout.connect(self.detect)
@@ -36,7 +36,7 @@ class VideoCapture(QThread):
         cv2.destroyAllWindows()
         self.quit()
 
-    def start(self):
+    def start(self, **kwargs):
         if platform.system() == "Darwin":
             self.video_capture = cv2.VideoCapture(0)
             self.nbCam = 1
@@ -59,7 +59,7 @@ class VideoCapture(QThread):
         if self.video_capture.isOpened():
             self.videoWorkLoop.start()
         else:
-            print('Error - Can\'t open camera')
+            raise Exception("Can't open camera.")
 
     @ehpyqtSlot()
     def detect(self):
@@ -77,8 +77,7 @@ class VideoCapture(QThread):
         self.videoWorkLoop.setInterval(-time.time() % (1 / self.NB_IMG_PER_SECOND)*1000)
 
     @ehpyqtSlot()
-    def changeCamera(self):
-        print('yolo')
+    def change_camera(self):
         self.currentCam = (self.currentCam+1) % self.nbCam
         self.video_capture.open(self.currentCam)
 

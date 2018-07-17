@@ -100,7 +100,6 @@ class ConverseApiCaller(ApiCaller):
                                            {"intent": intent, "reply": message, "audiopath": filename})
 
     def start(self):
-        self.converse_audio()
         ApiCaller.start(self)
 
     def stop(self):

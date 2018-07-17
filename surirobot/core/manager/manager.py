@@ -202,6 +202,13 @@ class Manager(QObject):
                             params[name] = self.services[value["name"]][value["variable"]]
                     else:
                         params[name] = value["variable"]
+                # Case : the parameter is a dict of parameter encoders
+                elif type(value) is dict:
+                    for dd_key,dd_value in value.items():
+                        if not is_parameter_encoder(dd_value):
+                            raise TypeNotAllowedInDataRetrieverException(name, value, None, None, dd_value)
+                    params[name] = value
+                
                 # Case : the parameter is something else
                 else:
                     raise TypeNotAllowedInDataRetrieverException(name, None, None, None, value)

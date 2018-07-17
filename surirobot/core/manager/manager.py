@@ -208,7 +208,7 @@ class Manager(QObject):
                         if not is_parameter_encoder(dd_value):
                             raise TypeNotAllowedInDataRetrieverException(name, value, None, None, dd_value)
                     params[name] = value
-                
+
                 # Case : the parameter is something else
                 else:
                     raise TypeNotAllowedInDataRetrieverException(name, None, None, None, value)

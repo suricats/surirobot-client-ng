@@ -513,7 +513,7 @@
 					"name": "displayText",
 					"text": {
 						"type": "input",
-						"variable": "Bonjour {@firstname} {@lastname}. Que puis-je faire pour vous ?"
+						"variable": "Bonjour {@firstname} {@lastname}. Voici vos notifications :"
 					},
 					"variables": [{
 							"firstname": {
@@ -539,6 +539,33 @@
           }
         },
         {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+		  {
+			"name": "wait",
+			  "time": {
+				  "type" : "input",
+				  "variable": 2000
+			  }
+		  },
+		  {
+			  "name": "notifications"
+		  },
+		  {
+			  "name": "displayText",
+			  "text":
+			  {
+				  "type": "service",
+				  "name": "storage",
+				  "variable": "@notifications"
+			  }
+		  },
+		  {
           "name": "speak",
           "text": {
             "type": "service",
@@ -903,24 +930,52 @@
           "name": "displayText",
           "text": {
             "type": "input",
-            "variable": "Bonjour créateur. Que puis-je faire pour vous aujourd'hui ?"
+            "variable": "Bonjour créateur. Voici vos notifications"
           }
         },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        },
-        {
+		  {
+			  "name": "speak",
+			  "text": {
+				  "type": "service",
+				  "name": "storage",
+				  "variable": "@text"
+			  }
+		  },
+			{
+			"name": "wait",
+			  "time": {
+				  "type" : "input",
+				  "variable": 2000
+			  }
+		  },
+		  {
+			  "name": "notifications"
+		  },
+		  {
+			  "name": "displayText",
+			  "text":
+			  {
+				  "type": "service",
+				  "name": "storage",
+				  "variable": "@notifications"
+			  }
+		  },
+		  {
           "name": "speak",
           "text": {
             "type": "service",
             "name": "storage",
             "variable": "@text"
           }
-        }
+        },
+		  {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        	}
+
       ]
     },
     {
@@ -1875,7 +1930,7 @@
           }
         },
         {
-          "name": "takePicture",
+          "name": "picture",
           "firstname": {
             "type": "service",
             "name": "storage",
@@ -2156,7 +2211,7 @@
           }
         },
         {
-          "name": "takePicture",
+          "name": "picture",
           "firstname": {
             "type": "service",
             "name": "storage",
@@ -2180,3 +2235,4 @@
     }
   ]
 }
+

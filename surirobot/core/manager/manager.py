@@ -242,12 +242,14 @@ class Manager(QObject):
                                 func(self, params)
                                 # Store remaining actions while scope is frozen
                                 if self.freeze:
+                                    self.remainingActions = sc["actions"][index + 1:]
                                     if self.debug:
                                         self.logger.info('Scenario engine has been frozen.')
-                                    self.remainingActions = sc["actions"][index+1:]
-                                    if self.debug:
                                         self.logger.info('Remaining actions: {}'.format(self.remainingActions))
                                     break
+                        # Block the others scenario in the same scope
+                        if self.freeze:
+                            break
                 self.scopeChanged = False
         except Exception as e:
             raise ManagerException('check_scope_error', 'An unexpected error occured while checking scope\n{}.'.format(e)) from e
@@ -283,7 +285,7 @@ class Manager(QObject):
             params = self.retrieve_data(action)
             func = self.actions[action["name"]]
             if func:
-                func(params)
+                func(self, params)
                 # Store remaining actions while scope is frozen
                 if self.freeze:
                     self.remainingActions = actions[index+1:]

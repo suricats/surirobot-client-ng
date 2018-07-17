@@ -33,6 +33,7 @@ def ehpyqtSlot(*args):
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
+                # print(*args)
                 func(*args)
             except Exception as e:
                 print('{} occurred in slot'.format(type(e).__name__))

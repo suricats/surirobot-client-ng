@@ -26,19 +26,21 @@ class Actions:
             self.actions["displayText"] = self.display_text
             self.actions["speak"] = self.speak
             self.actions["wait"] = self.wait_for
-            self.actions["takePicture"] = self.add_picture_with_user
+            self.actions["picture"] = self.add_picture_with_user
             self.actions["listen"] = self.listen
             self.actions["store"] = self.store
             self.actions["changeSuriface"] = self.change_suriface
             self.actions["activateKeyboardInput"] = self.activate_keyboard_input
-            self.actions["updateMemory"] = self.converse_update_memory
+            self.actions["memory"] = self.converse_update_memory
             self.actions["giveSensorData"] = self.give_sensor_data
+            self.actions["notifications"] = self.retrieve_notifications
             return self.actions
         except AttributeError as e:
             raise NotFoundActionException(e.args[0].split("'")[3])
         except Exception:
             raise ActionException()
-# Actions
+
+    # Actions
 
     @staticmethod
     def wait_for(mgr, params):
@@ -90,7 +92,8 @@ class Actions:
                 ui.set_text_middle(text)
                 mgr.services["storage"]["@text"] = text
             else:
-                raise ActionException("displayText", "Type of argument 'text' is not str but {}.".format(type(text).__name__))
+                raise ActionException("displayText",
+                                      "Type of argument 'text' is not str but {}.".format(type(text).__name__))
         else:
             raise MissingParametersActionException("displayText", 'text')
 
@@ -167,7 +170,8 @@ class Actions:
             elif type(scenario_id) is str:
                 mgr.scope += mgr.groups[scenario_id]
             else:
-                raise ActionException("callScenarios", "Invalid id type {} in new scope.".format(type(scenario_id).__name__))
+                raise ActionException("callScenarios",
+                                      "Invalid id type {} in new scope.".format(type(scenario_id).__name__))
         print('Scope has changed : ' + str(mgr.scope))
         mgr.scopeChanged = True
 
@@ -177,7 +181,7 @@ class Actions:
             token = os.environ.get('API_MEMORY_TOKEN', '')
             url = os.environ.get('API_MEMORY_URL', '')
             headers = {'Authorization': 'Token ' + token}
-            r1 = requests.get(url + '/memorize/sensors/last/' + params["type"] + '/', headers=headers)
+            r1 = requests.get(url + '/api/memory/sensors/last/' + params["type"] + '/', headers=headers)
             last_sensor_data = r1.json()
             print(last_sensor_data)
             if last_sensor_data:
@@ -187,10 +191,12 @@ class Actions:
             time_to = int(time.time())
             date_from = datetime.datetime.fromtimestamp(time_to)
             date_from = date_from.replace(hour=0, minute=0, second=0)
-            date_to = date_from.replace(day=date_from.day+1)
+            date_to = date_from.replace(day=date_from.day + 1)
             time_from = int(date_from.timestamp())
             time_to = int(date_to.timestamp())
-            r2 = requests.get(url + '/memorize/sensors/' + str(time_from) + '/' + str(time_to) + '/' + params["type"] + '/', headers=headers)
+            r2 = requests.get(
+                url + '/api/memory/sensors/' + str(time_from) + '/' + str(time_to) + '/' + params["type"] + '/',
+                headers=headers)
             # sensors_data = [x for x in r1.json() if x["type"] == params["type"]]
             sensors_data = r2.json()
             if sensors_data:
@@ -215,6 +221,21 @@ class Actions:
                 mgr.services["storage"][params["output"]] = sensors_data[0]["data"]
         else:
             raise MissingParametersActionException("giveSensorData", ['type', 'output'])
+
+    @staticmethod
+    def retrieve_notifications(mgr, params):
+        print('test')
+        text = ''
+        token = os.environ.get('API_MEMORY_TOKEN', '')
+        url = os.environ.get('API_MEMORY_URL', '')
+        headers = {'Authorization': 'Token ' + token}
+        r = requests.get(url + '/api/notifications', headers=headers)
+        for notification in r.json():
+            if notification.get('type') == 'message' and notification.get('target') == 'all':
+                text += notification.get('data', '')
+
+        # Store the notifications
+        mgr.services['storage']['@notifications'] = text
 
 
 mgr_actions = Actions()

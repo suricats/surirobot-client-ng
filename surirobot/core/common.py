@@ -25,9 +25,6 @@ def rawbytes(s):
 
 
 def ehpyqtSlot(*args):
-    """
-    Decorator that replicates the behaviour of 'pyqtSlot' but display errors that has been raised.
-    """
     if len(args) == 0 or isinstance(args[0], types.FunctionType):
         args = []
 
@@ -38,11 +35,9 @@ def ehpyqtSlot(*args):
             try:
                 func(*args)
             except Exception as e:
-                print('{} occured in slot'.format(type(e).__name__))
+                print('{} occurred in slot'.format(type(e).__name__))
                 traceback.print_exc()
-
         return wrapper
-
     return slotdecorator
 
 

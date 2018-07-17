@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QThread
+from PyQt5 import QtWidgets
 import time
 
 
@@ -7,6 +8,20 @@ class progressBarUpdater(QThread):
     Provides a QtProgressBar updater with a QTimer
     """
     def __init__(self, bar, timer, counter, text=None):
+        """
+        Create a new instance of progressBarUpdater
+
+        Parameters
+        ----------
+        bar : QProgressBar
+            Progress bar that needs to be updated
+
+        timer : QTimer
+
+        counter : QElapsedTimer
+
+        text : QLabel
+        """
         QThread.__init__(self)
         self.bar = bar
         self.timer = timer
@@ -17,10 +32,13 @@ class progressBarUpdater(QThread):
 
     def __del__(self):
         self.quit()
+        progressBarUpdater()
 
     def run(self):
         try:
+            # Main loop
             while True:
+                # Case:
                 if self.timer.isActive():
                     if self.bar.isHidden():
                         self.bar.show()

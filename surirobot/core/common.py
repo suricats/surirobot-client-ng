@@ -52,6 +52,7 @@ class Dir():
     TMP = BASE + '/tmp/'
     DATA = BASE + '/data/'
     PICTURES = DATA + 'pictures/'
+    LOG = BASE + '/log/'
 
 
 class State():

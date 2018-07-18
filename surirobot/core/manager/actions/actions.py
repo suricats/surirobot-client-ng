@@ -1,3 +1,5 @@
+from logging import Logger
+
 from surirobot.services import serv_ap, serv_fr, face_loader
 from surirobot.core import ui
 from .exceptions import ActionException, NotFoundActionException, MissingParametersActionException
@@ -13,7 +15,9 @@ from dateutil import parser
 import datetime
 import logging
 
-logger = logging.getLogger('Actions')
+logger = logging.getLogger('Actions')  # type: Logger
+
+
 class Actions:
     def __init__(self):
 

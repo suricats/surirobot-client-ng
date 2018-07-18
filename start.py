@@ -5,12 +5,27 @@ import logging
 # Load .env
 load_dotenv(find_dotenv())
 # Logging configuration
+from surirobot.core.common import Dir
+import time
+
 if int(os.environ.get('DEBUG', '0')):
     print('DEBUG MODE : on')
     logging.basicConfig(level=logging.DEBUG)
+    logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(name)-12.12s][%(levelname)-5.5s]  %(message)s")
+    rootLogger = logging.getLogger()
+    filename = '{}{}.txt'.format(Dir.LOG, time.strftime("%Y_%m_%d_%H_%M_%S"))
+    fileHandler = logging.FileHandler(filename)
+    fileHandler.setFormatter(logFormatter)
+    rootLogger.addHandler(fileHandler)
+
+    consoleHandler = logging.StreamHandler()
+    consoleHandler.setFormatter(logFormatter)
+    rootLogger.addHandler(consoleHandler)
+
 else:
     print('DEBUG MODE : off')
     logging.basicConfig(level=logging.INFO)
+
 # Launch GUI
 from surirobot.core import app
 

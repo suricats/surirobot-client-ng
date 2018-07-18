@@ -14,7 +14,6 @@ class AudioPlayer(QThread):
     def __init__(self):
         QThread.__init__(self)
 
-        logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(type(self).__name__)
         self.playObj = None
 
@@ -24,8 +23,12 @@ class AudioPlayer(QThread):
         self.engine.setProperty('voice', 'french')  # changes the voice
 
     def __del__(self):
-        self.stop()
-        self.quit()
+        try:
+            self.stop()
+            self.quit()
+        except Exception:
+            print('Stopping audio player.')
+            pass
 
     @ehpyqtSlot()
     def stop(self):

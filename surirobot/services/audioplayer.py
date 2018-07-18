@@ -15,7 +15,7 @@ class AudioPlayer(QThread):
         QThread.__init__(self)
 
         logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
         self.playObj = None
 
         self.local_voice = os.environ.get('LOCAL_VOICE', False)
@@ -36,17 +36,17 @@ class AudioPlayer(QThread):
     @ehpyqtSlot(str)
     def play(self, data):
         if self.local_voice:
-           self.engine.say(data)
-           self.engine.runAndWait()
+            self.engine.say(data)
+            self.engine.runAndWait()
         else:
             try:
                 if platform.system() == "Darwin":
-                    print('Audio is desactivated in MAC OS')
+                    self.logger.info('Audio is deactivated in MAC OS')
                 else:
                     self.stop()
                     waveObj = sa.WaveObject.from_wave_file(data)
-                    self.logger.info('Now playing' + str(data) + '.')
+                    self.logger.info('Now playing {}.'.format(data))
                     self.playObj = waveObj.play()
             except Exception as e:
-                self.logger.info('Error : ' + str(e))
+                self.logger.info('{} occurred while playing audio\n{}'.format(type(e).__name__, e))
 

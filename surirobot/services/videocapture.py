@@ -20,7 +20,7 @@ class VideoCapture(QThread):
         self.last_frame = None
 
         logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
         self.nbCam = 0
         self.currentCam = 0
         self.video_capture = None
@@ -73,7 +73,7 @@ class VideoCapture(QThread):
                 qImg = QImage(frame.data, width, height, bytesPerLine, QImage.Format_RGB888)
                 self.signal_change_camera.emit(qImg)
         except Exception as e:
-            print('Error : ' + str(e))
+            self.logger.error('{} occurred while detecting.\n{}'.format(type(e).__name__, e))
         self.videoWorkLoop.setInterval(-time.time() % (1 / self.NB_IMG_PER_SECOND)*1000)
 
     @ehpyqtSlot()

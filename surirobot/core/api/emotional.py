@@ -16,7 +16,7 @@ class EmotionalAPICaller(ApiCaller):
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
 
     def __del__(self):
         self.stop()

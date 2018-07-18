@@ -11,10 +11,12 @@ import re
 import time
 from dateutil import parser
 import datetime
+import logging
 
-
+logger = logging.getLogger('Actions')
 class Actions:
     def __init__(self):
+
         self.actions = {}
 
     def generate_actions(self):
@@ -172,7 +174,7 @@ class Actions:
             else:
                 raise ActionException("callScenarios",
                                       "Invalid id type {} in new scope.".format(type(scenario_id).__name__))
-        print('Scope has changed : ' + str(mgr.scope))
+        logger.debug('Scope has changed : ' + str(mgr.scope))
         mgr.scopeChanged = True
 
     @staticmethod
@@ -183,7 +185,6 @@ class Actions:
             headers = {'Authorization': 'Token ' + token}
             r1 = requests.get(url + '/acpi/memory/sensors/last/' + params["type"] + '/', headers=headers)
             last_sensor_data = r1.json()
-            print(last_sensor_data)
             if last_sensor_data:
                 mgr.services["storage"][params["output"]] = last_sensor_data["data"]
 
@@ -216,7 +217,6 @@ class Actions:
                 p1 = mgr.win.addPlot()
                 p1.plot(x, y, pen='b')
                 p1.setXRange(time_from, time_to)
-                # print("x :" + str(x) + "\ny :" + str(y))
                 # pg.show()
                 mgr.services["storage"][params["output"]] = sensors_data[0]["data"]
         else:
@@ -224,7 +224,6 @@ class Actions:
 
     @staticmethod
     def retrieve_notifications(mgr, params):
-        print('test')
         text = ''
         token = os.environ.get('API_MEMORY_TOKEN', '')
         url = os.environ.get('API_MEMORY_URL', '')

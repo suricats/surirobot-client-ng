@@ -16,7 +16,7 @@ class SttApiCaller(ApiCaller):
 
     def __init__(self, url):
         ApiCaller.__init__(self, url)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
 
     def __del__(self):
         self.stop()
@@ -57,6 +57,6 @@ class SttApiCaller(ApiCaller):
                                        {"intent": "no-understand", "reply": "J'ai n'ai pas entendu ce que vous avez dit."})
             else:
                 self.logger.error('HTTP {} error occurred while retrieving text.'.format(r.status_code))
-                print(r.content)
+                self.logger.error(r.content)
                 # self.signal_indicator.emit("converse", "orange")
                 # self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": "dont-understand", "reply": "Je n'ai pas compris."})

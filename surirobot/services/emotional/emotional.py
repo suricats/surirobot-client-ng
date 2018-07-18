@@ -34,7 +34,7 @@ class EmotionalRecognition(QThread):
         self.api_emotion.received_reply.connect(self.emit_emotion_changed)
 
         logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
         self.isBusy = False
 
         self.api_emotion.signal_indicator.connect(self.relayer)
@@ -63,7 +63,7 @@ class EmotionalRecognition(QThread):
                         else:
                             ui.set_text_down("NO FACE")
             except Exception as e:
-                print('Emotional - Error : ' + str(e))
+                self.logger.error('{} occurred in emotion service.\n{}'.format(type(e).__name__, e))
 
     @ehpyqtSlot(int, dict)
     def emit_emotion_changed(self, state, data):

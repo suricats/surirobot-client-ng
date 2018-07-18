@@ -27,7 +27,7 @@ class AudioRecorder(QThread):
         self.recording = False
 
         logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
 
         self.update_suri_image.connect(ui.set_image)
 

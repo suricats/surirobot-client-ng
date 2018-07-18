@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QMainWindow
 
 from surirobot.core.common import State, ehpyqtSlot
 from .mainwindow import Ui_MainWindow
+import logging
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -20,6 +21,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.logger = logging.getLogger(type(self).__name__)
 
         self.ui = Ui_MainWindow()
         self.setupUi(self)
@@ -133,11 +135,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         q_img : QImage
             ID of the image
         """
-        print('q_img:{},{}'.format(type(q_img).__name__, q_img.byteCount()))
+        self.logger.debug('q_img:{},{}'.format(type(q_img).__name__, q_img.byteCount()))
         try:
             self.camera.setPixmap(QPixmap.fromImage(q_img).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
         except Exception as e:
-            print(e)
+            self.logger.error('{} occurred while setting camera\n{}'.format(type(e).__name__, e))
 
     @ehpyqtSlot()
     def set_manual_input(self, checked):

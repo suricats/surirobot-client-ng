@@ -20,7 +20,7 @@ class TtsApiCaller(ApiCaller):
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
         self.local_voice = os.environ.get('LOCAL_VOICE', False)
         self.play_sound.connect(serv_ap.play)
 
@@ -68,10 +68,10 @@ class TtsApiCaller(ApiCaller):
                 filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"
                 file = QFile(filename)
                 if not file.open(QIODevice.WriteOnly):
-                    print("Could not create file : " + filename)
+                    self.logger.error("Could not create file : {}".format(filename))
                     return
                 file.write(r.content)
-                print("Sound file generated at : " + filename)
+                self.logger.info("Sound file generated at : {}".format(filename))
                 file.close()
                 # Play the audio
                 self.play_sound.emit(filename)

@@ -24,7 +24,7 @@ class ConverseApiCaller(ApiCaller):
         ApiCaller.__init__(self, url)
         self.local_voice = os.environ.get('LOCAL_VOICE', False)
         self.play_sound.connect(serv_ap.play)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
 
     def __del__(self):
         self.stop()
@@ -73,7 +73,7 @@ class ConverseApiCaller(ApiCaller):
                 # Text response
                 if self.local_voice:
                     json_object = r.json()
-                    print(json_object)
+                    self.logger.info('Full converse response :\n{}'.format(json_object))
                     intent = json_object.get('intent', 'no-understand')
                     message = json_object.get('message', '.')
                     self.signal_indicator.emit("converse", "green")
@@ -84,17 +84,17 @@ class ConverseApiCaller(ApiCaller):
                     json_header = json.loads(r.headers['JSON'])
                     # Intent
                     intent = json_header["intent"]
-                    print("intent : " + intent)
+                    self.logger.info("Intent detected : {}".format(intent))
                     # Message
                     message = json_header["message"]
                     # Audio
                     filename = self.TMP_DIR + str(uuid.uuid4()) + ".wav"
                     file = QFile(filename)
                     if not file.open(QIODevice.WriteOnly):
-                        print("Could not create file : " + filename)
+                        self.logger.error("Could not create file : {}".format(filename))
                         return
                     file.write(r.content)
-                    print("Sound file generated at : " + filename)
+                    self.logger.info("Sound file generated at : {}".format(filename))
                     file.close()
                     self.signal_indicator.emit("converse", "green")
                     self.update_state.emit("converse", State.CONVERSE_NEW,

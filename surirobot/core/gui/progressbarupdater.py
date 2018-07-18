@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QThread
 from PyQt5 import QtWidgets
 import time
-
+import logging
 
 class progressBarUpdater(QThread):
     """
@@ -23,6 +23,7 @@ class progressBarUpdater(QThread):
         text : QLabel
         """
         QThread.__init__(self)
+        self.logger = logging.getLogger(type(self).__name__)
         self.bar = bar
         self.timer = timer
         self.counter = counter
@@ -53,4 +54,4 @@ class progressBarUpdater(QThread):
                         self.text.hide()
                 time.sleep(0.01)
         except Exception as e:
-            print('{} in progressBarUpdater : {} '.format(type(e).__name__, e))
+            self.logger.error('{} occurred in progressBarUpdater.\n{} '.format(type(e).__name__, e))

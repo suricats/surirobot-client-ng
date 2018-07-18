@@ -2,7 +2,7 @@ from PyQt5.QtCore import QObject, QTimer, QEvent, Qt, pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 from surirobot.services import serv_ar, face_loader
 from surirobot.core.common import ehpyqtSlot
-
+import logging
 
 class KeyPressEventHandler(QObject):
     startRecord = pyqtSignal()
@@ -12,6 +12,7 @@ class KeyPressEventHandler(QObject):
 
     def __init__(self):
         QObject.__init__(self)
+        self.logger = logging.getLogger(type(self).__name__)
         self.onScenario = False
         self.audioRecording = False
 
@@ -40,7 +41,7 @@ class KeyPressEventHandler(QObject):
         if(event.type() == QEvent.KeyPress):
             keyP = event
             if((keyP.key() == Qt.Key_Escape) or (keyP.key() == Qt.Key_Return)):
-                print('Leaving app...')
+                self.logger.info('Leaving app...')
                 QApplication.quit()
             elif(keyP.key() == Qt.Key_C):
                 # Expiration timer is set to prevent keyboard error

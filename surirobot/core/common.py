@@ -5,6 +5,7 @@ import traceback
 from PyQt5.QtCore import pyqtSlot
 import types
 from functools import wraps
+primitives = [int, str, bool, dict, list, float, tuple, set]
 
 
 def rawbytes(s):
@@ -23,7 +24,6 @@ def rawbytes(s):
     return b''.join(outlist)
 
 
-
 def ehpyqtSlot(*args):
     if len(args) == 0 or isinstance(args[0], types.FunctionType):
         args = []
@@ -33,7 +33,9 @@ def ehpyqtSlot(*args):
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
-                print(*args)
+                if os.environ.get('DEBUG', False):
+                    # pass
+                    print('Slot called : {}.{} : {}'.format(type(args[0]).__name__, func.__name__, [type(item).__name__ if type(item) not in primitives else '{}:{}'.format(type(item).__name__, item) for item in args[1:]]))
                 func(*args)
             except Exception as e:
                 print('{} occurred in slot'.format(type(e).__name__))

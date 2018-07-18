@@ -133,17 +133,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         q_img : QImage
             ID of the image
         """
-        self.camera.setPixmap(QPixmap.fromImage(q_img).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
+        print('q_img:{},{}'.format(type(q_img).__name__, q_img.byteCount()))
+        try:
+            self.camera.setPixmap(QPixmap.fromImage(q_img).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
+        except Exception as e:
+            print(e)
 
     @ehpyqtSlot()
-    def set_manual_input(self):
+    def set_manual_input(self, checked):
         """
         Activate the manual layout
         """
         self.manualLayoutContainer.show()
 
     @ehpyqtSlot()
-    def on_click_validate_manual_input(self):
+    def on_click_validate_manual_input(self, checked):
         """
         Send a signal to manager
 
@@ -152,7 +156,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         None:
             This function send a signal
         """
-        self.update_state.emit("keyboard", State.KEYBOARD_NEW, {"text": self.manualEdit.display_text()})
+        self.update_state.emit("keyboard", State.KEYBOARD_NEW, {"text": self.manualEdit.displayText()})
 
     @ehpyqtSlot(str, str)
     def change_indicator(self, service, value):

@@ -57,12 +57,13 @@ class ConverseApiCaller(ApiCaller):
                 url = self.url+'/converse/audio'
             data = {'language': self.DEFAULT_LANGUAGE_EXT}
             if user_id:
-                data['id'] = user_id
+                data['user_id'] = 'SURI{}'.format(user_id)
             self.logger.info("Sent to Converse API : File - {} : {}Ko".format(file_path, os.fstat(file.fileno()).st_size / 1000))
             r = requests.post(url, files={'audio': file}, data=data)
             # Receive response
             if r.status_code != 200:
                 self.logger.error('HTTP {} error occurred.'.format(r.status_code))
+                self.logger.error(r.content)
                 self.signal_indicator.emit("converse", "red")
                 message = "Oh mince ! Je ne fonctionne plus très bien :("
                 filename = Dir.DATA + "error.wav"

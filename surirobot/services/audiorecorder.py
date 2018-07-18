@@ -36,7 +36,7 @@ class AudioRecorder(QThread):
         self.quit()
 
     def run(self):
-        while(True):
+        while True:
             elm = self.list.get()
             self.recording = True
             self.logger.info('Now starting record')

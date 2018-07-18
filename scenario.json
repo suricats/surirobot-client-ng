@@ -1,12 +1,12 @@
 {
-  "initial": ["converse","emotion-detection","special-persons","face-working",3,4,40],
+  "initial": ["converse","emotion-detection","special-persons","face-working",3,4,10],
   "groups" : {
-    "person-detection" : [3,4,9,40],
-    "emotion-detection" : [10,16],
+    "person-detection" : [3,4,9,10],
+    "emotion-detection" : [3000,3006],
     "special-persons" : [1001,1002,1003],
-    "converse" : [-5,-4,-3,43,2,1],
+    "converse" : [2002,2001,2000,0,2,1],
     "person-detection-know-out" : [3,9],
-    "face-working" : [41,42]
+    "face-working" : [11,12]
   },
   "actions" : [
     {
@@ -16,393 +16,8 @@
   ],
 
   "scenarios": [
-	{
-			"id": -5,
-			"description": "Ask for humidity",
-			"triggers": [{
-				"service": "converse",
-				"name": "new",
-				"parameters": {
-					"intent": "ask-humidity"
-				}
-			}],
-			"actions": [{
-					"name": "activateKeyboardInput",
-					"activate": {
-						"type": "input",
-						"variable": false
-					}
-				},
-		{
-					"name": "changeSuriface",
-					"image": {
-						"type": "input",
-						"variable": "basic"
-					}
-				},
-		{
-		  "name": "giveSensorData",
-		  "type": {
-			"type": "input",
-			"variable": "humidity"
-		  },
-		  "output": {
-			"type": "input",
-			"variable": "last_humidity"
-		  }
-		},
-		{
-					"name": "displayText",
-					"text": {
-						"type": "input",
-						"variable": "L'humidité est actuellement à {@last_humidity}%."
-					},
-					"variables": [{
-							"last_humidity": {
-								"type": "service",
-								"name": "storage",
-								"variable": "last_humidity"
-							}
-						}
-					]
-				},
-				{
-					"name": "speak",
-					"text": {
-						"type": "service",
-						"name": "storage",
-						"variable": "@text"
-					}
-				},
-				{
-					"name": "callScenarios",
-					"id": {
-						"type": "input",
-						"variable": ["converse", "person-detection", "emotion-detection"]
-					}
-				}
-			]
-
-		},
-	{
-			"id": -4,
-			"description": "Ask for temperature",
-			"triggers": [{
-				"service": "converse",
-				"name": "new",
-				"parameters": {
-					"intent": "ask-temperature"
-				}
-			}],
-			"actions": [{
-					"name": "activateKeyboardInput",
-					"activate": {
-						"type": "input",
-						"variable": false
-					}
-				},
-		{
-					"name": "changeSuriface",
-					"image": {
-						"type": "input",
-						"variable": "basic"
-					}
-				},
-		{
-		  "name": "giveSensorData",
-		  "type": {
-			"type": "input",
-			"variable": "temperature"
-		  },
-		  "output": {
-			"type": "input",
-			"variable": "last_temperature"
-		  }
-		},
-		{
-					"name": "displayText",
-					"text": {
-						"type": "input",
-						"variable": "Il fait actuellement {@last_temperature}°C."
-					},
-					"variables": [{
-							"last_temperature": {
-								"type": "service",
-								"name": "storage",
-								"variable": "last_temperature"
-							}
-						}
-					]
-				},
-				{
-					"name": "speak",
-					"text": {
-						"type": "service",
-						"name": "storage",
-						"variable": "@text"
-					}
-				},
-				{
-					"name": "callScenarios",
-					"id": {
-						"type": "input",
-						"variable": ["converse", "person-detection", "emotion-detection"]
-					}
-				}
-			]
-
-		},
-	{
-			"id": -3,
-			"description": "Ask for operations",
-			"triggers": [{
-				"service": "converse",
-				"name": "new",
-				"parameters": {
-					"intent": "ask-operations"
-				}
-			}],
-			"actions": [{
-					"name": "activateKeyboardInput",
-					"activate": {
-						"type": "input",
-						"variable": false
-					}
-				},
-		{
-					"name": "changeSuriface",
-					"image": {
-						"type": "input",
-						"variable": "basic"
-					}
-				},
-				{
-					"name": "displayText",
-					"text": {
-						"type": "input",
-						"variable": "Voici vos dernières opérations :"
-					}
-				},
-				{
-					"name": "speak",
-					"text": {
-						"type": "service",
-						"name": "storage",
-						"variable": "@text"
-					}
-				},
-				{
-					"name": "displayText",
-					"text": {
-						"type": "input",
-						"variable": "30 mai 2018 : VIREMENT SURICATS : +856€\n30 mai 2018 : CB MIAM-MIAM NOODL : -8,90€\n29 mai 2018 : CB Spotify : -14,99€\n11 mai 2018 : CB SUBWAY : -10,50€"
-					},
-					"variables": [{
-							"firstname": {
-								"type": "service",
-								"name": "face",
-								"variable": "firstname"
-							}
-						},
-						{
-							"lastname": {
-								"type": "service",
-								"name": "face",
-								"variable": "lastname"
-							}
-						}
-					]
-				},
-				{
-					"name": "wait",
-					"time": {
-						"type": "input",
-						"variable": 4000
-					}
-				},
-				{
-					"name": "speak",
-					"text": {
-						"type": "input",
-						"variable": "Que voulez vous faire maintenant ?"
-					}
-				},
-				{
-					"name": "changeSuriface",
-					"image": {
-						"type": "input",
-						"variable": "listening"
-					}
-				},
-				{
-					"name": "wait",
-					"time": {
-						"type": "input",
-						"variable": 5000
-					}
-				},
-				{
-					"name": "callScenarios",
-					"id": {
-						"type": "input",
-						"variable": [-2, 0, "converse", "person-detection", "emotion-detection"]
-					}
-				}
-			]
-
-		},
-	{
-			"id": -2,
-			"description": "[MEET UP] :  Angry",
-			"triggers": [{
-				"service": "emotion",
-				"name": "new",
-				"parameters": {
-					"emotion": "anger"
-				}
-			}],
-			"actions": [{
-					"name": "changeSuriface",
-					"image": {
-						"type": "input",
-						"variable": "worried"
-					}
-				},
-				{
-					"name": "displayText",
-					"text": {
-						"type": "input",
-						"variable": "Voulez vous que j'appelle un conseiller pour venir vous aider ?"
-					}
-				},
-				{
-					"name": "callScenarios",
-					"id": {
-						"type": "input",
-						"variable": [5, 9, 3]
-					}
-				},
-				{
-					"name": "speak",
-					"text": {
-						"type": "service",
-						"name": "storage",
-						"variable": "@text"
-					}
-				}
-			]
-		},
-	{
-		"id": -1,
-		"description": "[MEET UP] :  Wait for converse -take appointment",
-		"triggers": [{
-			"service": "converse",
-			"name": "new",
-			"parameters": {
-				"intent": "appointment"
-			}
-		}],
-		"actions": [
-	  {
-				"name": "changeSuriface",
-				"image": {
-					"type": "input",
-					"variable": "basic"
-				}
-			},
-	  {
-				"name": "displayText",
-				"text": {
-					"type": "input",
-					"variable": "Vendredi 15 Juin à 17h.\nLundi 18 Juin à 14h.\nMercredi 20 Juin à 9h30."
-				}
-			},
-			{
-				"name": "speak",
-				"text": {
-					"type": "input",
-					"name": "storage",
-					"variable": "Votre conseiller participe actuellement à un mite eupe. Voici ses disponibilité."
-				}
-			},
-			{
-				"name": "callScenarios",
-				"id": {
-					"type": "input",
-					"variable": ["face-working", "converse", "person-detection", "emotion-detection"]
-				}
-			}
-		]
-	},
-	  {
-			"id": 0,
-			"description": "[MEET UP] : Wait for audio - take appointment",
-			"triggers": [{
-				"service": "sound",
-				"name": "new",
-				"parameters": {}
-			}],
-			"actions": [{
-					"name": "converse",
-					"filepath": {
-						"type": "service",
-						"name": "sound",
-						"variable": "filepath"
-					}
-				},
-				{
-					"name": "changeSuriface",
-					"image": {
-						"type": "input",
-						"variable": "computing2"
-					}
-				},
-				{
-					"name": "callScenarios",
-					"id": {
-						"type": "input",
-						"variable": [-1, "converse"]
-					}
-				}
-			]
-		},
     {
-      "id": 1,
-      "description": "Wait for audio",
-      "triggers": [
-        {
-          "service": "sound",
-          "name": "new",
-          "parameters": {}
-        }
-      ],
-      "actions": [
-        {
-          "name": "converse",
-          "filepath": {
-            "type": "service",
-            "name": "sound",
-            "variable": "filepath"
-          }
-        },
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "computing2"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse"]
-          }
-        }
-      ]
-    },
-    {
-      "id": 43,
+      "id": 0,
       "description": "Wait for audio - recognize person",
       "triggers": [
         {
@@ -430,6 +45,41 @@
             "type": "service",
             "name": "face",
             "variable": "id"
+          }
+        },
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "computing2"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "description": "Wait for audio",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
           }
         },
         {
@@ -510,27 +160,27 @@
           }
         },
         {
-					"name": "displayText",
-					"text": {
-						"type": "input",
-						"variable": "Bonjour {@firstname} {@lastname}. Voici vos notifications :"
-					},
-					"variables": [{
-							"firstname": {
-								"type": "service",
-								"name": "face",
-								"variable": "firstname"
-							}
-						},
-						{
-							"lastname": {
-								"type": "service",
-								"name": "face",
-								"variable": "lastname"
-							}
-						}
-					]
-				},
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Bonjour {@firstname} {@lastname}. Voici vos notifications :"
+          },
+          "variables": [{
+            "firstname": {
+              "type": "service",
+              "name": "face",
+              "variable": "firstname"
+            }
+          },
+            {
+              "lastname": {
+                "type": "service",
+                "name": "face",
+                "variable": "lastname"
+              }
+            }
+          ]
+        },
         {
           "name": "changeSuriface",
           "image": {
@@ -546,26 +196,26 @@
             "variable": "@text"
           }
         },
-		  {
-			"name": "wait",
-			  "time": {
-				  "type" : "input",
-				  "variable": 2000
-			  }
-		  },
-		  {
-			  "name": "notifications"
-		  },
-		  {
-			  "name": "displayText",
-			  "text":
-			  {
-				  "type": "service",
-				  "name": "storage",
-				  "variable": "@notifications"
-			  }
-		  },
-		  {
+        {
+          "name": "wait",
+          "time": {
+            "type" : "input",
+            "variable": 2000
+          }
+        },
+        {
+          "name": "notifications"
+        },
+        {
+          "name": "displayText",
+          "text":
+          {
+            "type": "service",
+            "name": "storage",
+            "variable": "@notifications"
+          }
+        },
+        {
           "name": "speak",
           "text": {
             "type": "service",
@@ -577,7 +227,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [-2,0,"converse","special-persons","person-detection","emotion-detection"]
+            "variable": [-2,"converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]
@@ -756,7 +406,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["special-persons",5,9,40,3]
+            "variable": ["special-persons",5,9,10,3]
           }
         }
       ]
@@ -806,13 +456,13 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["converse","special-persons",3,4,40,"emotion-detection"]
+            "variable": ["converse","special-persons",3,4,10,"emotion-detection"]
           }
         }
       ]
     },
     {
-      "id": 40,
+      "id": 10,
       "description": "Too many known people",
       "triggers": [
         {
@@ -862,7 +512,7 @@
       ]
     },
     {
-      "id": 41,
+      "id": 11,
       "description": "Face is working",
       "triggers": [
         {
@@ -884,7 +534,7 @@
       ]
     },
     {
-      "id": 42,
+      "id": 12,
       "description": "Face is not working",
       "triggers": [
         {
@@ -901,494 +551,6 @@
           "image": {
             "type" : "input",
             "variable": "basic"
-          }
-        }
-      ]
-    },
-    {
-      "id": 1001,
-      "description": "Recognize his creator",
-      "triggers": [
-        {
-          "service": "face",
-          "name": "know",
-          "parameters": {
-            "firstname" : "Alain",
-            "lastname" : "Berrier"
-          }
-        }
-      ],
-      "actions": [
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic2"
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Bonjour créateur. Voici vos notifications"
-          }
-        },
-		  {
-			  "name": "speak",
-			  "text": {
-				  "type": "service",
-				  "name": "storage",
-				  "variable": "@text"
-			  }
-		  },
-			{
-			"name": "wait",
-			  "time": {
-				  "type" : "input",
-				  "variable": 2000
-			  }
-		  },
-		  {
-			  "name": "notifications"
-		  },
-		  {
-			  "name": "displayText",
-			  "text":
-			  {
-				  "type": "service",
-				  "name": "storage",
-				  "variable": "@notifications"
-			  }
-		  },
-		  {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        },
-		  {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        	}
-
-      ]
-    },
-    {
-      "id": 1002,
-      "description": "Recognize a founder of Suricats",
-      "triggers": [
-        {
-          "service": "face",
-          "name": "know",
-          "parameters": {
-            "firstname" : "\\b(Thierry|François|Bruno|Bernard)\\b",
-            "lastname" : "\\b(Berdy|Giraudon|Levy|Chartier)\\b"
-          }
-        }
-      ],
-      "actions": [
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic2"
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Oh un fantastique ! Que puis-je faire pour vous ?"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        }
-      ]
-    },
-    {
-      "id": 1003,
-      "description": "Recognize Loic Steer",
-      "triggers": [
-        {
-          "service": "face",
-          "name": "know",
-          "parameters": {
-            "firstname" : "Loïc",
-            "lastname" : "Steer"
-          }
-        }
-      ],
-      "actions": [
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic2"
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Yo Loïc ! ça boum ma poule ?"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        }
-      ]
-    },
-    {
-      "id": 10,
-      "description": "SAD - Joke : ask",
-      "triggers": [
-        {
-          "service": "emotion",
-          "name": "new",
-          "parameters": {
-            "emotion": "sadness"
-          }
-        },
-        {
-          "service": "face",
-          "name": "know",
-          "parameters": {
-            "new": false
-          }
-        }
-      ],
-      "actions": [
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "sad"
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Oh tu es triste... Tu veux que je te raconte une blague ?"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["special-persons","person-detection",11]
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        }
-      ]
-    },
-    {
-      "id": 11,
-      "description": "SAD - Joke : wait",
-      "triggers": [
-        {
-          "service": "sound",
-          "name": "new",
-          "parameters": {}
-        }
-      ],
-      "actions": [
-        {
-          "name": "converse",
-          "filepath": {
-            "type": "service",
-            "name": "sound",
-            "variable": "filepath"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": [12,14,15]
-          }
-        }
-      ]
-    },
-    {
-      "id": 12,
-      "description": "SAD - Joke : confirm",
-      "triggers": [
-        {
-          "service": "converse",
-          "name": "new",
-          "parameters": {
-            "intent": "say-yes"
-          }
-        }
-      ],
-      "actions": [
-        {
-          "name": "converseAnswer",
-          "intent": {
-            "type": "input",
-            "variable": "Raconte moi une blague"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": [13]
-          }
-        }
-      ]
-    },
-    {
-      "id": 13,
-      "description": "SAD - Joke : tell",
-      "triggers": [
-        {
-          "service": "converse",
-          "name": "new",
-          "parameters": {}
-        }
-      ],
-      "actions": [
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic2"
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "service",
-            "name": "converse",
-            "variable": "reply"
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        }
-      ]
-    },
-    {
-      "id": 14,
-      "description": "SAD - Joke : denied",
-      "triggers": [
-        {
-          "service": "converse",
-          "name": "new",
-          "parameters": {
-            "intent": "say-no"
-          }
-        }
-      ],
-      "actions": [
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Très bien."
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        },
-        {
-          "name": "wait",
-          "time": {
-            "type": "input",
-            "variable": 2
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        }
-      ]
-    },
-    {
-      "id": 15,
-      "description": "SAD - Joke : don't understand",
-      "triggers": [
-        {
-          "service": "converse",
-          "name": "new",
-          "parameters": {}
-        }
-      ],
-      "actions": [
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Je n'ai pas compris. Répondez par OUI ou NON."
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["special-persons","person-detection",11]
-          }
-        }
-      ]
-    },
-    {
-      "id": 16,
-      "description": "HAPPY - tell",
-      "triggers": [
-        {
-          "service": "emotion",
-          "name": "new",
-          "parameters": {
-            "emotion": "happiness"
-          }
-        },
-        {
-          "service": "face",
-          "name": "know",
-          "parameters" : {}
-        }
-      ],
-      "actions": [
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "{@firstname}, ça me fait plaisir de voir que tu es heureux aujourd'hui :)"
-          },
-          "variables": [
-            {
-              "firstname": {
-                "type": "service",
-                "name": "face",
-                "variable": "firstname"
-              }
-            }
-          ]
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        }
-      ]
-    },
-    {
-      "id": 17,
-      "description": "Play music",
-      "triggers": [
-        {
-          "service": "converse",
-          "name": "new",
-          "parameters": {
-            "intent": "play-music"
-          }
-        }
-      ],
-      "actions": [
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "C'est parti matelos !"
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        },
-        {
-          "name": "playSound",
-          "filepath": {
-            "type": "input",
-            "variable": "data/music.wav"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]
@@ -2229,6 +1391,685 @@
           "id": {
             "type": "input",
             "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 1001,
+      "description": "Recognize his creator",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {
+            "firstname" : "Alain",
+            "lastname" : "Berrier"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic2"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Bonjour créateur. Voici vos notifications"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "wait",
+          "time": {
+            "type" : "input",
+            "variable": 2000
+          }
+        },
+        {
+          "name": "notifications"
+        },
+        {
+          "name": "displayText",
+          "text":
+          {
+            "type": "service",
+            "name": "storage",
+            "variable": "@notifications"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+
+      ]
+    },
+    {
+      "id": 1002,
+      "description": "Recognize a founder of Suricats",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {
+            "firstname" : "\\b(Thierry|François|Bruno|Bernard)\\b",
+            "lastname" : "\\b(Berdy|Giraudon|Levy|Chartier)\\b"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic2"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Oh un fantastique ! Que puis-je faire pour vous ?"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        }
+      ]
+    },
+    {
+      "id": 1003,
+      "description": "Recognize Loic Steer",
+      "triggers": [
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {
+            "firstname" : "Loïc",
+            "lastname" : "Steer"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic2"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Yo Loïc ! ça boum ma poule ?"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2000,
+      "description": "Ask for operations",
+      "triggers": [{
+        "service": "converse",
+        "name": "new",
+        "parameters": {
+          "intent": "ask-operations"
+        }
+      }],
+      "actions": [{
+        "name": "activateKeyboardInput",
+        "activate": {
+          "type": "input",
+          "variable": false
+        }
+      },
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Voici vos dernières opérations :"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "30 mai 2018 : VIREMENT SURICATS : +856€\n30 mai 2018 : CB MIAM-MIAM NOODL : -8,90€\n29 mai 2018 : CB Spotify : -14,99€\n11 mai 2018 : CB SUBWAY : -10,50€"
+          },
+          "variables": [{
+            "firstname": {
+              "type": "service",
+              "name": "face",
+              "variable": "firstname"
+            }
+          },
+            {
+              "lastname": {
+                "type": "service",
+                "name": "face",
+                "variable": "lastname"
+              }
+            }
+          ]
+        },
+        {
+          "name": "wait",
+          "time": {
+            "type": "input",
+            "variable": 4000
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "input",
+            "variable": "Que voulez vous faire maintenant ?"
+          }
+        },
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "listening"
+          }
+        },
+        {
+          "name": "wait",
+          "time": {
+            "type": "input",
+            "variable": 5000
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [-2, 0, "converse", "person-detection", "emotion-detection"]
+          }
+        }
+      ]
+
+    },
+    {
+      "id": 2001,
+      "description": "Ask for temperature",
+      "triggers": [{
+        "service": "converse",
+        "name": "new",
+        "parameters": {
+          "intent": "ask-temperature"
+        }
+      }],
+      "actions": [{
+        "name": "activateKeyboardInput",
+        "activate": {
+          "type": "input",
+          "variable": false
+        }
+      },
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic"
+          }
+        },
+        {
+          "name": "giveSensorData",
+          "type": {
+            "type": "input",
+            "variable": "temperature"
+          },
+          "output": {
+            "type": "input",
+            "variable": "last_temperature"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Il fait actuellement {@last_temperature}°C."
+          },
+          "variables": [{
+            "last_temperature": {
+              "type": "service",
+              "name": "storage",
+              "variable": "last_temperature"
+            }
+          }
+          ]
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse", "person-detection", "emotion-detection"]
+          }
+        }
+      ]
+
+    },
+    {
+      "id": 2002,
+      "description": "Ask for humidity",
+      "triggers": [{
+        "service": "converse",
+        "name": "new",
+        "parameters": {
+          "intent": "ask-humidity"
+        }
+      }],
+      "actions": [{
+        "name": "activateKeyboardInput",
+        "activate": {
+          "type": "input",
+          "variable": false
+        }
+      },
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic"
+          }
+        },
+        {
+          "name": "giveSensorData",
+          "type": {
+            "type": "input",
+            "variable": "humidity"
+          },
+          "output": {
+            "type": "input",
+            "variable": "last_humidity"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "L'humidité est actuellement à {@last_humidity}%."
+          },
+          "variables": [{
+            "last_humidity": {
+              "type": "service",
+              "name": "storage",
+              "variable": "last_humidity"
+            }
+          }
+          ]
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse", "person-detection", "emotion-detection"]
+          }
+        }
+      ]
+
+    },
+    {
+      "id": 3000,
+      "description": "SAD - Joke : ask",
+      "triggers": [
+        {
+          "service": "emotion",
+          "name": "new",
+          "parameters": {
+            "emotion": "sadness"
+          }
+        },
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {
+            "new": false
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "sad"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Oh tu es triste... Tu veux que je te raconte une blague ?"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["special-persons","person-detection",3001]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        }
+      ]
+    },
+    {
+      "id": 3001,
+      "description": "SAD - Joke : wait",
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [3002,3004,3005]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3002,
+      "description": "SAD - Joke : confirm",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-yes"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "converseAnswer",
+          "intent": {
+            "type": "input",
+            "variable": "Raconte moi une blague"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [3003]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3003,
+      "description": "SAD - Joke : tell",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "basic2"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "service",
+            "name": "converse",
+            "variable": "reply"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3004,
+      "description": "SAD - Joke : denied",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "say-no"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Très bien."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "wait",
+          "time": {
+            "type": "input",
+            "variable": 2
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3005,
+      "description": "SAD - Joke : don't understand",
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Je n'ai pas compris. Répondez par OUI ou NON."
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["special-persons","person-detection",3001]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3006,
+      "description": "HAPPY - tell",
+      "triggers": [
+        {
+          "service": "emotion",
+          "name": "new",
+          "parameters": {
+            "emotion": "happiness"
+          }
+        },
+        {
+          "service": "face",
+          "name": "know",
+          "parameters" : {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "{@firstname}, ça me fait plaisir de voir que tu es heureux aujourd'hui :)"
+          },
+          "variables": [
+            {
+              "firstname": {
+                "type": "service",
+                "name": "face",
+                "variable": "firstname"
+              }
+            }
+          ]
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
           }
         }
       ]

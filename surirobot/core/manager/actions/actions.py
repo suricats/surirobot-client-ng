@@ -181,7 +181,7 @@ class Actions:
             token = os.environ.get('API_MEMORY_TOKEN', '')
             url = os.environ.get('API_MEMORY_URL', '')
             headers = {'Authorization': 'Token ' + token}
-            r1 = requests.get(url + '/api/memory/sensors/last/' + params["type"] + '/', headers=headers)
+            r1 = requests.get(url + '/acpi/memory/sensors/last/' + params["type"] + '/', headers=headers)
             last_sensor_data = r1.json()
             print(last_sensor_data)
             if last_sensor_data:
@@ -235,7 +235,7 @@ class Actions:
                 text += notification.get('data', '')
 
         # Store the notifications
-        mgr.services['storage']['@notifications'] = text
+        mgr.services['storage']['@notifications'] = text if text else "Vous n'avez aucune notification"
 
 
 mgr_actions = Actions()

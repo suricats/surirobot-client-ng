@@ -143,7 +143,7 @@
     },
     {
       "id": 3,
-      "description": "[MEET UP] : Recognize a known person",
+      "description": "Recognize a known person",
       "triggers": [
         {
           "service": "face",
@@ -157,6 +157,23 @@
           "activate": {
             "type": "input",
             "variable": false
+          }
+        },
+        {
+          "name" : "memory",
+          "field" : {
+            "type": "input",
+            "variable": "username"
+          },
+          "value" : {
+            "type": "service",
+            "name": "face",
+            "variable": "name"
+          },
+          "id" : {
+            "type": "service",
+            "name": "face",
+            "variable": "id"
           }
         },
         {
@@ -613,7 +630,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [20,"person-detection-know"]
+            "variable": [20,"person-detection-know-out"]
           }
         }
       ]
@@ -1414,6 +1431,23 @@
           "image": {
             "type": "input",
             "variable": "basic2"
+          }
+        },
+        {
+          "name" : "memory",
+          "field" : {
+            "type": "input",
+            "variable": "username"
+          },
+          "value" : {
+            "type": "service",
+            "name": "face",
+            "variable": "name"
+          },
+          "id" : {
+            "type": "service",
+            "name": "face",
+            "variable": "id"
           }
         },
         {

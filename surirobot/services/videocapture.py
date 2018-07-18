@@ -11,7 +11,7 @@ from surirobot.core.common import ehpyqtSlot
 
 
 class VideoCapture(QThread):
-    NB_IMG_PER_SECOND = 20
+    NB_IMG_PER_SECOND = 15
     signal_change_camera = pyqtSignal(QImage)
 
     def __init__(self):

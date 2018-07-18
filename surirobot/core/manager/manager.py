@@ -24,10 +24,7 @@ def is_parameter_encoder(element):
                 return True
             elif element.get("type") == "input":
                 return True
-            else:
-                return False
-    else:
-        return False
+    return False
 
 
 class Manager(QObject):
@@ -96,6 +93,7 @@ class Manager(QObject):
             serv_emo.signal_indicator.connect(ui.change_indicator)
             api_converse.signal_indicator.connect(ui.change_indicator)
             api_tts.signal_indicator.connect(ui.change_indicator)
+            api_nlp.signal_indicator.connect(ui.change_indicator)
 
             # Indicators default state
             self.signal_ui_indicator.emit("face", "grey")
@@ -223,7 +221,7 @@ class Manager(QObject):
         for trigger in sc["triggers"]:
             func = self.triggers[trigger["service"]][trigger["name"]]
             if func:
-                # self.logger.info("Trigger: {}".format(trigger)
+                # self.logger.info("Trigger: {}".format(trigger))
                 active = func(self, trigger)
             if not active:
                 break
@@ -245,6 +243,7 @@ class Manager(QObject):
                         for index, action in enumerate(sc["actions"]):
                             params = self.retrieve_data(action)
                             func = self.actions[action["name"]]
+                            print('{}:{}'.format(func.__name__,params))
                             if func:
                                 func(self, params)
                                 # Store remaining actions while scope is frozen

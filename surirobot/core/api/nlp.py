@@ -1,3 +1,5 @@
+import json
+
 from .base import ApiCaller
 from PyQt5.QtCore import pyqtSignal
 from surirobot.core.common import State, ehpyqtSlot
@@ -12,6 +14,7 @@ class NlpApiCaller(ApiCaller):
     https://github.com/suricats/surirobot-api-converse
     """
     update_state = pyqtSignal(str, int, dict)
+    signal_indicator = pyqtSignal(str, str)
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
@@ -46,7 +49,8 @@ class NlpApiCaller(ApiCaller):
             'value': value,
             'user_id': 'SURI{}'.format(user_id)
         }
-        r = requests.post(self.url + '/nlp/memory', data=data)
+        data = json.dumps(data)
+        r = requests.post(self.url + '/nlp/memory', data=data, headers={'Content-Type': 'application/json'})
         # Receive response
         if r.status_code != 200:
             self.logger.error('HTTP {} error occurred while updating memory.'.format(r.status_code))

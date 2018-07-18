@@ -47,12 +47,16 @@ class SttApiCaller(ApiCaller):
             self.logger.info("Sent to STT API : File - {} : {}Ko".format(file_path, os.fstat(file.fileno()).st_size / 1000))
             r = requests.post(url, files={'audio': file}, data=data)
             # Receive response
-            if r.status_code != 200:
+            if r.status_code == 200:
+                json_object = r.json()
+                self.update_state.emit("converse", State.CONVERSE_NEW,
+                                       {"intent": "@STT", "reply": json_object["text"]})
+
+            elif r.status_code == 422:
+                self.update_state.emit("converse", State.CONVERSE_NEW,
+                                       {"intent": "no-understand", "reply": "J'ai n'ai pas entendu ce que vous avez dit."})
+            else:
                 self.logger.error('HTTP {} error occurred while retrieving text.'.format(r.status_code))
                 print(r.content)
                 # self.signal_indicator.emit("converse", "orange")
                 # self.update_state.emit("converse", State.CONVERSE_NEW, {"intent": "dont-understand", "reply": "Je n'ai pas compris."})
-            else:
-                json_object = r.json()
-                self.update_state.emit("converse", State.CONVERSE_NEW,
-                                       {"intent": "@STT", "reply": json_object["text"]})

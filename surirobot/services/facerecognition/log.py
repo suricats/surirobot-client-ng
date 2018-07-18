@@ -10,7 +10,7 @@ class FaceLogger(QObject):
         QObject.__init__(self)
 
         logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
 
     @ehpyqtSlot(bool)
     def log(self, value):

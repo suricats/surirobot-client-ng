@@ -29,7 +29,7 @@ class FaceRecognition(QThread):
         QThread.__init__(self)
 
         logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
 
         self.signalPersonChanged.connect(ui.set_text_up)
 
@@ -95,8 +95,6 @@ class FaceRecognition(QThread):
                     self.stateChanged(State.FACE_MULTIPLES)
                 else:
                     # See if the face is a match for the known face(s)
-                    # print("size of array : " + str(getsizeof(self.faces)))
-                    # print("size of string : " + str(getsizeof(str(self.faces))))
                     match = face_recognition.compare_faces(self.faces, faceEncodings[0], self.tolerance)
                     id = self.UNKNOWN
                     # Transform in tuples of (index, value)
@@ -195,7 +193,7 @@ class FaceRecognition(QThread):
 
     def personChanged(self, id):
         name = self.idToName(id)
-        print(name)
+        self.logger.info('New person detected : {}'.format(name))
         self.signalPersonChanged.emit(name)
 
     def addModel(self, model):

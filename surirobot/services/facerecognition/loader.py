@@ -23,7 +23,7 @@ class FaceLoader(QThread):
         self.q = queue.Queue()
 
         logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
 
     def __del__(self):
         self.quit()
@@ -41,7 +41,6 @@ class FaceLoader(QThread):
             self.logger.info("Start loading models ....")
             self.signal_indicator.emit("face", "orange")
             r1 = requests.get(self.url + '/api/memory/users/', headers=self.headers)
-            # print(r1.json())
             users = r1.json()
             for user in users:
                 r2 = requests.get(self.url + '/api/memory/users/' + str(user.get("id")) + '/encodings/', headers=self.headers)
@@ -55,7 +54,7 @@ class FaceLoader(QThread):
             self.logger.info(str(counter) + " model(s) loaded !")
             self.signal_indicator.emit("face", "green")
         except Exception as e:
-            print("load from db : " + str(e))
+            self.logger.error("{} occurred while loading encodings.\n" + str(e))
             self.signal_indicator.emit("face", "red")
 
     def add_user(self, firstname, lastname, email, face):
@@ -83,4 +82,4 @@ class FaceLoader(QThread):
             self.new_user.emit(firstname)
             self.add_user(firstname, lastname, '', face)
         except Exception as e:
-            print("take_picture : " + str(e))
+            self.logger.error("{} occurred while creating picture for new user\n{}".format(type(e).__name__, e))

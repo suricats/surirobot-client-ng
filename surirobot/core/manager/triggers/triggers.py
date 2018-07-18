@@ -67,11 +67,14 @@ class Triggers:
             # Check new/available condition
             newParameter = input["parameters"].get("new")
             if newParameter is None or newParameter:
+                print('A')
                 if mgr.services["face"]["state"] == State.FACE_KNOWN:
+                    print('AA')
                     newCondition = True
             elif mgr.services["face"]["state"] == State.FACE_KNOWN or mgr.services["face"]["state"] == State.FACE_KNOWN_AVAILABLE:
+                print('B')
                 newCondition = True
-
+            print('C: {}'.format(mgr.services["face"]))
             # Check if regex for name is activated
             if input["parameters"].get("name"):
                 patternName = re.compile(input["parameters"]["name"])
@@ -101,6 +104,7 @@ class Triggers:
                     lastNameRegex = True
                 else:
                     lastNameRegex = False
+        print('{},{},{},{}'.format(firstNameRegex, lastNameRegex, newCondition, fullNameRegex))
         return firstNameRegex and lastNameRegex and newCondition and fullNameRegex
 
     @staticmethod

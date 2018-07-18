@@ -18,7 +18,7 @@ class NlpApiCaller(ApiCaller):
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
 
     def __del__(self):
         self.stop()
@@ -54,7 +54,7 @@ class NlpApiCaller(ApiCaller):
         # Receive response
         if r.status_code != 200:
             self.logger.error('HTTP {} error occurred while updating memory.'.format(r.status_code))
-            print(r.content)
+            self.logger.error(r.content)
             self.signal_indicator.emit("converse", "orange")
         else:
             self.logger.info('Memory updated successfully.')
@@ -90,7 +90,7 @@ class NlpApiCaller(ApiCaller):
         # Receive response
         if r.status_code != 200:
             self.logger.error('HTTP {} error occurred while retrieving nlp answer.'.format(r.status_code))
-            print(r.content)
+            self.logger.error(r.content)
             self.signal_indicator.emit("converse", "orange")
         else:
             json_object = r.json()
@@ -130,7 +130,7 @@ class NlpApiCaller(ApiCaller):
         # Receive response
         if r.status_code != 200:
             self.logger.error('HTTP {} error occurred while retrieving intent answer.'.format(r.status_code))
-            print(r.content)
+            self.logger.error(r.content)
             self.signal_indicator.emit("converse", "orange")
         else:
             json_object = r.json()

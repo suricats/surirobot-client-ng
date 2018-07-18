@@ -49,7 +49,6 @@ class Manager(QObject):
     def __init__(self):
 
         QObject.__init__(self)
-        self.debug = os.environ.get('DEBUG', True)
         self.local_voice = os.environ.get('LOCAL_VOICE', False)
         self.triggers = {}
         self.actions = {}
@@ -63,8 +62,7 @@ class Manager(QObject):
         self.win = None
         self.freeze = False
         self.remainingActions = []
-        logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(type(self).__name__)
         self.scopeChanged = False
         try:
             # INPUTS : Connect to services
@@ -144,8 +142,7 @@ class Manager(QObject):
                         self.scope += self.groups[scenario_id]
                     else:
                         raise InitialisationManagerException('invalid_type_scenario_file')
-                if self.debug:
-                    self.logger.info('Scope : {}'.format(self.scope))
+                self.logger.debug('Scope : {}'.format(self.scope))
         except Exception as e:
             raise BadEncodingScenarioFileException() from e
 
@@ -153,10 +150,9 @@ class Manager(QObject):
     def update(self, name, state, data):
         if name not in self.services_list:
             raise ManagerException('invalid_service_name', "The service {} doesn't exist.".format(name))
-        if self.debug:
-            self.logger.info('Update of scenarios from ' + name)
-            # self.logger.info('Data : {}'.format(data))
-            # self.logger.info('Scope : {}'.format(self.scope))
+        self.logger.debug('Update of scenarios from ' + name)
+        self.logger.debug('Data : {}'.format(data))
+        self.logger.debug('Scope : {}'.format(self.scope))
         self.services[name]["state"] = state
         self.services[name].update(data)
         self.check_scope()
@@ -221,7 +217,7 @@ class Manager(QObject):
         for trigger in sc["triggers"]:
             func = self.triggers[trigger["service"]][trigger["name"]]
             if func:
-                # self.logger.info("Trigger: {}".format(trigger))
+                self.logger.debug("Trigger of {}: {}".format(sc['id'], trigger))
                 active = func(self, trigger)
             if not active:
                 break
@@ -232,26 +228,23 @@ class Manager(QObject):
             if not self.freeze:
                 for scId in self.scope:
                     sc = self.scenarios[scId]
-                    # self.logger.info('Scenario : ' + str(scId))
                     if self.scopeChanged:
                         self.scopeChanged = False
                         break
                     if self.check_for_triggers(sc):
                         self.update_state(sc)
-                        if self.debug:
-                            self.logger.info('Scenario {} has been activated\n'.format(sc["id"]))
+                        self.logger.debug('Scenario {} has been activated\n'.format(sc["id"]))
                         for index, action in enumerate(sc["actions"]):
                             params = self.retrieve_data(action)
                             func = self.actions[action["name"]]
-                            print('{}:{}'.format(func.__name__,params))
+                            self.logger.debug('Action called : {}:{}'.format(func.__name__,params))
                             if func:
                                 func(self, params)
                                 # Store remaining actions while scope is frozen
                                 if self.freeze:
                                     self.remainingActions = sc["actions"][index + 1:]
-                                    if self.debug:
-                                        self.logger.info('Scenario engine has been frozen.')
-                                        self.logger.info('Remaining actions: {}'.format(self.remainingActions))
+                                    self.logger.info('Scenario engine has been frozen.')
+                                    self.logger.debug('Remaining actions: {}'.format(self.remainingActions))
                                     break
                         # Block the others scenario in the same scope
                         if self.freeze:
@@ -295,8 +288,7 @@ class Manager(QObject):
                 # Store remaining actions while scope is frozen
                 if self.freeze:
                     self.remainingActions = actions[index+1:]
-                    if self.debug:
-                        self.logger.info('Remaining actions: {}'.format(self.remainingActions))
+                    self.logger.debug('[R] Remaining actions: {}'.format(self.remainingActions))
                     break
         if not self.freeze:
             self.check_scope()
@@ -312,4 +304,4 @@ class Manager(QObject):
                     elif os.path.isdir(file_path):
                         shutil.rmtree(file_path)
                 except Exception as e:
-                    self.logger.info(e)
+                    self.logger.error('{} occurred while deleting temporary files.\n{}'.format(type(e).__name__,e))

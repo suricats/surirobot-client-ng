@@ -5,7 +5,10 @@ import traceback
 from PyQt5.QtCore import pyqtSlot
 import types
 from functools import wraps
+import logging
+
 primitives = [int, str, bool, dict, list, float, tuple, set]
+logger = logging.getLogger('COMMON')
 
 
 def rawbytes(s):
@@ -35,10 +38,10 @@ def ehpyqtSlot(*args):
             try:
                 if os.environ.get('DEBUG', False):
                     # pass
-                    print('Slot called : {}.{} : {}'.format(type(args[0]).__name__, func.__name__, [type(item).__name__ if type(item) not in primitives else '{}:{}'.format(type(item).__name__, item) for item in args[1:]]))
+                    logger.debug('Slot called : {}.{} : {}'.format(type(args[0]).__name__, func.__name__, [type(item).__name__ if type(item) not in primitives else '{}:{}'.format(type(item).__name__, item) for item in args[1:]]))
                 func(*args)
             except Exception as e:
-                print('{} occurred in slot'.format(type(e).__name__))
+                logger.error('{} occurred in slot'.format(type(e).__name__))
                 traceback.print_exc()
         return wrapper
     return slotdecorator

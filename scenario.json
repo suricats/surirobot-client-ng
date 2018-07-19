@@ -110,14 +110,6 @@
       ],
       "actions": [
         {
-          "name": "playSound",
-          "filepath": {
-            "type": "service",
-            "name": "converse",
-            "variable": "audiopath"
-          }
-        },
-        {
           "name": "changeSuriface",
           "image": {
             "type": "input",
@@ -130,6 +122,14 @@
             "type": "service",
             "name": "converse",
             "variable": "reply"
+          }
+        },
+        {
+          "name": "playSound",
+          "filepath": {
+            "type": "service",
+            "name": "converse",
+            "variable": "audiopath"
           }
         },
         {

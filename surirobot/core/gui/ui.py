@@ -122,8 +122,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         image_id : str
             ID of the image
         """
+
         image = self.load_image(self.SURIFACES_DIR + '/' + image_id + self.JPG)  # type: QImage
         self.image.setPixmap(QPixmap.fromImage(image).scaled(self.imageWidget.width(), self.imageWidget.height(), Qt.KeepAspectRatio))
+
 
     @ehpyqtSlot(QImage)
     def set_camera(self, q_img):

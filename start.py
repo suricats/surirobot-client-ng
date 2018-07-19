@@ -34,7 +34,7 @@ from surirobot.core import app
 import surirobot.services
 
 # Launch keyboard listener
-import surirobot.core.keyboard
+import surirobot.services.keyboard
 
 # Launch API callers
 import surirobot.core.api

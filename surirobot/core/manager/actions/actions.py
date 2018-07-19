@@ -187,7 +187,7 @@ class Actions:
             token = os.environ.get('API_MEMORY_TOKEN', '')
             url = os.environ.get('API_MEMORY_URL', '')
             headers = {'Authorization': 'Token ' + token}
-            r1 = requests.get(url + '/acpi/memory/sensors/last/' + params["type"] + '/', headers=headers)
+            r1 = requests.get(url + '/api/memory/sensors/last/' + params["type"] + '/', headers=headers)
             last_sensor_data = r1.json()
             if last_sensor_data:
                 mgr.services["storage"][params["output"]] = last_sensor_data["data"]

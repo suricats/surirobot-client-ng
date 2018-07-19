@@ -1,8 +1,11 @@
-from PyQt5.QtCore import QObject, QTimer, QEvent, Qt, pyqtSlot, pyqtSignal
-from PyQt5.QtWidgets import QApplication
-from surirobot.services import serv_ar, face_loader
-from surirobot.core.common import ehpyqtSlot
 import logging
+
+from PyQt5.QtCore import QObject, QTimer, QEvent, Qt, pyqtSignal
+from PyQt5.QtWidgets import QApplication
+
+from surirobot.core.common import ehpyqtSlot
+from surirobot.services import serv_ar
+
 
 class KeyPressEventHandler(QObject):
     startRecord = pyqtSignal()

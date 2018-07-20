@@ -68,6 +68,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.manualLayoutContainer.hide()
 
     def load_image(self, image_path):
+        """
+            Load image
+            Parameters
+            ----------
+            image_path : str
+
+            Returns
+            -------
+            QImage
+        """
         image = QImage()
         # print('image_path :' + str(image_path))
         image.load(image_path)
@@ -139,7 +149,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         #self.logger.debug('q_img:{},{}'.format(type(q_img).__name__, q_img.byteCount()))
         try:
-            self.camera.setPixmap(QPixmap.fromImage(q_img).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
+            self.camera.setPixmap(QPixmap.fromImage(QPixmap().fromImage(q_img))).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
+
         except Exception as e:
             self.logger.error('{} occurred while setting camera\n{}'.format(type(e).__name__, e))
 
@@ -174,7 +185,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         value : str
             Value of the indicator
         """
-        image = self.load_image(self.INDICATORS_DIR + '/' + service + '/' + value + self.PNG)
+        image = self.load_image(self.INDICATORS_DIR + '/' + service + '/' + value + self.PNG)  # type: QImage
         if not image.isNull():
             if service == "face":
                 self.faceIndicator.setPixmap(QPixmap.fromImage(image))

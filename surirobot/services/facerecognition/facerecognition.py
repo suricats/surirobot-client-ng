@@ -61,7 +61,7 @@ class FaceRecognition(QThread):
         self.knownTimer.timeout.connect(self.knownTimeout)
 
         self.stateId = self.NOBODY
-        self.pretendentId = self.NOBODY
+        self.predentent_id = self.NOBODY
 
         self.buffer = {
             'id': self.UNKNOWN,
@@ -80,43 +80,40 @@ class FaceRecognition(QThread):
 
     @ehpyqtSlot()
     def detect(self):
-        faceLocations = []
-        faceEncodings = []
-        smallFrame = serv_vc.get_frame()
-        if smallFrame is None:
+        small_frame = serv_vc.get_frame()
+        if small_frame is None:
             self.signal_indicator.emit("face", "red")
         else:
             # Find all the faces and face encodings in the current frame of video
-            faceLocations = face_recognition.face_locations(smallFrame)
+            face_locations = face_recognition.face_locations(small_frame)
             # num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)
-            faceEncodings = face_recognition.face_encodings(smallFrame, faceLocations, 2)
-            if faceEncodings:
-                if len(faceEncodings) > 1:
+            face_encodings = face_recognition.face_encodings(small_frame, face_locations, 2)
+            if face_encodings:
+                if len(face_encodings) > 1:
                     self.stateChanged(State.FACE_MULTIPLES)
                 else:
                     # See if the face is a match for the known face(s)
-                    match = face_recognition.compare_faces(self.faces, faceEncodings[0], self.tolerance)
-                    id = self.UNKNOWN
+                    match = face_recognition.compare_faces(self.faces, face_encodings[0], self.tolerance)
                     # Transform in tuples of (index, value)
                     match = list(enumerate(match))
                     match = list(filter(lambda t: t[1], match))
-                    # print('match : ' + str(match))
+                    # print('match : {}'.format(match))
                     if len(match) == 0:
-                        self.addToBuffer(self.UNKNOWN)
+                        self.add_to_buffer(self.UNKNOWN)
                     elif len(match) == 1:
-                        id = self.linker[match[0][0]]
-                        self.addToBuffer(id)
+                        face_id = self.linker[match[0][0]]
+                        self.add_to_buffer(face_id)
             else:
-                self.addToBuffer(self.NOBODY)
+                self.add_to_buffer(self.NOBODY)
         self.faceWorkLoop.setInterval(-time.time() % (1 / self.NB_IMG_PER_SECOND)*1000)
 
-    def addToBuffer(self, id):
+    def add_to_buffer(self, id):
         # Case nobody is on the camera
         if id == self.NOBODY:
-            self.pretendentId = self.NOBODY
+            self.predentent_id = self.NOBODY
             self.unknownTimer.stop()
             self.knownTimer.stop()
-            self.dataValueChanged(State.FACE_DATAVALUE_NOT_WORKING)
+            self.workingState(State.FACE_DATAVALUE_NOT_WORKING)
             if not self.nobodyTimer.isActive():
                 if self.stateId != self.NOBODY:
                     self.nobodyTimer.start()
@@ -124,7 +121,7 @@ class FaceRecognition(QThread):
 
         # Case a face is present but we don't know who is it
         elif id == self.UNKNOWN:
-            self.pretendentId = self.NOBODY
+            self.predentent_id = self.NOBODY
             self.nobodyTimer.stop()
             self.knownTimer.stop()
 
@@ -132,7 +129,7 @@ class FaceRecognition(QThread):
                 if self.stateId != self.UNKNOWN:
                     self.unknownTimer.start()
                     self.unknowElaspedTimer.start()
-                    self.dataValueChanged(State.FACE_DATAVALUE_WORKING)
+                    self.workingState(State.FACE_DATAVALUE_WORKING)
 
         # Case a know person is present
         else:
@@ -142,11 +139,11 @@ class FaceRecognition(QThread):
             if id == self.stateId:
                 self.knownTimer.stop()
             else:
-                if id != self.pretendentId:
-                    self.pretendentId = id
+                if id != self.predentent_id:
+                    self.predentent_id = id
                     self.knownTimer.start()
                     self.knowElaspedTimer.start()
-                    self.dataValueChanged(State.FACE_DATAVALUE_WORKING)
+                    self.workingState(State.FACE_DATAVALUE_WORKING)
 
     @ehpyqtSlot()
     def nobodyTimeout(self):
@@ -164,10 +161,10 @@ class FaceRecognition(QThread):
     @ehpyqtSlot()
     def knownTimeout(self):
         self.signal_indicator.emit("face", "green")
-        if (not self.pretendentId == self.NOBODY) and (not self.pretendentId == self.UNKNOWN):
-            self.logger.info('Detection of ' + str(self.pretendentId))
-            self.stateId = self.pretendentId
-            self.pretendentId = self.NOBODY
+        if (not self.predentent_id == self.NOBODY) and (not self.predentent_id == self.UNKNOWN):
+            self.logger.info('Detection of ' + str(self.predentent_id))
+            self.stateId = self.predentent_id
+            self.predentent_id = self.NOBODY
             self.personChanged(self.stateId)
             self.stateChanged(State.FACE_KNOWN, self.stateId)
         else:
@@ -185,9 +182,19 @@ class FaceRecognition(QThread):
             }
         self.update_state.emit(self.MODULE_NAME, state, data)
 
-    def dataValueChanged(self, datavalue):
+    def workingState(self, working):
+        """
+            Change the working state of the face service
+            Parameters
+            ----------
+            working : bool
+
+            Returns
+            -------
+            None
+        """
         data = {
-            'datavalue':  datavalue
+            'working':  working
         }
         self.update_state.emit(self.MODULE_NAME, State.NO_STATE, data)
 

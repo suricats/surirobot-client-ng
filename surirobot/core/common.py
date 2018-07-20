@@ -12,7 +12,16 @@ logger = logging.getLogger('COMMON')
 
 
 def rawbytes(s):
-    """Convert a string to raw bytes without encoding"""
+    """
+    Convert a string to raw bytes without encoding
+    Parameters
+    ----------
+    s : str
+
+    Returns
+    -------
+    bytearray
+    """
     outlist = []
     for cp in s:
         num = ord(cp)
@@ -34,12 +43,11 @@ def ehpyqtSlot(*args):
     @pyqtSlot(*args)
     def slotdecorator(func):
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*wargs, **wkwargs):
             try:
-                if os.environ.get('DEBUG', False):
-                    # pass
-                    logger.debug('Slot called : {}.{} : {}'.format(type(args[0]).__name__, func.__name__, [type(item).__name__ if type(item) not in primitives else '{}:{}'.format(type(item).__name__, item) for item in args[1:]]))
-                func(*args)
+                if (int(os.environ.get('DEBUG', '0')) in [0, 1] and not (func.__name__ == 'set_camera' or (type(wargs[0]).__name__ == 'VideoCapture' and func.__name__ == 'detect'))) or int(os.environ.get('DEBUG', '0')) >= 2:
+                    logger.debug('Slot called : {}.{} : {}'.format(type(wargs[0]).__name__, func.__name__, [type(item).__name__ if type(item) not in primitives else '{}:{}'.format(type(item).__name__, item) for item in wargs[1:]]))
+                func(*wargs)
             except Exception as e:
                 logger.error('{} occurred in slot'.format(type(e).__name__))
                 traceback.print_exc()
@@ -47,7 +55,7 @@ def ehpyqtSlot(*args):
     return slotdecorator
 
 
-class Dir():
+class Dir:
     BASE = os.getcwd()
     TMP = BASE + '/tmp/'
     DATA = BASE + '/data/'
@@ -55,7 +63,7 @@ class Dir():
     LOG = BASE + '/log/'
 
 
-class State():
+class State:
     """
     List all the states that services can have
     """

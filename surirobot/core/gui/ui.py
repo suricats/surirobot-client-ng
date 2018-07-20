@@ -137,7 +137,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         q_img : QImage
             ID of the image
         """
-        self.logger.debug('q_img:{},{}'.format(type(q_img).__name__, q_img.byteCount()))
+        #self.logger.debug('q_img:{},{}'.format(type(q_img).__name__, q_img.byteCount()))
         try:
             self.camera.setPixmap(QPixmap.fromImage(q_img).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
         except Exception as e:

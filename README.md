@@ -16,6 +16,8 @@ cd dlib
 python3 setup.py install --yes USE_AVX_INSTRUCTIONS --no DLIB_USE_CUDA
 cd .. && rm -rf dlib
 ```
+Create a symlink on libespeak.dylib :
+`cd /usr/local/lib/ && ln -s libespeak.dylib libespeak.so.1`
 
 ## Installation under ubuntu
 

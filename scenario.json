@@ -244,7 +244,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [-2,"converse","special-persons","person-detection","emotion-detection"]
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]
@@ -1685,7 +1685,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [-2, 0, "converse", "person-detection", "emotion-detection"]
+            "variable": ["converse", "person-detection", "emotion-detection"]
           }
         }
       ]

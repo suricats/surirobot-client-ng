@@ -106,7 +106,7 @@ class Manager(QObject):
 
         scenario_filepath = os.environ.get("SCENARIO_PATH")
         if scenario_filepath:
-            self.load_scenario_file("/scenario.json")
+            self.load_scenario_file(scenario_filepath)
         else:
             raise InitialisationManagerException("scenario_filepath")
 
@@ -123,7 +123,7 @@ class Manager(QObject):
 
     def load_scenario_file(self, filepath=None):
         try:
-            with open(Dir.BASE + filepath) as filepath:
+            with open(Dir.BASE + '/' + filepath) as filepath:
                 json_file = json.load(filepath)
                 json_scenarios = json_file["scenarios"]
                 self.scenarios = {}

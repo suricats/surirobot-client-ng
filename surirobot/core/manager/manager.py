@@ -153,7 +153,8 @@ class Manager(QObject):
         self.logger.debug('Update of scenarios from ' + name)
         self.logger.debug('Data : {}'.format(data))
         self.logger.debug('Scope : {}'.format(self.scope))
-        self.services[name]["state"] = state
+        if state != State.NO_STATE:
+            self.services[name]["state"] = state
         self.services[name].update(data)
         self.check_scope()
 

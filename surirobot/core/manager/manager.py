@@ -59,6 +59,7 @@ class Manager(QObject):
         self.scope = []
         self.groups = {}
         self.scenarios = {}
+        self.templates = {}
         self.win = None
         self.freeze = False
         self.remainingActions = []
@@ -134,6 +135,8 @@ class Manager(QObject):
                 # Load groups of scenarios
                 self.groups = json_file["groups"]
                 self.logger.info('Loaded {} groups of scenarios.'.format(len(self.groups)))
+                self.templates = json_file["templates"]
+                self.logger.info('Loaded {} templates.'.format(len(self.templates)))
                 # Load initial scope
                 for scenario_id in json_file["initial"]:  # type: [str,int]
                     if type(scenario_id) is int:
@@ -235,7 +238,21 @@ class Manager(QObject):
                     if self.check_for_triggers(sc):
                         self.update_state(sc)
                         self.logger.debug('Scenario {} has been activated\n'.format(sc["id"]))
-                        for index, action in enumerate(sc["actions"]):
+                        # Retrieve layouts
+                        actions = sc["actions"]
+                        before_actions = []
+                        after_actions = []
+                        if sc.get('templates'):
+                            for template_name in sc['templates']:
+                                if self.templates.get(template_name):
+                                    if self.templates[template_name].get('before'):
+                                        before_actions += self.templates[template_name]['before']
+                                    if self.templates[template_name].get('after'):
+                                        after_actions += self.templates[template_name]['after']
+                                else:
+                                    raise ManagerException('check_scope_error', 'Invalid template name {} in scenario n°{}'.format(template_name, sc['id']))
+                        actions = before_actions + actions + after_actions
+                        for index, action in enumerate(actions):
                             params = self.retrieve_data(action)
                             func = self.actions[action["name"]]
                             self.logger.debug('Action called : {}:{}'.format(func.__name__,params))
@@ -243,7 +260,7 @@ class Manager(QObject):
                                 func(self, params)
                                 # Store remaining actions while scope is frozen
                                 if self.freeze:
-                                    self.remainingActions = sc["actions"][index + 1:]
+                                    self.remainingActions = actions[index + 1:]
                                     self.logger.info('Scenario engine has been frozen.')
                                     self.logger.debug('Remaining actions: {}'.format(self.remainingActions))
                                     break

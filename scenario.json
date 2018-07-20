@@ -8,107 +8,11 @@
     "person-detection-know-out" : [3,9],
     "face-working" : [11,12]
   },
-  "actions" : [
-    {
-      "id": 1,
-      "description" : "Action"
-    }
-  ],
-
-  "scenarios": [
-    {
-      "id": 0,
-      "description": "Wait for audio - recognize person",
-      "triggers": [
-        {
-          "service": "sound",
-          "name": "new",
-          "parameters": {}
-        },
-        {
-          "service": "face",
-          "name": "know",
-          "parameters" : {
-            "new": false
-          }
-        }
-      ],
-      "actions": [
-        {
-          "name": "converse",
-          "filepath": {
-            "type": "service",
-            "name": "sound",
-            "variable": "filepath"
-          },
-          "id": {
-            "type": "service",
-            "name": "face",
-            "variable": "id"
-          }
-        },
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "computing2"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse"]
-          }
-        }
-      ]
-    },
-    {
-      "id": 1,
-      "description": "Wait for audio",
-      "triggers": [
-        {
-          "service": "sound",
-          "name": "new",
-          "parameters": {}
-        }
-      ],
-      "actions": [
-        {
-          "name": "converse",
-          "filepath": {
-            "type": "service",
-            "name": "sound",
-            "variable": "filepath"
-          }
-        },
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "computing2"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse"]
-          }
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "description": "Wait for converse",
-      "triggers": [
-        {
-          "service": "converse",
-          "name": "new",
-          "parameters": {}
-        }
-      ],
-      "actions": [
+  "templates" :
+  {
+    "base" : {
+      "description": "Base template",
+      "before": [
         {
           "name": "changeSuriface",
           "image": {
@@ -117,48 +21,149 @@
           }
         },
         {
-          "name": "displayText",
-          "text": {
-            "type": "service",
-            "name": "converse",
-            "variable": "reply"
-          }
-        },
-        {
-          "name": "playSound",
-          "filepath": {
-            "type": "service",
-            "name": "converse",
-            "variable": "audiopath"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["face-working","converse","special-persons","person-detection","emotion-detection"]
-          }
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "description": "Recognize a known person",
-      "triggers": [
-        {
-          "service": "face",
-          "name": "know",
-          "parameters": {}
-        }
-      ],
-      "actions": [
-        {
           "name": "activateKeyboardInput",
           "activate": {
             "type": "input",
             "variable": false
           }
+        }
+      ]
+    },
+    "computing": {
+      "description": "Computing template",
+      "after" : [
+        {
+          "name": "changeSuriface",
+          "image": {
+            "type": "input",
+            "variable": "computing2"
+          }
+        }
+      ]
+    },
+    "take-picture": {
+      "description": "Take picture template",
+      "after": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Très bien {@firstname} {@lastname}. Je vais prendre une photo maintenant ! Prépare toi !"
+          },
+          "variables": [
+            {
+              "firstname": {
+                "type": "service",
+                "name": "storage",
+                "variable": "firstname"
+              }
+            },
+            {
+              "lastname": {
+                "type": "service",
+                "name": "storage",
+                "variable": "lastname"
+              }
+            }
+          ]
         },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 5000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "3"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "2"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "1"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Cheese !"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "picture",
+          "firstname": {
+            "type": "service",
+            "name": "storage",
+            "variable": "firstname"
+          },
+          "lastname": {
+            "type": "service",
+            "name": "storage",
+            "variable": "lastname"
+          }
+
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },
+    "recognize-face": {
+      "description": "Layout for recognizing someone while saying a specific message",
+      "before": [
         {
           "name" : "memory",
           "field" : {
@@ -177,34 +182,14 @@
           }
         },
         {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Bonjour {@firstname} {@lastname}. Voici vos notifications :"
-          },
-          "variables": [{
-            "firstname": {
-              "type": "service",
-              "name": "face",
-              "variable": "firstname"
-            }
-          },
-            {
-              "lastname": {
-                "type": "service",
-                "name": "face",
-                "variable": "lastname"
-              }
-            }
-          ]
-        },
-        {
           "name": "changeSuriface",
           "image": {
             "type" : "input",
             "variable": "happy2"
           }
-        },
+        }
+      ],
+      "after": [
         {
           "name": "speak",
           "text": {
@@ -248,10 +233,156 @@
           }
         }
       ]
+    }
+  },
+  "scenarios": [
+    {
+      "id": 0,
+      "description": "Wait for audio - recognize person",
+      "templates" : ["base", "computing"],
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        },
+        {
+          "service": "face",
+          "name": "know",
+          "parameters" : {
+            "new": false
+          }
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          },
+          "id": {
+            "type": "service",
+            "name": "face",
+            "variable": "id"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "description": "Wait for audio",
+      "templates" : ["base", "computing"],
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "converse",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "description": "Wait for converse",
+      "templates" : ["base"],
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "service",
+            "name": "converse",
+            "variable": "reply"
+          }
+        },
+        {
+          "name": "playSound",
+          "filepath": {
+            "type": "service",
+            "name": "converse",
+            "variable": "audiopath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["face-working","converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "description": "Recognize a known person",
+      "templates" : ["base"],
+      "triggers": [
+        {
+          "service": "face",
+          "name": "know",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Bonjour {@firstname} {@lastname}. Voici vos notifications :"
+          },
+          "variables": [{
+            "firstname": {
+              "type": "service",
+              "name": "face",
+              "variable": "firstname"
+            }
+          },
+            {
+              "lastname": {
+                "type": "service",
+                "name": "face",
+                "variable": "lastname"
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "id": 4,
       "description": "Detect a unknown person",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "face",
@@ -287,6 +418,7 @@
     {
       "id": 5,
       "description": "Wait for audio when an unknow person is recognized",
+      "templates" : ["base", "computing"],
       "triggers": [
         {
           "service": "sound",
@@ -315,6 +447,7 @@
     {
       "id": 6,
       "description": "Wait for converse : yes - unknow person",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -431,6 +564,7 @@
     {
       "id": 9,
       "description": "Nobody on front of camera (someone just leaved)",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "face",
@@ -439,14 +573,6 @@
         }
       ],
       "actions": [
-        {
-          "name": "activateKeyboardInput",
-          "activate": {
-            "type": "input",
-            "variable": false
-          }
-
-        },
         {
           "name": "displayText",
           "text": {
@@ -481,6 +607,7 @@
     {
       "id": 10,
       "description": "Too many known people",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "face",
@@ -489,14 +616,6 @@
         }
       ],
       "actions": [
-        {
-          "name": "activateKeyboardInput",
-          "activate": {
-            "type": "input",
-            "variable": false
-          }
-
-        },
         {
           "name": "displayText",
           "text": {
@@ -575,6 +694,7 @@
     {
       "id": 20,
       "description": "Listen for lastname",
+      "templates" : ["base", "computing"],
       "triggers": [
         {
           "service": "sound",
@@ -603,6 +723,7 @@
     {
       "id": 21,
       "description": "Don't understand - unknow person lastname",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -638,6 +759,7 @@
     {
       "id": 22,
       "description": "Confirm name",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -694,6 +816,7 @@
     {
       "id": 23,
       "description": "Listen for confirmation lastname",
+      "templates" : ["base", "computing"],
       "triggers": [
         {
           "service": "sound",
@@ -722,6 +845,7 @@
     {
       "id": 24,
       "description": "Confirm name - yes",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -808,6 +932,7 @@
     {
       "id": 26,
       "description": "Don't understand - unknow person lastname confirmation",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -843,6 +968,7 @@
     {
       "id": 27,
       "description": "Listen for firstname",
+      "templates" : ["base", "computing"],
       "triggers": [
         {
           "service": "sound",
@@ -851,13 +977,6 @@
         }
       ],
       "actions": [
-        {
-          "name": "activateKeyboardInput",
-          "activate": {
-            "type": "input",
-            "variable": false
-          }
-        },
         {
           "name": "listen",
           "filepath": {
@@ -878,6 +997,7 @@
     {
       "id": 28,
       "description": "Don't understand - unknow person firstname",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -913,6 +1033,7 @@
     {
       "id": 29,
       "description": "Confirm firstname",
+      "templates" : ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -969,6 +1090,7 @@
     {
       "id": 30,
       "description": "Listen for confirmation firstname",
+      "templates" : ["base", "computing"],
       "triggers": [
         {
           "service": "sound",
@@ -997,6 +1119,7 @@
     {
       "id": 31,
       "description": "Confirm firstname - yes - TAKE PICTURE",
+      "templates" : ["base", "take-picture"],
       "triggers": [
         {
           "service": "converse",
@@ -1006,130 +1129,7 @@
           }
         }
       ],
-      "actions": [
-        {
-          "name": "activateKeyboardInput",
-          "activate": {
-            "type": "input",
-            "variable": false
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Très bien {@firstname} {@lastname}. Je vais prendre une photo maintenant ! Prépare toi !"
-          },
-          "variables": [
-            {
-              "firstname": {
-                "type": "service",
-                "name": "storage",
-                "variable": "firstname"
-              }
-            },
-            {
-              "lastname": {
-                "type": "service",
-                "name": "storage",
-                "variable": "lastname"
-              }
-            }
-          ]
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 5000
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "3"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "2"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "1"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Cheese !"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
-        {
-          "name": "picture",
-          "firstname": {
-            "type": "service",
-            "name": "storage",
-            "variable": "firstname"
-          },
-          "lastname": {
-            "type": "service",
-            "name": "storage",
-            "variable": "lastname"
-          }
-
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        }
-      ]
+      "actions": []
     },
     {
       "id": 32,
@@ -1183,6 +1183,7 @@
     {
       "id": 33,
       "description": "Don't understand - unknow person firstname confirmation",
+      "templates": ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -1270,6 +1271,7 @@
     {
       "id": 35,
       "description": "Wait for keyboard input - firstname - TAKE PICTURE",
+      "templates": ["base", "take-picture"],
       "triggers": [
         {
           "service": "keyboard",
@@ -1287,134 +1289,13 @@
               "variable": "text"
             }
           }
-        },
-        {
-          "name": "activateKeyboardInput",
-          "activate": {
-            "type": "input",
-            "variable": false
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Très bien {@firstname} {@lastname}. Je vais prendre une photo maintenant ! Prépare toi !"
-          },
-          "variables": [
-            {
-              "firstname": {
-                "type": "service",
-                "name": "storage",
-                "variable": "firstname"
-              }
-            },
-            {
-              "lastname": {
-                "type": "service",
-                "name": "storage",
-                "variable": "lastname"
-              }
-            }
-          ]
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 5000
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "3"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "2"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "1"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Cheese !"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
-        {
-          "name": "picture",
-          "firstname": {
-            "type": "service",
-            "name": "storage",
-            "variable": "firstname"
-          },
-          "lastname": {
-            "type": "service",
-            "name": "storage",
-            "variable": "lastname"
-          }
-
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
         }
       ]
     },
     {
       "id": 1001,
       "description": "Recognize his creator",
+      "templates": ["base", "recognize-face"],
       "triggers": [
         {
           "service": "face",
@@ -1427,84 +1308,18 @@
       ],
       "actions": [
         {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic2"
-          }
-        },
-        {
-          "name" : "memory",
-          "field" : {
-            "type": "input",
-            "variable": "username"
-          },
-          "value" : {
-            "type": "service",
-            "name": "face",
-            "variable": "name"
-          },
-          "id" : {
-            "type": "service",
-            "name": "face",
-            "variable": "id"
-          }
-        },
-        {
           "name": "displayText",
           "text": {
             "type": "input",
             "variable": "Bonjour créateur. Voici vos notifications"
           }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        },
-        {
-          "name": "wait",
-          "time": {
-            "type" : "input",
-            "variable": 2000
-          }
-        },
-        {
-          "name": "notifications"
-        },
-        {
-          "name": "displayText",
-          "text":
-          {
-            "type": "service",
-            "name": "storage",
-            "variable": "@notifications"
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
         }
-
       ]
     },
     {
       "id": 1002,
       "description": "Recognize a founder of Suricats",
+      "templates": ["base", "recognize-face"],
       "triggers": [
         {
           "service": "face",
@@ -1517,32 +1332,10 @@
       ],
       "actions": [
         {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic2"
-          }
-        },
-        {
           "name": "displayText",
           "text": {
             "type": "input",
-            "variable": "Oh un fantastique ! Que puis-je faire pour vous ?"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
+            "variable": "Oh un fantastique ! Voici vos notifications :"
           }
         }
       ]
@@ -1550,6 +1343,7 @@
     {
       "id": 1003,
       "description": "Recognize Loic Steer",
+      "templates": ["base", "recognize-face"],
       "triggers": [
         {
           "service": "face",
@@ -1562,32 +1356,10 @@
       ],
       "actions": [
         {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic2"
-          }
-        },
-        {
           "name": "displayText",
           "text": {
             "type": "input",
             "variable": "Yo Loïc ! ça boum ma poule ?"
-          }
-        },
-        {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@text"
           }
         }
       ]
@@ -1595,6 +1367,7 @@
     {
       "id": 2000,
       "description": "Ask for operations",
+      "templates": ["base"],
       "triggers": [{
         "service": "converse",
         "name": "new",
@@ -1602,20 +1375,7 @@
           "intent": "ask-operations"
         }
       }],
-      "actions": [{
-        "name": "activateKeyboardInput",
-        "activate": {
-          "type": "input",
-          "variable": false
-        }
-      },
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic"
-          }
-        },
+      "actions": [
         {
           "name": "displayText",
           "text": {
@@ -1694,6 +1454,7 @@
     {
       "id": 2001,
       "description": "Ask for temperature",
+      "templates": ["base"],
       "triggers": [{
         "service": "converse",
         "name": "new",
@@ -1701,20 +1462,7 @@
           "intent": "ask-temperature"
         }
       }],
-      "actions": [{
-        "name": "activateKeyboardInput",
-        "activate": {
-          "type": "input",
-          "variable": false
-        }
-      },
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic"
-          }
-        },
+      "actions": [
         {
           "name": "giveSensorData",
           "type": {
@@ -1762,6 +1510,7 @@
     {
       "id": 2002,
       "description": "Ask for humidity",
+      "templates": ["base"],
       "triggers": [{
         "service": "converse",
         "name": "new",
@@ -1769,20 +1518,7 @@
           "intent": "ask-humidity"
         }
       }],
-      "actions": [{
-        "name": "activateKeyboardInput",
-        "activate": {
-          "type": "input",
-          "variable": false
-        }
-      },
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic"
-          }
-        },
+      "actions": [
         {
           "name": "giveSensorData",
           "type": {
@@ -1830,6 +1566,7 @@
     {
       "id": 3000,
       "description": "SAD - Joke : ask",
+      "templates": ["base"],
       "triggers": [
         {
           "service": "emotion",
@@ -1881,6 +1618,7 @@
     {
       "id": 3001,
       "description": "SAD - Joke : wait",
+      "templates": ["base", "computing"],
       "triggers": [
         {
           "service": "sound",
@@ -1938,6 +1676,7 @@
     {
       "id": 3003,
       "description": "SAD - Joke : tell",
+      "templates": ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -1946,13 +1685,6 @@
         }
       ],
       "actions": [
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "basic2"
-          }
-        },
         {
           "name": "displayText",
           "text": {
@@ -1981,6 +1713,7 @@
     {
       "id": 3004,
       "description": "SAD - Joke : denied",
+      "templates": ["base"],
       "triggers": [
         {
           "service": "converse",
@@ -2025,6 +1758,7 @@
     {
       "id": 3005,
       "description": "SAD - Joke : don't understand",
+      "templates": ["base"],
       "triggers": [
         {
           "service": "converse",

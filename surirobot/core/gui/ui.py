@@ -1,10 +1,11 @@
+import logging
+
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette
 from PyQt5.QtWidgets import QMainWindow
 
 from surirobot.core.common import State, ehpyqtSlot
 from .mainwindow import Ui_MainWindow
-import logging
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -136,7 +137,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         image = self.load_image(self.SURIFACES_DIR + '/' + image_id + self.JPG)  # type: QImage
         self.image.setPixmap(QPixmap.fromImage(image).scaled(self.imageWidget.width(), self.imageWidget.height(), Qt.KeepAspectRatio))
 
-
     @ehpyqtSlot(QImage)
     def set_camera(self, q_img):
         """
@@ -147,9 +147,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         q_img : QImage
             ID of the image
         """
-        #self.logger.debug('q_img:{},{}'.format(type(q_img).__name__, q_img.byteCount()))
+        # self.logger.debug('q_img:{},{}'.format(type(q_img).__name__, q_img.byteCount()))
         try:
-            self.camera.setPixmap(QPixmap.fromImage(QImage=q_img).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
+            self.camera.setPixmap(QPixmap.fromImage(q_img).scaled(self.cameraFrame.width(), self.cameraFrame.height(), Qt.KeepAspectRatio))
 
         except Exception as e:
             self.logger.error('{} occurred while setting camera\n{}'.format(type(e).__name__, e))

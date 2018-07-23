@@ -16,18 +16,17 @@ class ConverseApiCaller(ApiCaller):
 
     https://github.com/suricats/surirobot-api-converse
     """
-    play_sound = pyqtSignal(str)
     update_state = pyqtSignal(str, int, dict)
     signal_indicator = pyqtSignal(str, str)
 
     def __init__(self, url):
         ApiCaller.__init__(self, url)
-        self.local_voice = os.environ.get('LOCAL_VOICE', False)
-        self.play_sound.connect(serv_ap.play)
+        self.local_voice = bool(int(os.environ.get('LOCAL_VOICE', '0')))
         self.logger = logging.getLogger(type(self).__name__)
 
     def __del__(self):
         self.stop()
+
 
     @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
@@ -67,8 +66,13 @@ class ConverseApiCaller(ApiCaller):
                 self.signal_indicator.emit("converse", "red")
                 message = "Oh mince ! Je ne fonctionne plus très bien :("
                 filename = Dir.DATA + "error.wav"
-                self.update_state.emit("converse", State.CONVERSE_NEW,
-                                       {"intent": "error", "reply": message, "audiopath": filename})
+                if self.local_voice:
+                    self.update_state.emit("converse", State.CONVERSE_NEW,
+                                           {"intent": "error", "reply": message, "local": True})
+
+                else:
+                    self.update_state.emit("converse", State.CONVERSE_NEW,
+                                           {"intent": "error", "reply": message, "audiopath": filename})
             else:
                 # Text response
                 if self.local_voice:
@@ -78,7 +82,7 @@ class ConverseApiCaller(ApiCaller):
                     message = json_object.get('message', '.')
                     self.signal_indicator.emit("converse", "green")
                     self.update_state.emit("converse", State.CONVERSE_NEW,
-                                           {"intent": intent, "reply": message, "audiopath": message})
+                                           {"intent": intent, "reply": message, "local": True})
                 # Audio response
                 else:
                     json_header = json.loads(r.headers['JSON'])

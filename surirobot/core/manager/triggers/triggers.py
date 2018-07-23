@@ -73,14 +73,10 @@ class Triggers:
                 # Check new/available condition
                 newParameter = input["parameters"].get("new")
                 if newParameter is None or newParameter:
-                    logger.debug('TEMP : new true')
                     if mgr.services["face"]["state"] == State.FACE_KNOWN:
-                        logger.debug('TEMP : new true known')
                         new_condition = True
                 elif mgr.services["face"]["state"] == State.FACE_KNOWN or mgr.services["face"]["state"] == State.FACE_KNOWN_AVAILABLE:
-                    logger.debug('TEMP : new false know/available')
                     new_condition = True
-                logger.debug('TEMP : face_service {}'.format(mgr.services["face"]))
                 # Check if regex for name is activated
                 if input["parameters"].get("name"):
                     patternName = re.compile(input["parameters"]["name"])

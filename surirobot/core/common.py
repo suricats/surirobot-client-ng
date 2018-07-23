@@ -46,7 +46,7 @@ def ehpyqtSlot(*args):
         def wrapper(*wargs, **wkwargs):
             try:
                 if (int(os.environ.get('DEBUG', '0')) in [0, 1] and not (func.__name__ == 'set_camera' or (type(wargs[0]).__name__ == 'VideoCapture' and func.__name__ == 'detect'))) or int(os.environ.get('DEBUG', '0')) >= 2:
-                    logger.debug('Slot called : {}.{} : {}'.format(type(wargs[0]).__name__, func.__name__, [type(item).__name__ if type(item) not in primitives else '{}:{}'.format(type(item).__name__, item) for item in wargs[1:]]))
+                    logger.debug('Slot called : {}.{} ({}) : {}'.format(type(wargs[0]).__name__, func.__name__, [item.__name__ for item in args], [type(item).__name__ if type(item) not in primitives else '{}:{}'.format(type(item).__name__, item) for item in wargs[1:]]))
                 func(*wargs)
             except Exception as e:
                 logger.error('{} occurred in slot'.format(type(e).__name__))

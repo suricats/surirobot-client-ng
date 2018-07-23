@@ -1,19 +1,18 @@
-from logging import Logger
-
-from surirobot.services import serv_ap, serv_fr, face_loader
-from surirobot.core import ui
-from .exceptions import ActionException, NotFoundActionException, MissingParametersActionException
-
-from PyQt5.QtCore import QTimer
-import pyqtgraph as pg
-
-import os
-import requests
-import re
-import time
-from dateutil import parser
 import datetime
 import logging
+import os
+import re
+import time
+from logging import Logger
+
+import pyqtgraph as pg
+import requests
+from PyQt5.QtCore import QTimer
+from dateutil import parser
+
+from surirobot.core import ui
+from surirobot.services import serv_fr, face_loader
+from .exceptions import ActionException, NotFoundActionException, MissingParametersActionException
 
 logger = logging.getLogger('Actions')  # type: Logger
 
@@ -27,8 +26,9 @@ class Actions:
         try:
             self.actions["playSound"] = self.play_sound
             self.actions["converse"] = self.converse
-            self.actions["converseAnswer"] = self.converse_answer
+            self.actions["converseText"] = self.converse_text
             self.actions["callScenarios"] = self.call_scenarios
+            self.actions["encodeText"] = self.encode_text
             self.actions["displayText"] = self.display_text
             self.actions["speak"] = self.speak
             self.actions["wait"] = self.wait_for
@@ -50,6 +50,11 @@ class Actions:
 
     @staticmethod
     def wait_for(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params.get("time"):
             mgr.freeze = True
             QTimer.singleShot(params["time"], mgr.resume_manager)
@@ -58,6 +63,11 @@ class Actions:
 
     @staticmethod
     def store(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params.get("list"):
             output_list = mgr.retrieve_data(params["list"])
             mgr.services["storage"].update(output_list)
@@ -66,6 +76,11 @@ class Actions:
 
     @staticmethod
     def add_picture_with_user(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params.get("firstname") and params.get("lastname"):
             face_loader.take_picture_new_user(params["firstname"], params["lastname"])
         else:
@@ -73,13 +88,25 @@ class Actions:
 
     @staticmethod
     def play_sound(mgr, params):
-        if params.get("filepath"):
-            serv_ap.play(params["filepath"])
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get("local") and params.get("message"):
+            mgr.signal_audio_play.emit(params["message"], True)
+        elif params.get("filepath"):
+            mgr.signal_audio_play.emit(params["filepath"], False)
         else:
             raise MissingParametersActionException("playSound", 'filepath')
 
     @staticmethod
-    def display_text(mgr, params):
+    def encode_text(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         text = params.get("text")
         if text:
             if type(text) is str:
@@ -95,16 +122,35 @@ class Actions:
                                     str_list[index] = element["value"]
                 text = ""
                 text = text.join(str_list)
-                ui.set_text_middle(text)
+                # Store the encoded text in special variable 'text'
                 mgr.services["storage"]["@text"] = text
             else:
                 raise ActionException("displayText",
                                       "Type of argument 'text' is not str but {}.".format(type(text).__name__))
         else:
+            raise MissingParametersActionException("encodeText", 'text')
+
+    @staticmethod
+    def display_text(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get("text"):
+            # Store the encoded text in special variable 'displayed_text'
+            mgr.services["storage"]["@displayed_text"] = params["text"]
+            ui.set_text_middle(params["text"])
+        else:
             raise MissingParametersActionException("displayText", 'text')
 
     @staticmethod
     def speak(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params.get("text"):
             mgr.signal_tts_request.emit(params["text"])
         else:
@@ -112,6 +158,11 @@ class Actions:
 
     @staticmethod
     def converse(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params.get("filepath"):
             if params.get("id"):
                 mgr.signal_nlp_memory.emit("username", serv_fr.idToName(params["id"]), params["id"])
@@ -122,17 +173,27 @@ class Actions:
             raise MissingParametersActionException("converse", 'id')
 
     @staticmethod
-    def converse_answer(mgr, params):
+    def converse_text(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params.get("intent"):
             if params.get("id"):
                 mgr.signal_nlp_answer_with_id.emit(params["intent"], params["id"])
             else:
                 mgr.signal_nlp_answer.emit(params["intent"])
         else:
-            raise MissingParametersActionException("converseAnswer", 'intent')
+            raise MissingParametersActionException("converseText", 'intent')
 
     @staticmethod
     def converse_update_memory(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params.get("field") and params.get("value") and params.get("id"):
             mgr.signal_nlp_memory.emit(params["field"], params["value"], params["id"])
         else:
@@ -140,6 +201,11 @@ class Actions:
 
     @staticmethod
     def listen(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params.get("filepath"):
             mgr.signal_stt_request.emit(params["filepath"])
         else:
@@ -147,6 +213,11 @@ class Actions:
 
     @staticmethod
     def change_suriface(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params.get("image"):
             mgr.signal_ui_suriface.emit(params["image"])
         else:
@@ -154,6 +225,11 @@ class Actions:
 
     @staticmethod
     def activate_keyboard_input(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if not (params.get("activate") is None):
             if params["activate"]:
                 ui.activateManualButton.show()
@@ -168,6 +244,11 @@ class Actions:
 
     @staticmethod
     def call_scenarios(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         id_table = params["id"]
         mgr.scope = []
         for scenario_id in id_table:
@@ -183,6 +264,11 @@ class Actions:
 
     @staticmethod
     def give_sensor_data(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         if params["type"] and params["output"]:
             token = os.environ.get('API_MEMORY_TOKEN', '')
             url = os.environ.get('API_MEMORY_URL', '')
@@ -228,6 +314,11 @@ class Actions:
 
     @staticmethod
     def retrieve_notifications(mgr, params):
+        """
+
+        :param params: dict
+        :type mgr: Manager
+        """
         text = ''
         token = os.environ.get('API_MEMORY_TOKEN', '')
         url = os.environ.get('API_MEMORY_URL', '')

@@ -15,13 +15,13 @@ class TtsApiCaller(ApiCaller):
 
     https://github.com/suricats/surirobot-api-converse
     """
-    play_sound = pyqtSignal(str)
+    play_sound = pyqtSignal(str, bool)
     signal_indicator = pyqtSignal(str, str)
 
     def __init__(self, text):
         ApiCaller.__init__(self, text)
         self.logger = logging.getLogger(type(self).__name__)
-        self.local_voice = os.environ.get('LOCAL_VOICE', False)
+        self.local_voice = bool(int(os.environ.get('LOCAL_VOICE', False)))
         self.play_sound.connect(serv_ap.play)
 
     def __del__(self):
@@ -51,7 +51,7 @@ class TtsApiCaller(ApiCaller):
             # tts = gTTS(text=text, lang="fr", slow=False)
             # tts.save(data_audio)
             # self.play_sound.emit(audio_file)
-            self.play_sound.emit(text)
+            self.play_sound.emit(text, True)
         else:
             # Json request
             data = {
@@ -74,7 +74,7 @@ class TtsApiCaller(ApiCaller):
                 self.logger.info("Sound file generated at : {}".format(filename))
                 file.close()
                 # Play the audio
-                self.play_sound.emit(filename)
+                self.play_sound.emit(filename, False)
 
     def start(self):
         ApiCaller.start(self)

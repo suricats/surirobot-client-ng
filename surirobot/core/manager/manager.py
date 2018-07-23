@@ -10,7 +10,7 @@ from surirobot.core import ui
 from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core.common import State, Dir, ehpyqtSlot
 from surirobot.core.gui.progressbarupdater import progressBarUpdater
-from surirobot.services import serv_fr, serv_ar, face_loader, serv_emo
+from surirobot.services import serv_fr, serv_ar, face_loader, serv_emo, serv_ap
 from .actions.actions import mgr_actions
 from .exceptions import ManagerException, InitialisationManagerException, BadEncodingScenarioFileException, \
     TypeNotAllowedInDataRetrieverException
@@ -40,6 +40,7 @@ class Manager(QObject):
     signal_stt_request = pyqtSignal(str)
     signal_ui_suriface = pyqtSignal(str)
     signal_ui_indicator = pyqtSignal(str, str)
+    signal_audio_play = pyqtSignal(str, bool)
 
     def __new__(cls):
         if cls.__instance__ is None:
@@ -49,7 +50,7 @@ class Manager(QObject):
     def __init__(self):
 
         QObject.__init__(self)
-        self.local_voice = os.environ.get('LOCAL_VOICE', False)
+        self.local_voice = bool(int(os.environ.get('LOCAL_VOICE', False)))
         self.triggers = {}
         self.actions = {}
         self.services = {}
@@ -84,6 +85,7 @@ class Manager(QObject):
             self.signal_tts_request.connect(api_tts.speak)
             self.signal_ui_suriface.connect(ui.set_image)
             self.signal_nlp_memory.connect(api_nlp.memory)
+            self.signal_audio_play.connect(serv_ap.play)
 
             # OUTPUTS : Connect to interface
             self.signal_ui_indicator.connect(ui.change_indicator)
@@ -243,6 +245,7 @@ class Manager(QObject):
                         before_actions = []
                         after_actions = []
                         if sc.get('templates'):
+                            self.logger.debug('Templates detected  : {}'.format(sc['templates']))
                             for template_name in sc['templates']:
                                 if self.templates.get(template_name):
                                     if self.templates[template_name].get('before'):
@@ -252,6 +255,7 @@ class Manager(QObject):
                                 else:
                                     raise ManagerException('check_scope_error', 'Invalid template name {} in scenario n°{}'.format(template_name, sc['id']))
                         actions = before_actions + actions + after_actions
+                        self.logger.debug('List of actions : {}'.format(actions))
                         for index, action in enumerate(actions):
                             params = self.retrieve_data(action)
                             func = self.actions[action["name"]]

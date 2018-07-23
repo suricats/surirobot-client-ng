@@ -45,7 +45,7 @@
       "description": "Take picture template",
       "after": [
         {
-          "name": "displayText",
+          "name": "encodeText",
           "text": {
             "type": "input",
             "variable": "Très bien {@firstname} {@lastname}. Je vais prendre une photo maintenant ! Prépare toi !"
@@ -68,11 +68,19 @@
           ]
         },
         {
-          "name": "speak",
+          "name": "displayText",
           "text": {
             "type": "service",
             "name": "storage",
             "variable": "@text"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
           }
         },
         {
@@ -195,7 +203,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -222,7 +230,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -332,6 +340,16 @@
             "type": "service",
             "name": "converse",
             "variable": "audiopath"
+          },
+          "local": {
+            "type": "service",
+            "name": "converse",
+            "variable": "local"
+          },
+          "message": {
+            "type": "service",
+            "name": "converse",
+            "variable": "reply"
           }
         },
         {
@@ -346,7 +364,7 @@
     {
       "id": 3,
       "description": "Recognize a known person",
-      "templates" : ["base"],
+      "templates" : ["base", "recognize-face"],
       "triggers": [
         {
           "service": "face",
@@ -356,7 +374,7 @@
       ],
       "actions": [
         {
-          "name": "displayText",
+          "name": "encodeText",
           "text": {
             "type": "input",
             "variable": "Bonjour {@firstname} {@lastname}. Voici vos notifications :"
@@ -376,6 +394,14 @@
               }
             }
           ]
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
         }
       ]
     },
@@ -403,7 +429,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -470,7 +496,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -507,7 +533,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -549,7 +575,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -592,7 +618,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -635,7 +661,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -744,7 +770,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -771,7 +797,7 @@
       ],
       "actions": [
         {
-          "name": "displayText",
+          "name": "encodeText",
           "text": {
             "type": "input",
             "variable": "J'ai compris {@name}. C'est bien ça ?"
@@ -787,11 +813,19 @@
           ]
         },
         {
-          "name": "speak",
+          "name": "displayText",
           "text": {
             "type": "service",
             "name": "storage",
             "variable": "@text"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
           }
         },
         {
@@ -868,7 +902,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -917,7 +951,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -953,7 +987,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1018,7 +1052,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1045,7 +1079,7 @@
       ],
       "actions": [
         {
-          "name": "displayText",
+          "name": "encodeText",
           "text": {
             "type": "input",
             "variable": "J'ai compris {@name}. C'est bien ça ?"
@@ -1059,6 +1093,14 @@
               }
             }
           ]
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
         },
         {
           "name": "speak",
@@ -1168,7 +1210,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1204,7 +1246,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1246,7 +1288,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1388,7 +1430,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1475,7 +1517,7 @@
           }
         },
         {
-          "name": "displayText",
+          "name": "encodeText",
           "text": {
             "type": "input",
             "variable": "Il fait actuellement {@last_temperature}°C."
@@ -1490,11 +1532,19 @@
           ]
         },
         {
-          "name": "speak",
+          "name": "displayText",
           "text": {
             "type": "service",
             "name": "storage",
             "variable": "@text"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1531,7 +1581,7 @@
           }
         },
         {
-          "name": "displayText",
+          "name": "encodeText",
           "text": {
             "type": "input",
             "variable": "L'humidité est actuellement à {@last_humidity}%."
@@ -1546,11 +1596,19 @@
           ]
         },
         {
-          "name": "speak",
+          "name": "displayText",
           "text": {
             "type": "service",
             "name": "storage",
             "variable": "@text"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1610,7 +1668,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         }
       ]
@@ -1658,7 +1716,7 @@
       ],
       "actions": [
         {
-          "name": "converseAnswer",
+          "name": "converseText",
           "intent": {
             "type": "input",
             "variable": "Raconte moi une blague"
@@ -1698,7 +1756,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1736,7 +1794,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1779,7 +1837,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         },
         {
@@ -1810,7 +1868,7 @@
       ],
       "actions": [
         {
-          "name": "displayText",
+          "name": "encodeText",
           "text": {
             "type": "input",
             "variable": "{@firstname}, ça me fait plaisir de voir que tu es heureux aujourd'hui :)"
@@ -1826,6 +1884,14 @@
           ]
         },
         {
+          "name": "displayText",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
           "name": "callScenarios",
           "id": {
             "type": "input",
@@ -1837,7 +1903,7 @@
           "text": {
             "type": "service",
             "name": "storage",
-            "variable": "@text"
+            "variable": "@displayed_text"
           }
         }
       ]

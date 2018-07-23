@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QThread, pyqtSlot
+from PyQt5.QtCore import QThread, QObject
 import logging
 import simpleaudio as sa
 import subprocess
@@ -10,14 +10,18 @@ import pyttsx3
 import asyncio
 
 
-class AudioPlayer(QThread):
+class AudioPlayer(QObject):
+    playObj = ...  # type: WaveObject
+
     def __init__(self):
-        QThread.__init__(self)
+        QObject.__init__(self)
+        self.currentThread = QThread()
+        self.moveToThread(self.currentThread)
 
         self.logger = logging.getLogger(type(self).__name__)
         self.playObj = None
 
-        self.local_voice = os.environ.get('LOCAL_VOICE', False)
+        self.local_voice = bool(int(os.environ.get('LOCAL_VOICE', False)))
         self.engine = pyttsx3.init(driverName='espeak')
         self.engine.setProperty('rate', 150)
         self.engine.setProperty('voice', 'french')  # changes the voice
@@ -25,20 +29,27 @@ class AudioPlayer(QThread):
     def __del__(self):
         try:
             self.stop()
-            self.quit()
-        except Exception:
+            self.currentThread.quit()
+        except Exception as e:
+            print(e)
             print('Stopping audio player.')
-            pass
+
+    def start(self, priority=None):
+        """
+        Start the thread of the API caller
+        """
+        self.currentThread.start(priority)
 
     @ehpyqtSlot()
     def stop(self):
         if self.playObj:
             self.playObj.stop()
-            self.logger.info('Stop playing.')
+            # self.logger.info('Stop playing.')
 
+    @ehpyqtSlot(str, bool)
     @ehpyqtSlot(str)
-    def play(self, data):
-        if self.local_voice:
+    def play(self, data, local=False):
+        if local:
             self.engine.say(data)
             self.engine.runAndWait()
         else:

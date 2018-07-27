@@ -1,11 +1,6 @@
 from PyQt5.QtCore import QThread
 
 
-# Start VideoCapture
-from surirobot.services.videocapture import VideoCapture
-serv_vc = VideoCapture()
-serv_vc.start()
-
 # Start FaceRecognition
 from surirobot.services.facerecognition import FaceRecognition
 serv_fr = FaceRecognition()
@@ -16,17 +11,14 @@ from surirobot.services.facerecognition.loader import FaceLoader
 face_loader = FaceLoader()
 face_loader.start(QThread.LowestPriority)
 
-# Start AudioPlayer
-from surirobot.services.audioplayer import AudioPlayer
-serv_ap = AudioPlayer()
-serv_ap.start(QThread.HighestPriority)
-
-# Start AudioRecorder
-from surirobot.services.audiorecorder import AudioRecorder
-serv_ar = AudioRecorder()
-serv_ar.start()
-
 # Start EmotionalRecognition
 from surirobot.services.emotional import EmotionalRecognition
 serv_emo = EmotionalRecognition()
 serv_emo.start()
+
+# Start Keyboard listener
+from surirobot.services.keyboard import KeyPressEventHandler
+from surirobot.core import ui
+
+serv_keyboard = KeyPressEventHandler()
+ui.installEventFilter(serv_keyboard)

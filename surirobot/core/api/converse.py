@@ -1,13 +1,14 @@
-from .base import ApiCaller
-from PyQt5.QtCore import QFile, QIODevice, pyqtSignal
-import uuid
-from surirobot.services import serv_ap
-from surirobot.core.common import State, Dir, ehpyqtSlot
-import os
 import json
+import logging
+import os
+import uuid
+
 # from gtts import gTTS
 import requests
-import logging
+from PyQt5.QtCore import QFile, QIODevice, pyqtSignal
+
+from surirobot.core.common import State, Dir, ehpyqtSlot
+from .base import ApiCaller
 
 
 class ConverseApiCaller(ApiCaller):

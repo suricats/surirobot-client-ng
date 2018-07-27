@@ -1,7 +1,7 @@
 from .base import ApiCaller
 from PyQt5.QtCore import QFile, QIODevice, pyqtSignal
 import uuid
-from surirobot.services import serv_ap
+from surirobot.devices import serv_ap
 from surirobot.core.common import ehpyqtSlot
 import os
 import requests

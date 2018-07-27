@@ -10,7 +10,8 @@ from surirobot.core import ui
 from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
 from surirobot.core.common import State, Dir, ehpyqtSlot
 from surirobot.core.gui.progressbarupdater import progressBarUpdater
-from surirobot.services import serv_fr, serv_ar, face_loader, serv_emo, serv_ap
+from surirobot.services import serv_fr, face_loader, serv_emo
+from surirobot.devices import serv_ar, serv_ap
 from .actions.actions import mgr_actions
 from .exceptions import ManagerException, InitialisationManagerException, BadEncodingScenarioFileException, \
     TypeNotAllowedInDataRetrieverException

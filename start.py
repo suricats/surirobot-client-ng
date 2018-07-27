@@ -30,14 +30,18 @@ else:
 # Launch GUI
 from surirobot.core import app
 
+# Launch device services
+import surirobot.devices
+# Launch API callers
+import surirobot.core.api
+
 # Launch services
 import surirobot.services
 
 # Launch keyboard listener
-import surirobot.services.keyboard
 
-# Launch API callers
-import surirobot.core.api
+
+
 
 # Launch manager
 from surirobot.core.manager import manager

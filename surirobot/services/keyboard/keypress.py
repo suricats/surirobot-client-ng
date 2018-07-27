@@ -4,7 +4,7 @@ from PyQt5.QtCore import QObject, QTimer, QEvent, Qt, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 
 from surirobot.core.common import ehpyqtSlot
-from surirobot.services import serv_ar
+from surirobot.devices import serv_ar
 
 
 class KeyPressEventHandler(QObject):

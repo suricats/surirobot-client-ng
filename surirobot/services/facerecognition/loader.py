@@ -2,13 +2,15 @@ from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal
 import logging
 import queue
 import uuid
-from surirobot.services import serv_fr, serv_vc
+from surirobot.services import serv_fr
+from surirobot.devices import serv_vc
+from surirobot.core.api import api_memory
 from surirobot.core.common import Dir, ehpyqtSlot
 import cv2
 import os
 import requests
 import face_recognition
-
+import traceback
 
 class FaceLoader(QThread):
     signal_indicator = pyqtSignal(str, str)
@@ -40,11 +42,9 @@ class FaceLoader(QThread):
             counter = 0
             self.logger.info("Start loading models ....")
             self.signal_indicator.emit("face", "orange")
-            r1 = requests.get(self.url + '/api/memory/users/', headers=self.headers)
-            users = r1.json()
+            users = api_memory.get_users()
             for user in users:
-                r2 = requests.get(self.url + '/api/memory/users/' + str(user.get("id")) + '/encodings/', headers=self.headers)
-                models = r2.json()
+                models = api_memory.get_encodings(user.get("id"))
                 for model in models:
                     counter += 1
                     model["user"] = user
@@ -54,17 +54,20 @@ class FaceLoader(QThread):
             self.logger.info(str(counter) + " model(s) loaded !")
             self.signal_indicator.emit("face", "green")
         except Exception as e:
-            self.logger.error("{} occurred while loading encodings.\n" + str(e))
+            self.logger.error("{} occurred while loading encodings.\n{}.".format(type(e).__name__, e))
+            traceback.print_exc()
             self.signal_indicator.emit("face", "red")
 
     def add_user(self, firstname, lastname, email, face):
-        r1 = requests.post(self.url + '/api/memory/users/', {"firstname": firstname, "lastname": lastname, "email": email}, headers=self.headers)
-        user = r1.json()
-        r2 = requests.post(self.url + '/api/memory/encodings/', {"value": " ".join(map(str, face)), "user": user["id"]}, headers=self.headers)
-        model = r2.json()
-        # model["path"] = list(model["path"])
-        model['user'] = user
-        self.q.put(model)
+        try:
+            user = api_memory.add_user(firstname, lastname, email)
+            model = api_memory.add_encoding(face, user['id'])
+            model['user'] = user
+            self.q.put(model)
+        except Exception as e:
+            self.logger.error("{} occurred while adding user.\n{}.".format(type(e).__name__, e))
+            traceback.print_exc()
+            self.signal_indicator.emit("face", "orange")
 
     @ehpyqtSlot(str, str)
     def take_picture_new_user(self, firstname, lastname):
@@ -83,3 +86,4 @@ class FaceLoader(QThread):
             self.add_user(firstname, lastname, '', face)
         except Exception as e:
             self.logger.error("{} occurred while creating picture for new user\n{}".format(type(e).__name__, e))
+            traceback.print_exc()

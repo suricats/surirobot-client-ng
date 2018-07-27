@@ -32,3 +32,9 @@ if nlp_url:
     api_nlp.start()
 else:
     raise URLNotDefinedAPIException('NLP')
+
+from .memory import MemoryApiCaller
+memory_url = os.environ.get('API_MEMORY_URL')
+if memory_url:
+    api_memory = MemoryApiCaller(memory_url)
+    api_memory.start()

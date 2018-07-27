@@ -4,7 +4,7 @@ import time
 import os
 import cv2
 import uuid
-from surirobot.services import serv_vc
+from surirobot.devices import serv_vc
 from surirobot.core.api.emotional import EmotionalAPICaller
 from surirobot.core.api.exceptions import URLNotDefinedAPIException
 from surirobot.core.common import Dir, ehpyqtSlot

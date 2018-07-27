@@ -4,7 +4,7 @@ import logging
 import time
 import face_recognition
 from surirobot.core import ui
-from surirobot.services import serv_vc
+from surirobot.devices import serv_vc
 from surirobot.core.common import State, ehpyqtSlot
 from sys import getsizeof
 

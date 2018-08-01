@@ -98,12 +98,13 @@ class MemoryApiCaller(ApiCaller):
         """
         # Send request
         data = {"firstname": firstname, "lastname": lastname}
+
         if email:
             data['email'] = email
-        r = requests.post(self.url + '/api/memory/users/', data, headers=self.headers)
+        r = requests.post(self.url + '/api/memory/users/', json=data, headers=self.headers)
 
         # Receive response
-        if r.status_code == 200:
+        if r.status_code == 201 or r.status_code == 200:
             user = r.json()
             self.new_user.emit(user)
             return user
@@ -127,12 +128,14 @@ class MemoryApiCaller(ApiCaller):
             This function send a user dictionary and signal
         """
         # Send request
-        r = requests.post(self.url + '/api/memory/encodings/', {"value": " ".join(map(str, face)), "user": user_id}, headers=self.headers)
+        data = {"value": " ".join(map(str, face)), "user": user_id}
+        r = requests.post(self.url + '/api/memory/encodings/', json=data, headers=self.headers)
 
         # Receive response
-        if r.status_code == 200:
+        if r.status_code == 201 or r.status_code==200:
             model = r.json()
             self.new_encoding.emit(model)
+            print(model)
             return model
         else:
             self.logger.error('HTTP {} error occurred while adding encoding.'.format(r.status_code))

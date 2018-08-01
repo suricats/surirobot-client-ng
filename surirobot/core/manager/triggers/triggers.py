@@ -106,14 +106,14 @@ class Triggers:
                         last_name_regex = True
                     else:
                         last_name_regex = False
-        logger.debug('know_person_trigger : {},{},{},{}'.format(first_name_regex, last_name_regex, new_condition, full_name_regex))
+        # logger.debug('know_person_trigger : {},{},{},{}'.format(first_name_regex, last_name_regex, new_condition, full_name_regex))
         return first_name_regex and last_name_regex and new_condition and full_name_regex
 
     @staticmethod
     def nobodyTrigger(mgr, input):
         if mgr.services.get("face"):
             # TODO: Implement regex parameters
-            if mgr.services["face"]["state"] == State.FACE_NOBODY:
+            if mgr.services["face"].get("state") == State.FACE_NOBODY:
                 return True
         return False
 

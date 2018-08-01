@@ -34,8 +34,10 @@ class FaceLoader(QThread):
         self.load_from_db()
 
         while True:
+            self.logger.debug('BEGIN LOOP')
             model = self.q.get()
             serv_fr.addModel(model)
+            self.logger.debug('END LOOP')
 
     def load_from_db(self):
         try:

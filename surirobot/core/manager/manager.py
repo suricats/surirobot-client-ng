@@ -156,9 +156,10 @@ class Manager(QObject):
     def update(self, name, state, data):
         if name not in self.services_list:
             raise ManagerException('invalid_service_name', "The service {} doesn't exist.".format(name))
-        self.logger.debug('Update of scenarios from ' + name)
-        self.logger.debug('Data : {}'.format(data))
-        self.logger.debug('Scope : {}'.format(self.scope))
+        if int(os.environ.get('DEBUG', '0')) >= 2 or (int(os.environ.get('DEBUG', '0')) == 1 and name != 'face' and 'working' not in data):
+            self.logger.debug('Update of scenarios from ' + name)
+            self.logger.debug('Data : {}'.format(data))
+            self.logger.debug('Scope : {}'.format(self.scope))
         if state != State.NO_STATE:
             self.services[name]["state"] = state
         self.services[name].update(data)

@@ -39,19 +39,29 @@ class progressBarUpdater(QThread):
         try:
             # Main loop
             while True:
+                self.logger.debug('BEGIN LOOP')
                 # Case:
                 if self.timer.isActive():
+                    self.logger.debug('A')
                     if self.bar.isHidden():
+                        self.logger.debug('AA')
                         self.bar.show()
                     if self.text:
+                        self.logger.debug('AB')
                         if self.text.isHidden():
+                            self.logger.debug('ABA')
                             self.text.show()
+                    self.logger.debug('BEFORE VALUE')
                     value = (self.counter.elapsed() / self.timer.interval()) * 100
+                    self.logger.debug('AFTER VALUE')
                     self.bar.setValue(value)
                 elif not self.bar.isHidden():
+                    self.logger.debug('B')
                     self.bar.hide()
                     if self.text:
+                        self.logger.debug('BA')
                         self.text.hide()
                 time.sleep(0.01)
+                self.logger.debug('END LOOP')
         except Exception as e:
             self.logger.error('{} occurred in progressBarUpdater.\n{} '.format(type(e).__name__, e))

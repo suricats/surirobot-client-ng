@@ -37,6 +37,7 @@ class AudioRecorder(QThread):
 
     def run(self):
         while True:
+            self.logger.debug('BEGIN LOOP')
             elm = self.list.get()
             self.recording = True
             self.logger.info('Now starting record')
@@ -55,6 +56,7 @@ class AudioRecorder(QThread):
             # self.end_record.emit(elm['filename'])
             self.logger.info('Calling scenario manager...')
             self.update_state.emit("sound", State.SOUND_NEW, {"filepath": elm['filename']})
+            self.logger.debug('END LOOP')
 
     @ehpyqtSlot()
     def start_record(self):

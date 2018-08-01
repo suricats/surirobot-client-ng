@@ -52,7 +52,7 @@ class SttApiCaller(ApiCaller):
                 self.update_state.emit("converse", State.CONVERSE_NEW,
                                        {"intent": "@STT", "reply": json_object["text"]})
 
-            elif r.status_code == 422:
+            elif r.status_code == 503:
                 self.update_state.emit("converse", State.CONVERSE_NEW,
                                        {"intent": "no-understand", "reply": "J'ai n'ai pas entendu ce que vous avez dit."})
             else:

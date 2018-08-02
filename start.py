@@ -10,18 +10,26 @@ import time
 
 if int(os.environ.get('DEBUG', '0')):
     print('DEBUG MODE : on')
+    if int(os.environ.get('LOG', '0')):
+        logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(name)-12.12s][%(levelname)-5.5s]  %(message)s")
+        rootLogger = logging.getLogger()
+        rootLogger.setLevel(level=logging.DEBUG)
+        filename = '{}{}.txt'.format(Dir.LOG, time.strftime("%Y_%m_%d_%H_%M_%S"))
+        fileHandler = logging.FileHandler(filename)
+        fileHandler.setFormatter(logFormatter)
+        rootLogger.addHandler(fileHandler)
 
-    logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(name)-12.12s][%(levelname)-5.5s]  %(message)s")
-    rootLogger = logging.getLogger()
-    rootLogger.setLevel(level=logging.DEBUG)
-    filename = '{}{}.txt'.format(Dir.LOG, time.strftime("%Y_%m_%d_%H_%M_%S"))
-    fileHandler = logging.FileHandler(filename)
-    fileHandler.setFormatter(logFormatter)
-    rootLogger.addHandler(fileHandler)
+        consoleHandler = logging.StreamHandler()
+        consoleHandler.setFormatter(logFormatter)
+        rootLogger.addHandler(consoleHandler)
+    else:
+        logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(name)-12.12s][%(levelname)-5.5s]  %(message)s")
+        rootLogger = logging.getLogger()
+        rootLogger.setLevel(level=logging.DEBUG)
+        consoleHandler = logging.StreamHandler()
+        consoleHandler.setFormatter(logFormatter)
+        rootLogger.addHandler(consoleHandler)
 
-    consoleHandler = logging.StreamHandler()
-    consoleHandler.setFormatter(logFormatter)
-    rootLogger.addHandler(consoleHandler)
 
 else:
     print('DEBUG MODE : off')

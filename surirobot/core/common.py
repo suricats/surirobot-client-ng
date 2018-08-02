@@ -1,15 +1,41 @@
+import logging
 import os
-
 import struct
+import time
 import traceback
-from PyQt5.QtCore import pyqtSlot
 import types
 from functools import wraps
-import logging
+
+from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
 
 primitives = [int, str, bool, dict, list, float, tuple, set]
 logger = logging.getLogger('COMMON')
 
+class QSuperTimer(QTimer):
+    started = pyqtSignal()
+    stopped = pyqtSignal()
+    def __init__(self):
+        QTimer.__init__(self)
+        self.start_time = 0
+
+    def start(self, p_int=None):
+        self.start_time = time.time()
+        if p_int:
+            super().start(p_int)
+        else:
+            super().start()
+        self.started.emit()
+    def stop(self):
+        super().stop()
+        self.stopped.emit()
+
+    def elapsed(self):
+        """
+        Return the elapsed time in msec
+        :return: float
+        """
+        diff = time.time() - self.start_time
+        return diff * 1000
 
 def rawbytes(s):
     """

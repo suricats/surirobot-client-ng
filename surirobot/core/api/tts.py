@@ -5,6 +5,7 @@ from surirobot.devices import serv_ap
 from surirobot.core.common import ehpyqtSlot
 import os
 import requests
+import json
 import logging
 # from gtts import gTTS
 
@@ -58,8 +59,8 @@ class TtsApiCaller(ApiCaller):
                 'text': text,
                 'language': self.DEFAULT_LANGUAGE_EXT
             }
-            print('url: {}'.format(self.url))
-            r = requests.post(self.url + '/tts/speak', data=data)
+            data = json.dumps(data)
+            r = requests.post(self.url + '/tts/speak', data=data, headers={'Content-Type': 'application/json'})
             # Receive response
             if r.status_code != 200:
                 self.logger.error('HTTP {} error occurred while retrieving audio.\n{}'.format(r.status_code, r.content))

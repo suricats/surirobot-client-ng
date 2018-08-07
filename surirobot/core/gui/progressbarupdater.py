@@ -78,7 +78,6 @@ class progressBarUpdater(QThread):
         if not self.bar.isHidden():
             self.bar.hide()
             if self.text:
-                self.logger.debug('BA')
                 self.text.hide()
 
 

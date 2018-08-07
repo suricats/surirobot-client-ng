@@ -1,5 +1,6 @@
 import logging
 import os
+import io
 import platform
 
 # Local TTS engine
@@ -62,9 +63,14 @@ class AudioPlayer(QObject):
                     self.logger.info('Audio is deactivated in MAC OS')
                 else:
                     self.stop()
-                    waveObj = sa.WaveObject.from_wave_file(data)
+                    try:
+                        file_b = io.BytesIO(open(data, 'rb').read())
+                    except:
+                        self.logger.error("Can't read file : ".format(data))
+                        raise Exception("Can't read file : ".format(data))
+                    wave_obj = sa.WaveObject.from_wave_file(file_b)
+                    print(wave_obj)
                     self.logger.info('Now playing {}.'.format(data))
-                    self.playObj = waveObj.play()
+                    self.playObj = wave_obj.play()
             except Exception as e:
-                self.logger.info('{} occurred while playing audio\n{}'.format(type(e).__name__, e))
-
+                self.logger.error('{} occurred while playing audio\n{}'.format(type(e).__name__, e))

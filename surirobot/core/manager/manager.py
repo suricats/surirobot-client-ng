@@ -133,11 +133,11 @@ class Manager(QObject):
 
         # Connect to progress bars
         try:
-            self.know_updater = progressBarUpdater(ui.knowProgressBar, serv_fr.knownTimer, serv_fr.knowElaspedTimer, ui.knowProgressText)
+            self.know_updater = progressBarUpdater(bar=ui.knowProgressBar, timer=serv_fr.knownTimer, text=ui.knowProgressText)
             self.know_updater.start()
-            self.unknow_updater = progressBarUpdater(ui.unknowProgressBar, serv_fr.unknownTimer, serv_fr.unknowElaspedTimer, ui.unknowProgressText)
+            self.unknow_updater = progressBarUpdater(bar=ui.unknowProgressBar, timer=serv_fr.unknownTimer, text=ui.unknowProgressText)
             self.unknow_updater.start()
-            self.nobody_updater = progressBarUpdater(ui.nobodyProgressBar, serv_fr.nobodyTimer, serv_fr.nobodyElaspedTimer, ui.nobodyProgressText)
+            self.nobody_updater = progressBarUpdater(bar=ui.nobodyProgressBar, timer=serv_fr.nobodyTimer, text=ui.nobodyProgressText)
             self.nobody_updater.start()
         except Exception as e:
             raise InitialisationManagerException("progress_bar_updater[{}]".format(type(e).__name__)) from e

@@ -11,6 +11,9 @@ from surirobot.core.common import State, ehpyqtSlot
 
 
 class AudioRecorder(QThread):
+    """
+    Threaded service that record audio
+    """
     started_record = pyqtSignal()
     end_record = pyqtSignal(str)
 

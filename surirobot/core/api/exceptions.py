@@ -1,4 +1,8 @@
 class BaseAPIException(Exception):
+    """
+    Base class of API exceptions
+
+    """
     status_code = 500
 
     def __init__(self, code='api_error', msg='Unexpected error', type='unknown'):

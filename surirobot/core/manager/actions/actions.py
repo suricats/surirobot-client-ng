@@ -1,16 +1,15 @@
 import datetime
 import logging
-import os
 import re
 import time
 from logging import Logger
 
 import pyqtgraph as pg
-import requests
 from PyQt5.QtCore import QTimer
 from dateutil import parser
 
 from surirobot.core import ui
+from surirobot.core.api import api_memory
 from surirobot.services import serv_fr, face_loader
 from .exceptions import ActionException, NotFoundActionException, MissingParametersActionException
 
@@ -51,6 +50,7 @@ class Actions:
     @staticmethod
     def wait_for(mgr, params):
         """
+        Wait for [time] seconds.
 
         :param params: dict
         :type mgr: Manager
@@ -64,6 +64,9 @@ class Actions:
     @staticmethod
     def store(mgr, params):
         """
+        Store a list of variables in the storage service
+        The output variable name is the name of the key in [list] dictionnary
+        The input variable is taken using the parameter encoder
 
         :param params: dict
         :type mgr: Manager
@@ -77,6 +80,7 @@ class Actions:
     @staticmethod
     def add_picture_with_user(mgr, params):
         """
+        Take a picture of the camera and create a new user with [firstname] and [lastname]
 
         :param params: dict
         :type mgr: Manager
@@ -103,6 +107,7 @@ class Actions:
     @staticmethod
     def encode_text(mgr, params):
         """
+        Encode the [text] and store it in storage.@text
 
         :param params: dict
         :type mgr: Manager
@@ -133,6 +138,7 @@ class Actions:
     @staticmethod
     def display_text(mgr, params):
         """
+        Display the [text] and store the result in storage.@displayed_text
 
         :param params: dict
         :type mgr: Manager
@@ -147,6 +153,7 @@ class Actions:
     @staticmethod
     def speak(mgr, params):
         """
+        Translate [text] in sound and play it.
 
         :param params: dict
         :type mgr: Manager
@@ -159,6 +166,7 @@ class Actions:
     @staticmethod
     def converse(mgr, params):
         """
+        Call Converse API audio endpoint with [filepath] (and [id])
 
         :param params: dict
         :type mgr: Manager
@@ -175,6 +183,7 @@ class Actions:
     @staticmethod
     def converse_text(mgr, params):
         """
+        Call Converse API text endpoint with [filepath] (and [id])
 
         :param params: dict
         :type mgr: Manager
@@ -190,6 +199,7 @@ class Actions:
     @staticmethod
     def converse_update_memory(mgr, params):
         """
+        Update the memory of conversation with [field], [value] and [id]
 
         :param params: dict
         :type mgr: Manager
@@ -202,6 +212,7 @@ class Actions:
     @staticmethod
     def listen(mgr, params):
         """
+        Translate file in [filepath] in text
 
         :param params: dict
         :type mgr: Manager
@@ -214,6 +225,7 @@ class Actions:
     @staticmethod
     def change_suriface(mgr, params):
         """
+        Change the avatar with the [image] id
 
         :param params: dict
         :type mgr: Manager
@@ -226,6 +238,7 @@ class Actions:
     @staticmethod
     def activate_keyboard_input(mgr, params):
         """
+        Activate or deactivate keyboard input box depending on [activate] value.
 
         :param params: dict
         :type mgr: Manager
@@ -245,6 +258,7 @@ class Actions:
     @staticmethod
     def call_scenarios(mgr, params):
         """
+        Change the script tree with all scenario's or group's id in [id] list
 
         :param params: dict
         :type mgr: Manager
@@ -265,31 +279,24 @@ class Actions:
     @staticmethod
     def give_sensor_data(mgr, params):
         """
+        Store [type] sensor information in storage.[output]
 
         :param params: dict
         :type mgr: Manager
         """
         if params["type"] and params["output"]:
-            token = os.environ.get('API_MEMORY_TOKEN', '')
-            url = os.environ.get('API_MEMORY_URL', '')
-            headers = {'Authorization': 'Token ' + token}
-            r1 = requests.get(url + '/api/memory/sensors/last/' + params["type"] + '/', headers=headers)
-            last_sensor_data = r1.json()
+            last_sensor_data = api_memory.get_last_sensor(params["type"])
             if last_sensor_data:
                 mgr.services["storage"][params["output"]] = last_sensor_data["data"]
 
             # Display a nice plot of the last 24 hours
             time_to = int(time.time())
-            date_from = datetime.datetime.fromtimestamp(time_to)
-            date_from = date_from.replace(hour=0, minute=0, second=0)
+            date_from = datetime.datetime.fromtimestamp(time_to).replace(hour=0, minute=0, second=0)
             date_to = date_from.replace(day=date_from.day + 1)
             time_from = int(date_from.timestamp())
             time_to = int(date_to.timestamp())
-            r2 = requests.get(
-                url + '/api/memory/sensors/' + str(time_from) + '/' + str(time_to) + '/' + params["type"] + '/',
-                headers=headers)
             # sensors_data = [x for x in r1.json() if x["type"] == params["type"]]
-            sensors_data = r2.json()
+            sensors_data = api_memory.get_sensors(sensor_type=type, t_from=time_from, t_to=time_to)
             if sensors_data:
                 x = []
                 y = []
@@ -315,18 +322,16 @@ class Actions:
     @staticmethod
     def retrieve_notifications(mgr, params):
         """
+        Store notifications in storage.@notifications
 
         :param params: dict
         :type mgr: Manager
         """
         text = ''
-        token = os.environ.get('API_MEMORY_TOKEN', '')
-        url = os.environ.get('API_MEMORY_URL', '')
-        headers = {'Authorization': 'Token ' + token}
-        r = requests.get(url + '/api/notifications', headers=headers)
-        for notification in r.json():
+        notifs = api_memory.get_notifications()
+        for notification in notifs:
             if notification.get('type') == 'message' and notification.get('target') == 'all':
-                text += notification.get('data', '')
+                text += notification.get('data', '') + '\n'
 
         # Store the notifications
         mgr.services['storage']['@notifications'] = text if text else "Vous n'avez aucune notification"

@@ -19,6 +19,20 @@ from .triggers.triggers import mgr_triggers
 
 
 def is_parameter_encoder(element):
+    """
+    Check if element is a parameter encoder
+
+    Example:
+    "text":{"type": "service", "name": "storage", "variable": "@text"}
+
+    Parameters
+    ----------
+    element : object
+
+    Returns
+    -------
+    bool
+    """
     if type(element) is dict:
         if element.get("type") is not None and element.get("variable") is not None:
             if element.get("type") == "service" and element.get("name") is not None:
@@ -29,6 +43,9 @@ def is_parameter_encoder(element):
 
 
 class Manager(QObject):
+    """
+    Manage all services, devices and api callers around scenarios and scopes
+    """
     __instance__ = None
     # Signals
     services_list = ["face", "emotion", "converse", "sound", "storage", "keyboard"]
@@ -103,16 +120,16 @@ class Manager(QObject):
             self.signal_ui_indicator.emit("converse", "grey")
 
             # Generate actions and triggers
-            self.triggers = mgr_triggers.generateTriggers(self.services)
+            self.triggers = mgr_triggers.generate_triggers(self.services)
             self.actions = mgr_actions.generate_actions()
         except Exception as e:
             raise InitialisationManagerException("connecting_signals[{}]".format(type(e).__name__)) from e
 
-        scenario_filepath = os.environ.get("SCENARIO_PATH")
-        if scenario_filepath:
-            self.load_scenario_file(scenario_filepath)
+        scenario_file_path = os.environ.get("SCENARIO_PATH")
+        if scenario_file_path:
+            self.load_scenario_file(scenario_file_path)
         else:
-            raise InitialisationManagerException("scenario_filepath")
+            raise InitialisationManagerException("scenario_file_path")
 
         # Connect to progress bars
         try:
@@ -125,10 +142,18 @@ class Manager(QObject):
         except Exception as e:
             raise InitialisationManagerException("progress_bar_updater[{}]".format(type(e).__name__)) from e
 
-    def load_scenario_file(self, filepath=None):
+    def load_scenario_file(self, file_path=None):
+        """
+        Load scenarios, groups, templates and initial scope from json file
+
+        Parameters
+        ----------
+        file_path : str
+            The path of the json file.
+        """
         try:
-            with open(Dir.BASE + '/' + filepath) as filepath:
-                json_file = json.load(filepath)
+            with open(Dir.BASE + '/' + file_path) as file_path:
+                json_file = json.load(file_path)
                 json_scenarios = json_file["scenarios"]
                 self.scenarios = {}
                 self.logger.info('Loaded {} scenarios.'.format(len(json_scenarios)))
@@ -154,6 +179,19 @@ class Manager(QObject):
 
     @ehpyqtSlot(str, int, dict)
     def update(self, name, state, data):
+        """
+        Slot called by service when it updates.
+        Change the state and the data of the service.
+
+        Parameters
+        ----------
+        data
+            dict
+        state
+            int
+        name
+            str
+        """
         if name not in self.services_list:
             raise ManagerException('invalid_service_name', "The service {} doesn't exist.".format(name))
         if int(os.environ.get('DEBUG', '0')) >= 2 or (int(os.environ.get('DEBUG', '0')) == 1 and name != 'face' and 'working' not in data):
@@ -166,6 +204,21 @@ class Manager(QObject):
         self.check_scope()
 
     def retrieve_data(self, action):
+        """
+        Convert data encodings into real values
+        Can convert if parameter is :
+
+        - list
+            - dict
+            - parameter encoder
+        - parameter encoder
+        - dict
+            - parameter encoder
+        Parameters
+        ----------
+        action
+            dict
+        """
         params = {}
         for name, value in action.items():
             # TODO: Change behaviour to allow variable 'name'
@@ -175,10 +228,10 @@ class Manager(QObject):
                     params[name] = []
                     # Browsing the list
                     for v in value:
-                        # Case : the element of the list is a dictionnary
+                        # Case : the element of the list is a dictionary
                         if type(v) is dict:
                             for keyElement, valueElement in v.items():
-                                # Case : the element of the dictionnary is a parameter encoder
+                                # Case : the element of the dictionary is a parameter encoder
                                 if is_parameter_encoder(valueElement):
                                     # Case : the encoder head to service variable
                                     if valueElement["type"] == "service" and self.services[valueElement["name"]].get(valueElement["variable"]):
@@ -186,7 +239,7 @@ class Manager(QObject):
                                     # Case : the encoder head to written variable
                                     else:
                                         params[name].append(valueElement["variable"])
-                                # Case : the element of the dictonnary is something else (no example 30.06.2018)
+                                # Case : the element of the dictionary is something else (no example 30.06.2018)
                                 else:
                                     raise TypeNotAllowedInDataRetrieverException(name, value, v, keyElement, valueElement)
                                     # input[name].append({"name": keyElement, "value": valueElement})
@@ -206,7 +259,7 @@ class Manager(QObject):
                         params[name] = value["variable"]
                 # Case : the parameter is a dict of parameter encoders
                 elif type(value) is dict:
-                    for dd_key,dd_value in value.items():
+                    for dd_key, dd_value in value.items():
                         if not is_parameter_encoder(dd_value):
                             raise TypeNotAllowedInDataRetrieverException(name, value, None, None, dd_value)
                     params[name] = value
@@ -221,17 +274,33 @@ class Manager(QObject):
         return params
 
     def check_for_triggers(self, sc):
+        """
+        Check if triggers of scenario are active
+
+        Returns
+        -------
+        bool
+        Parameters
+        ----------
+        sc
+            dict
+
+        """
         active = True
         for trigger in sc["triggers"]:
             func = self.triggers[trigger["service"]][trigger["name"]]
             if func:
-                self.logger.debug("Trigger of {}: {}".format(sc['id'], trigger))
+                # self.logger.debug("Trigger of {}: {}".format(sc['id'], trigger))
                 active = func(self, trigger)
             if not active:
                 break
         return active
 
     def check_scope(self):
+        """
+       Check if on the actual scope, one scenario need to be activated
+       If so, the scenario is activated and executes its actions
+       """
         try:
             if not self.freeze:
                 for scId in self.scope:
@@ -261,7 +330,7 @@ class Manager(QObject):
                         for index, action in enumerate(actions):
                             params = self.retrieve_data(action)
                             func = self.actions[action["name"]]
-                            self.logger.debug('Action called : {}:{}'.format(func.__name__,params))
+                            self.logger.debug('Action called : {}:{}'.format(func.__name__, params))
                             if func:
                                 func(self, params)
                                 # Store remaining actions while scope is frozen
@@ -275,9 +344,17 @@ class Manager(QObject):
                             break
                 self.scopeChanged = False
         except Exception as e:
-            raise ManagerException('check_scope_error', 'An unexpected error occured while checking scope\n{}.'.format(e)) from e
+            raise ManagerException('check_scope_error', 'An unexpected error occurred while checking scope\n{}.'.format(e)) from e
 
     def update_state(self, sc):
+        """
+        Update the state of scenarios if needed after an activation of a scenario
+
+        Parameters
+        ----------
+        sc
+            dict
+       """
         for trigger in sc["triggers"]:
             # SOUND
             if self.services.get("sound"):
@@ -302,6 +379,10 @@ class Manager(QObject):
 
     @ehpyqtSlot()
     def resume_manager(self):
+        """
+        Slot called after wait action that unfreeze the manager and executes the remaining actions
+
+        """
         self.freeze = False
         actions = self.remainingActions[:]
         for index, action in enumerate(actions):
@@ -319,6 +400,9 @@ class Manager(QObject):
 
     @ehpyqtSlot()
     def delete_temporary_files(self):
+        """
+        Delete temporary files
+        """
         for the_file in os.listdir(Dir.TMP):
             if not the_file.startswith("."):
                 file_path = os.path.join(Dir.TMP, the_file)
@@ -328,4 +412,4 @@ class Manager(QObject):
                     elif os.path.isdir(file_path):
                         shutil.rmtree(file_path)
                 except Exception as e:
-                    self.logger.error('{} occurred while deleting temporary files.\n{}'.format(type(e).__name__,e))
+                    self.logger.error('{} occurred while deleting temporary files.\n{}'.format(type(e).__name__, e))

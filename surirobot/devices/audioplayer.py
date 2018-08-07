@@ -1,17 +1,20 @@
-from PyQt5.QtCore import QThread, QObject
 import logging
-import simpleaudio as sa
-import subprocess
-import platform
-from surirobot.core.common import ehpyqtSlot
 import os
+import platform
+
 # Local TTS engine
 import pyttsx3
-import asyncio
+import simpleaudio as sa
+from PyQt5.QtCore import QThread, QObject
+
+from surirobot.core.common import ehpyqtSlot
 
 
 class AudioPlayer(QObject):
-    playObj = ...  # type: WaveObject
+    """
+    Threaded service that play audio
+    """
+    playObj = ...  # type: sa.WaveObject
 
     def __init__(self):
         QObject.__init__(self)
@@ -49,6 +52,7 @@ class AudioPlayer(QObject):
     @ehpyqtSlot(str, bool)
     @ehpyqtSlot(str)
     def play(self, data, local=False):
+        # Case: We use local engine to transform text into voice and play it
         if local:
             self.engine.say(data)
             self.engine.runAndWait()

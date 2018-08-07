@@ -11,6 +11,9 @@ from surirobot.core.common import ehpyqtSlot
 
 
 class VideoCapture(QThread):
+    """
+    Threaded service that records audio
+    """
     NB_IMG_PER_SECOND = 15
     signal_change_camera = pyqtSignal(QImage)
 
@@ -45,16 +48,16 @@ class VideoCapture(QThread):
         else:
             # Get the devices
             try:
-                fileList = os.listdir('/dev')
+                file_list = os.listdir('/dev')
                 regex = re.compile(r'^video')
-                deviceList = list(filter(regex.match, fileList))
-                # video_capture = cv2.VideoCapture(len(deviceList))
-                self.nbCam = len(deviceList)
+                device_list = list(filter(regex.match, file_list))
+                # video_capture = cv2.VideoCapture(len(device_list))
+                self.nbCam = len(device_list)
                 if self.nbCam <= 1:
                     ui.nextCamera.hide()
                 self.currentCam = 0
                 self.video_capture = cv2.VideoCapture(0)
-            except Exception as e:
+            except Exception:
                 self.video_capture = cv2.VideoCapture(-1)
         if self.video_capture.isOpened():
             self.videoWorkLoop.start()
@@ -69,9 +72,9 @@ class VideoCapture(QThread):
                 self.last_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
                 # cv2.imshow("preview", self.last_frame)
                 height, width, channel = frame.shape
-                bytesPerLine = 3 * width
-                qImg = QImage(frame.data, width, height, bytesPerLine, QImage.Format_RGB888)
-                self.signal_change_camera.emit(qImg)
+                bytes_per_line = 3 * width
+                q_img = QImage(frame.data, width, height, bytes_per_line, QImage.Format_RGB888)
+                self.signal_change_camera.emit(q_img)
         except Exception as e:
             self.logger.error('{} occurred while detecting.\n{}'.format(type(e).__name__, e))
         self.videoWorkLoop.setInterval(-time.time() % (1 / self.NB_IMG_PER_SECOND)*1000)

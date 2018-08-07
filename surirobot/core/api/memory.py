@@ -1,9 +1,11 @@
-from .base import ApiCaller
-from PyQt5.QtCore import pyqtSignal
-from surirobot.core.common import State, ehpyqtSlot
-import requests
 import logging
 import os
+
+import requests
+from PyQt5.QtCore import pyqtSignal
+
+from surirobot.core.common import ehpyqtSlot
+from .base import ApiCaller
 
 
 class MemoryApiCaller(ApiCaller):
@@ -15,7 +17,9 @@ class MemoryApiCaller(ApiCaller):
     new_user = pyqtSignal(dict)
     new_encodings = pyqtSignal(list)
     new_encoding = pyqtSignal(dict)
+    new_notifications = pyqtSignal(list)
     new_sensor_last = pyqtSignal(dict)
+    new_sensors = pyqtSignal(list)
     notifications = pyqtSignal(dict)
     users_list = pyqtSignal(list)
 
@@ -51,9 +55,24 @@ class MemoryApiCaller(ApiCaller):
             self.logger.error('HTTP {} error occurred while getting encodings of user n°{}.'.format(r.status_code, user_id))
             self.logger.error(r.content)
 
-    @ehpyqtSlot
-    def notifications(self):
-        pass
+    def get_notifications(self):
+        """
+        Get notifications
+
+        -------
+        dict
+            This function send a dictionary containing the notifications
+        """
+        r = requests.get(self.url + '/api/notifications', headers=self.headers)
+        # Receive response
+        if r.status_code == 200:
+            notifs = r.json()
+            self.new_notifications.emit(notifs)
+            return notifs
+        else:
+            self.logger.error(
+                'HTTP {} error occurred while getting notifications.'.format(r.status_code))
+            self.logger.error(r.content)
 
     def get_users(self):
         """
@@ -74,9 +93,57 @@ class MemoryApiCaller(ApiCaller):
             self.logger.error('HTTP {} error occurred while getting all users.'.format(r.status_code))
             self.logger.error(r.content)
 
-    @ehpyqtSlot
-    def get_last_sensor(self):
-        pass
+    def get_last_sensor(self, sensor_type):
+        """
+        Get last sensor data of specified type from the memory of the Surirobot
+
+        Parameters
+        ----------
+        sensor_type
+            str
+        Returns
+        -------
+        list
+            This function send list of all users
+
+        """
+        r = requests.get(self.url + '/api/memory/sensors/last/' + sensor_type + '/', headers=self.headers)
+        # Receive response
+        if r.status_code == 200:
+            sensor = r.json()
+            self.new_sensor_last.emit(sensor)
+            return sensor
+        else:
+            self.logger.error('HTTP {} error occurred while getting last sensor.'.format(r.status_code))
+            self.logger.error(r.content)
+
+    def get_sensors(self, sensor_type, t_from, t_to):
+        """
+        Get sensors data of type specified between the 2 time intervals
+
+        Parameters
+        ----------
+        sensor_type
+            str
+        t_to
+            int
+        t_from
+            int
+        Returns
+        -------
+        list
+            This function send list of all users
+
+        """
+        r = requests.get('{}/api/memory/sensors/{}/{}/{}/'.format(self.url, t_from, t_to, sensor_type), headers=self.headers)
+        # Receive response
+        if r.status_code == 200:
+            sensors = r.json()
+            self.new_sensors.emit(sensors)
+            return sensors
+        else:
+            self.logger.error('HTTP {} error occurred while getting last sensor.'.format(r.status_code))
+            self.logger.error(r.content)
 
     def add_user(self, firstname, lastname, email=None):
         """
@@ -135,7 +202,6 @@ class MemoryApiCaller(ApiCaller):
         if r.status_code == 201 or r.status_code==200:
             model = r.json()
             self.new_encoding.emit(model)
-            print(model)
             return model
         else:
             self.logger.error('HTTP {} error occurred while adding encoding.'.format(r.status_code))

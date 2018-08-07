@@ -37,13 +37,16 @@ def rawbytes(s):
 
 
 def ehpyqtSlot(*args):
+    """
+    Decorator that coats the :class:`PyQt5.QtCore.pyqtSlot` decorator and handles exceptions.
+    """
     if len(args) == 0 or isinstance(args[0], types.FunctionType):
         args = []
 
     @pyqtSlot(*args)
     def slotdecorator(func):
         @wraps(func)
-        def wrapper(*wargs, **wkwargs):
+        def wrapper(*wargs):
             try:
                 if (int(os.environ.get('DEBUG', '0')) in [0, 1] and not (func.__name__ == 'set_camera' or (type(wargs[0]).__name__ == 'VideoCapture' and func.__name__ == 'detect'))) or int(os.environ.get('DEBUG', '0')) >= 2:
                     logger.debug('Slot called : {}.{} ({}) : {}'.format(type(wargs[0]).__name__, func.__name__, [item.__name__ for item in args], [type(item).__name__ if type(item) not in primitives else '{}:{}'.format(type(item).__name__, item) for item in wargs[1:]]))
@@ -56,6 +59,9 @@ def ehpyqtSlot(*args):
 
 
 class Dir:
+    """
+    Store file and directory paths
+    """
     BASE = os.getcwd()
     TMP = BASE + '/tmp/'
     DATA = BASE + '/data/'

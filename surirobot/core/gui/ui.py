@@ -68,7 +68,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.activateManualButton.hide()
         self.manualLayoutContainer.hide()
 
-    def load_image(self, image_path):
+    @staticmethod
+    def load_image(image_path):
         """
             Load image
             Parameters

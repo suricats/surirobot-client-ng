@@ -58,10 +58,11 @@ class TtsApiCaller(ApiCaller):
                 'text': text,
                 'language': self.DEFAULT_LANGUAGE_EXT
             }
+            print('url: {}'.format(self.url))
             r = requests.post(self.url + '/tts/speak', data=data)
             # Receive response
             if r.status_code != 200:
-                self.logger.error('HTTP {} error occurred while retrieving audio.'.format(r.status_code))
+                self.logger.error('HTTP {} error occurred while retrieving audio.\n{}'.format(r.status_code, r.content))
                 self.signal_indicator.emit("converse", "red")
             else:
                 # Audio

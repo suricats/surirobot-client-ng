@@ -46,7 +46,8 @@ sudo apt-get install -y --fix-missing \
     python3-pip \
     software-properties-common \
     zip \
-    libasound2-dev
+    libasound2-dev \
+    sshpass
 ```
 
 Install required python3 modules: `pip3 install -r requirements.txt`

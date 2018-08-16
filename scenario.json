@@ -4,7 +4,7 @@
     "person-detection" : [3,4,9,10],
     "emotion-detection" : [3000,3006],
     "special-persons" : [1001,1002,1003],
-    "converse" : [2002,2001,2000,0,2,1],
+    "converse" : [2004, 2003, 2002,2001,2000,0,2,1],
     "person-detection-know-out" : [3,9],
     "face-working" : [11,12]
   },
@@ -1601,6 +1601,110 @@
             "type": "service",
             "name": "storage",
             "variable": "@text"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse", "person-detection", "emotion-detection"]
+          }
+        }
+      ]
+
+    },
+    {
+      "id": 2003,
+      "description": "Open fan",
+      "templates": ["base"],
+      "triggers": [{
+        "service": "converse",
+        "name": "new",
+        "parameters": {
+          "intent": "fan-on"
+        }
+      }],
+      "actions": [
+        {
+          "name": "ssh",
+          "password": {
+            "type": "input",
+            "variable": "surirobot"
+          },
+          "host": {
+            "type": "input",
+            "variable": "pi@raspberrypi.local"
+          },
+          "command": {
+            "type": "input",
+            "variable": "/usr/bin/python3 /home/pi/sensors/fan.py up"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Et voilà ! C'est enclenché !"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse", "person-detection", "emotion-detection"]
+          }
+        }
+      ]
+
+    },
+    {
+      "id": 2004,
+      "description": "Close fan",
+      "templates": ["base"],
+      "triggers": [{
+        "service": "converse",
+        "name": "new",
+        "parameters": {
+          "intent": "fan-off"
+        }
+      }],
+      "actions": [
+        {
+          "name": "ssh",
+          "password": {
+            "type": "input",
+            "variable": "surirobot"
+          },
+          "host": {
+            "type": "input",
+            "variable": "pi@raspberrypi.local"
+          },
+          "command": {
+            "type": "input",
+            "variable": "/usr/bin/python3 /home/pi/sensors/fan.py down"
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Et voilà ! C'est éteint !"
           }
         },
         {

@@ -2,6 +2,7 @@ import datetime
 import logging
 import re
 import time
+import subprocess
 from logging import Logger
 
 import pyqtgraph as pg
@@ -39,6 +40,7 @@ class Actions:
             self.actions["memory"] = self.converse_update_memory
             self.actions["giveSensorData"] = self.give_sensor_data
             self.actions["notifications"] = self.retrieve_notifications
+            self.actions["ssh"] = self.ssh_action
             return self.actions
         except AttributeError as e:
             raise NotFoundActionException(e.args[0].split("'")[3])
@@ -284,7 +286,7 @@ class Actions:
         :param params: dict
         :type mgr: Manager
         """
-        if params["type"] and params["output"]:
+        if params.get("type") and params.get("output"):
             last_sensor_data = api_memory.get_last_sensor(params["type"])
             if last_sensor_data:
                 mgr.services["storage"][params["output"]] = last_sensor_data["data"]
@@ -335,6 +337,18 @@ class Actions:
 
         # Store the notifications
         mgr.services['storage']['@notifications'] = text if text else "Vous n'avez aucune notification"
+
+    @staticmethod
+    def ssh_action(mgr, params):
+        """
+        Execute command in ssh
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get('password') and params.get('host') and params.get('command'):
+            command = 'sshpass -p "{}" ssh -o StrictHostKeyChecking=no {} {}'.format(params['password'], params['host'], params['command'])
+            subprocess.Popen(command, shell=True)
 
 
 mgr_actions = Actions()

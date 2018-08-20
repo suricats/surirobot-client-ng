@@ -41,7 +41,7 @@ class Actions:
             self.actions["giveSensorData"] = self.give_sensor_data
             self.actions["notifications"] = self.retrieve_notifications
             self.actions["ssh"] = self.ssh_action
-            self.actions["redis"] = self.redis_put
+            self.actions["redis"] = self.redis_publish
             return self.actions
         except AttributeError as e:
             raise NotFoundActionException(e.args[0].split("'")[3])
@@ -352,7 +352,7 @@ class Actions:
             subprocess.Popen(command, shell=True)
 
     @staticmethod
-    def redis_put(mgr, params):
+    def redis_publish(mgr, params):
         """
         Listen on specific redis channel
 
@@ -360,7 +360,7 @@ class Actions:
         :type mgr: Manager
         """
         if params.get('channel') and params.get('message'):
-            serv_redis.redis.set(params['channel'], params['message'])
+            serv_redis.redis.publish(params['channel'], params['message'])
 
 
 mgr_actions = Actions()

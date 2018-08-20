@@ -50,7 +50,7 @@ class RedisService(QThread):
             if type(command) == bytes:
                 command = command.decode('utf-8')
             print(command)
-            self.update_state.emit(self.MODULE_NAME, State.REDIS_NEW, command)
+            self.update_state.emit(self.MODULE_NAME, State.REDIS_NEW, {"data" : command})
 
     @ehpyqtSlot()
     def listen_thread(self, channel):

@@ -11,31 +11,6 @@ from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
 primitives = [int, str, bool, dict, list, float, tuple, set]
 logger = logging.getLogger('COMMON')
 
-class QSuperTimer(QTimer):
-    started = pyqtSignal()
-    stopped = pyqtSignal()
-    def __init__(self):
-        QTimer.__init__(self)
-        self.start_time = 0
-
-    def start(self, p_int=None):
-        self.start_time = time.time()
-        if p_int:
-            super().start(p_int)
-        else:
-            super().start()
-        self.started.emit()
-    def stop(self):
-        super().stop()
-        self.stopped.emit()
-
-    def elapsed(self):
-        """
-        Return the elapsed time in msec
-        :return: float
-        """
-        diff = time.time() - self.start_time
-        return diff * 1000
 
 def rawbytes(s):
     """
@@ -74,14 +49,70 @@ def ehpyqtSlot(*args):
         @wraps(func)
         def wrapper(*wargs):
             try:
-                if (int(os.environ.get('DEBUG', '0')) in [0, 1] and not (func.__name__ == 'set_camera' or (type(wargs[0]).__name__ == 'VideoCapture' and func.__name__ == 'detect'))) or int(os.environ.get('DEBUG', '0')) >= 2:
-                    logger.debug('Slot called : {}.{} ({}) : {}'.format(type(wargs[0]).__name__, func.__name__, [item.__name__ for item in args], [type(item).__name__ if type(item) not in primitives else '{}:{}'.format(type(item).__name__, item) for item in wargs[1:]]))
+                if (int(os.environ.get('DEBUG', '0')) in [0, 1] and not (func.__name__ == 'set_camera' or (
+                        type(wargs[0]).__name__ == 'VideoCapture' and func.__name__ == 'detect'))) or int(
+                    os.environ.get('DEBUG', '0')) >= 2:
+                    logger.debug('Slot called : {}.{} ({}) : {}'.format(type(wargs[0]).__name__, func.__name__,
+                                                                        [item.__name__ for item in args], [
+                                                                            type(item).__name__ if type(
+                                                                                item) not in primitives else '{}:{}'.format(
+                                                                                type(item).__name__, item) for item in
+                                                                            wargs[1:]]))
                 func(*wargs)
             except Exception as e:
                 logger.error('{} occurred in slot'.format(type(e).__name__))
                 traceback.print_exc()
+
         return wrapper
+
     return slotdecorator
+
+
+class QSuperTimer(QTimer):
+    started = pyqtSignal()
+    stopped = pyqtSignal()
+
+    def __init__(self):
+        QTimer.__init__(self)
+        self.start_time = 0
+        self.elapsed_time = 0
+
+    def start(self, p_int=None):
+        self.start_time = time.time()
+        self.elapsed_time = 0
+        if p_int:
+            super().start(p_int)
+        else:
+            super().start()
+        self.started.emit()
+
+    def stop(self):
+        self.elapsed_time = 0
+        super().stop()
+        self.stopped.emit()
+
+    def pause(self):
+        self.elapsed_time += self.elapsed()
+        self.stop()
+
+    def resume(self):
+        self.setSingleShot(True)
+        self.timeout.connect(self._resume)
+        self.start(self.interval() - (self.elapsed_time if self.elapsed_time > 0 else 0))
+
+    @ehpyqtSlot
+    def _resume(self):
+        self.setSingleShot(False)
+        self.timeout.disconnect(self._resume)
+        self.start()
+
+    def elapsed(self):
+        """
+        Return the elapsed time in msec
+        :return: float
+        """
+        diff = time.time() - self.start_time
+        return diff * 1000
 
 
 class Dir:
@@ -118,3 +149,5 @@ class State:
     EMOTION_NO = 16
     KEYBOARD_NEW = 17
     KEYBOARD_AVAILABLE = 18
+    REDIS_NEW = 19
+    REDIS_AVAILABLE = 20

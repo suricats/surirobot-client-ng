@@ -1,7 +1,10 @@
+import os
+
 from PyQt5.QtCore import QThread
 
 
 # Start FaceRecognition
+from surirobot.core.api import URLNotDefinedAPIException
 from surirobot.services.facerecognition import FaceRecognition
 serv_fr = FaceRecognition()
 serv_fr.start()
@@ -22,3 +25,12 @@ from surirobot.core import ui
 
 serv_keyboard = KeyPressEventHandler()
 ui.installEventFilter(serv_keyboard)
+
+# Start Redis listener
+url_redis = os.environ.get('REDIS_SERVER_URL')
+if url_redis:
+    from .redis import RedisService
+    serv_redis = RedisService(url_redis)
+    serv_redis.listen('slack')
+else:
+    raise URLNotDefinedAPIException('REDIS')

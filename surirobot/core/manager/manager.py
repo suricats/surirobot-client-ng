@@ -48,7 +48,7 @@ class Manager(QObject):
     """
     __instance__ = None
     # Signals
-    services_list = ["face", "emotion", "converse", "sound", "storage", "keyboard"]
+    services_list = ["face", "emotion", "converse", "sound", "storage", "keyboard", "redis"]
     signal_tts_request = pyqtSignal(str)
     signal_converse_audio_with_id = pyqtSignal(str, int)
     signal_converse_audio = pyqtSignal(str)

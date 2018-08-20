@@ -11,7 +11,7 @@ from dateutil import parser
 
 from surirobot.core import ui
 from surirobot.core.api import api_memory
-from surirobot.services import serv_fr, face_loader
+from surirobot.services import serv_fr, face_loader, serv_redis
 from .exceptions import ActionException, NotFoundActionException, MissingParametersActionException
 
 logger = logging.getLogger('Actions')  # type: Logger
@@ -41,6 +41,7 @@ class Actions:
             self.actions["giveSensorData"] = self.give_sensor_data
             self.actions["notifications"] = self.retrieve_notifications
             self.actions["ssh"] = self.ssh_action
+            self.actions["redis"] = self.redis_put
             return self.actions
         except AttributeError as e:
             raise NotFoundActionException(e.args[0].split("'")[3])
@@ -349,6 +350,17 @@ class Actions:
         if params.get('password') and params.get('host') and params.get('command'):
             command = 'sshpass -p "{}" ssh -o StrictHostKeyChecking=no {} {}'.format(params['password'], params['host'], params['command'])
             subprocess.Popen(command, shell=True)
+
+    @staticmethod
+    def redis_put(mgr, params):
+        """
+        Listen on specific redis channel
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get('channel') and params.get('message'):
+            serv_redis.redis.set(params['channel'], params['message'])
 
 
 mgr_actions = Actions()

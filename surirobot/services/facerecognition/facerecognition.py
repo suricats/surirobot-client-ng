@@ -28,7 +28,6 @@ class FaceRecognition(QThread):
     def __init__(self):
         QThread.__init__(self)
 
-        logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(type(self).__name__)
 
         self.signalPersonChanged.connect(ui.set_text_up)
@@ -70,7 +69,6 @@ class FaceRecognition(QThread):
 
     def start(self):
         QThread.start(self)
-        time.sleep(3)
         self.personChanged(self.NOBODY)
         self.stateChanged(self.NOBODY, self.NOBODY)
         self.faceWorkLoop.start()

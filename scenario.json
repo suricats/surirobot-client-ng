@@ -1634,18 +1634,14 @@
       }],
       "actions": [
         {
-          "name": "ssh",
-          "password": {
+          "name": "redis",
+          "channel": {
             "type": "input",
-            "variable": "surirobot"
+            "variable": "slack"
           },
-          "host": {
+          "message": {
             "type": "input",
-            "variable": "pi@raspberrypi.local"
-          },
-          "command": {
-            "type": "input",
-            "variable": "/usr/bin/python3 /home/pi/sensors/fan.py up"
+            "variable": "up"
           }
         },
         {
@@ -1686,18 +1682,14 @@
       }],
       "actions": [
         {
-          "name": "ssh",
-          "password": {
+          "name": "redis",
+          "channel": {
             "type": "input",
-            "variable": "surirobot"
+            "variable": "slack"
           },
-          "host": {
+          "message": {
             "type": "input",
-            "variable": "pi@raspberrypi.local"
-          },
-          "command": {
-            "type": "input",
-            "variable": "/usr/bin/python3 /home/pi/sensors/fan.py down"
+            "variable": "down"
           }
         },
         {

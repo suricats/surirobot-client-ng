@@ -34,7 +34,7 @@ class RedisService(QThread):
             timer = QSuperTimer()
             timer.timeout.connect(func)
             timer.setInterval(self.LISTEN_INTERVAL)
-            self.listenTasks[channel] = {'pub': p, 'stop': False, 'timer': timer}
+            self.listenTasks[channel] = {'pub': p, 'timer': timer}
             timer.start()
 
     def mute(self, channel):

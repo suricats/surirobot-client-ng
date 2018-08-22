@@ -33,6 +33,7 @@ class Actions:
             self.actions["speak"] = self.speak
             self.actions["wait"] = self.wait_for
             self.actions["picture"] = self.add_picture_with_user
+            self.actions["picture_without"] = self.add_picture
             self.actions["listen"] = self.listen
             self.actions["store"] = self.store
             self.actions["changeSuriface"] = self.change_suriface
@@ -92,6 +93,19 @@ class Actions:
             face_loader.take_picture_new_user(params["firstname"], params["lastname"])
         else:
             raise MissingParametersActionException("addPictureWithUser", ['firstname', 'lastname'])
+
+    @staticmethod
+    def add_picture(mgr, params):
+        """
+        Take a picture of the camera and create a new user with [firstname] and [lastname]
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get("id"):
+            face_loader.take_picture_known_user(params["id"])
+        else:
+            raise MissingParametersActionException("addPicture", ['id'])
 
     @staticmethod
     def play_sound(mgr, params):

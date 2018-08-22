@@ -32,5 +32,6 @@ if url_redis:
     from .redis import RedisService
     serv_redis = RedisService(url_redis)
     serv_redis.listen('slack')
+    serv_redis.listen('test')
 else:
     raise URLNotDefinedAPIException('REDIS')

@@ -12,6 +12,7 @@ import requests
 import face_recognition
 import traceback
 
+
 class FaceLoader(QThread):
     signal_indicator = pyqtSignal(str, str)
     new_user = pyqtSignal(str)
@@ -88,4 +89,24 @@ class FaceLoader(QThread):
             self.add_user(firstname, lastname, '', face)
         except Exception as e:
             self.logger.error("{} occurred while creating picture for new user\n{}".format(type(e).__name__, e))
+            traceback.print_exc()
+
+    @ehpyqtSlot(int)
+    def take_picture_known_user(self, user_id):
+        try:
+            picture = serv_vc.get_frame()
+            file_path = Dir.TMP + format(uuid.uuid4()) + '.jpeg'
+            cv2.imwrite(file_path, picture)
+            img = face_recognition.load_image_file(file_path)
+            encodings = face_recognition.face_encodings(img, None, 10)
+            if encodings:
+                face = encodings[0]
+                user = api_memory.get_user(user_id)
+                model = api_memory.add_encoding(face, user_id)
+                model['user'] = user
+                self.q.put(model)
+            else:
+                self.logger.info('No face on the model')
+        except Exception as e:
+            self.logger.error("{} occurred while creating picture for existing user\n{}".format(type(e).__name__, e))
             traceback.print_exc()

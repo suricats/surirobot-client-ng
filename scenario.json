@@ -4,7 +4,7 @@
     "person-detection" : [3,4,9,10],
     "emotion-detection" : [3000,3006],
     "special-persons" : [1001,1002,1003],
-    "converse" : [2004, 2003, 2002,2001,2000,0,2,1],
+    "converse" : [2005, 2004, 2003, 2002,2001,2000,0,2,1],
     "person-detection-know-out" : [3,9],
     "face-working" : [11,12]
   },
@@ -1715,7 +1715,145 @@
           }
         }
       ]
+    },
+    {
+      "id": 2005,
+      "description": "Add picture",
+      "templates": ["base"],
+      "triggers": [{
+        "service": "face",
+        "name": "know",
+        "parameters": {
+          "new": false
+        }
+      },
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "ask-picture"
+          }
+        }],
+      "actions": [
+        {
+          "name": "encodeText",
+          "text": {
+            "type": "input",
+            "variable": "Très bien {@firstname} {@lastname}. Je vais prendre une photo maintenant ! Prépare toi !"
+          },
+          "variables": [
+            {
+              "firstname": {
+                "type": "service",
+                "name": "face",
+                "variable": "firstname"
+              }
+            },
+            {
+              "lastname": {
+                "type": "service",
+                "name": "face",
+                "variable": "lastname"
+              }
+            }
+          ]
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@text"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 5000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "3"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "2"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "1"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Cheese !"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "picture_without",
+          "id": {
+            "type": "service",
+            "name": "face",
+            "variable": "id"
+          }
 
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
     },
     {
       "id": 3000,

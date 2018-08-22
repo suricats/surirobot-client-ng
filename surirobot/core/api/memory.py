@@ -93,6 +93,24 @@ class MemoryApiCaller(ApiCaller):
             self.logger.error('HTTP {} error occurred while getting all users.'.format(r.status_code))
             self.logger.error(r.content)
 
+    def get_user(self, user_id):
+        """
+        Get user from the memory of the Surirobot
+
+        Returns
+        -------
+        list
+            This function send list of all users
+        """
+        r = requests.get(self.url + '/api/memory/users/{}/'.format(user_id), headers=self.headers)
+        # Receive response
+        if r.status_code == 200:
+            user = r.json()
+            return user
+        else:
+            self.logger.error('HTTP {} error occurred while getting user n°{}.'.format(r.status_code, user_id))
+            self.logger.error(r.content)
+
     def get_last_sensor(self, sensor_type):
         """
         Get last sensor data of specified type from the memory of the Surirobot

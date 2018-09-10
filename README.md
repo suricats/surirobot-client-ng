@@ -65,7 +65,14 @@ cd dlib
 python3 setup.py install --yes USE_AVX_INSTRUCTIONS --no DLIB_USE_CUDA
 cd .. && rm -rf dlib
 ```
-
+## Configure the environment file
+* Configure .env 
+```shell
+cp .env.example .env
+```
+* If you want to use the default environment
+- Fill only the ```REMOTE_DATA_LOGIN```  and ```REMOTE_DATA_PASSWD``` fields
+- Run the command : ```tools/get-env```
 
 ## Launch the program 
 
@@ -80,19 +87,13 @@ mkvirtualenv surirobot && workon surirobot
 pip install -r requirements.txt
 ```
 
-* Configure .env 
-```shell
-cp .env.example .env
-```
+
 
 * Run the program
 ```shell
 python start.py
 ```
-## Configure the environment file
-If you want to use the default environment
-- Fill only the ```REMOTE_DATA_LOGIN```  and ```REMOTE_DATA_PASSWD``` fields
-- Run the command : ```tools/get-env```
+
 
 ## TODO
 WIP

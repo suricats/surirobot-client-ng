@@ -4,7 +4,9 @@ Client part of the Surirobot, a multi-users smart assistant.
 
 ## Installation under macOS using homebrew
 
-Install libs: `brew install python3 boost-python3 dlib cmake mysql`
+Install homebrew : https://brew.sh
+
+Install libs: `brew install python3 boost-python3 dlib espeak cmake mysql`
 
 Install required python3 modules: `pip3 install -r requirements.txt`
 
@@ -86,8 +88,6 @@ mkvirtualenv surirobot && workon surirobot
 ```shell
 pip install -r requirements.txt
 ```
-
-
 
 * Run the program
 ```shell

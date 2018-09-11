@@ -1,6 +1,6 @@
-# Surirobot v1.2
+# HAL-1 v1.2
 
-Client part of the Surirobot, a multi-users smart assistant.
+Client part of the HAL-1 (ex Surirobot) , a multi-users smart assistant.
 
 ## Installation under macOS using homebrew
 

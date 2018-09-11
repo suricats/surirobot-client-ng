@@ -80,6 +80,7 @@ If you want to use the default environment
 
 * Clone repository 
 * Create virtualenv
+* If you have some trouble with the command ```workon``` see : https://stackoverflow.com/questions/29900090/virtualenv-workon-doesnt-work
 ```shell
 mkvirtualenv surirobot && workon surirobot
 ```

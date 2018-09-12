@@ -1,10 +1,12 @@
-# Surirobot v1.2
+# HAL-1 v1.2
 
-Client part of the Surirobot, a multi-users smart assistant.
+Client part of the HAL-1 (ex Surirobot) , a multi-users smart assistant.
 
 ## Installation under macOS using homebrew
 
-Install libs: `brew install python3 boost-python3 dlib cmake mysql`
+Install homebrew : https://brew.sh
+
+Install libs: `brew install python3 boost-python3 dlib espeak cmake mysql`
 
 Install required python3 modules: `pip3 install -r requirements.txt`
 
@@ -65,12 +67,20 @@ cd dlib
 python3 setup.py install --yes USE_AVX_INSTRUCTIONS --no DLIB_USE_CUDA
 cd .. && rm -rf dlib
 ```
-
+## Configure the environment file
+* Configure .env 
+```shell
+cp .env.example .env
+```
+If you want to use the default environment
+- Fill only the ```REMOTE_DATA_LOGIN```  and ```REMOTE_DATA_PASSWD``` fields
+- Run the command : ```tools/get-env```
 
 ## Launch the program 
 
 * Clone repository 
 * Create virtualenv
+* If you have some trouble with the command ```workon``` see : https://stackoverflow.com/questions/29900090/virtualenv-workon-doesnt-work
 ```shell
 mkvirtualenv surirobot && workon surirobot
 ```
@@ -80,19 +90,11 @@ mkvirtualenv surirobot && workon surirobot
 pip install -r requirements.txt
 ```
 
-* Configure .env 
-```shell
-cp .env.example .env
-```
-
 * Run the program
 ```shell
 python start.py
 ```
-## Configure the environment file
-If you want to use the default environment
-- Fill only the ```REMOTE_DATA_LOGIN```  and ```REMOTE_DATA_PASSWD``` fields
-- Run the command : ```tools/get-env```
+
 
 ## TODO
 WIP

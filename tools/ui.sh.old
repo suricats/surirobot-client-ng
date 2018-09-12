@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cp -rf ${DIR}/surirobot-client-ui/surirobot/$1.ui ${DIR}/surirobot-client-ng/surirobot/core/gui/$1.ui
-cd ${DIR}/surirobot-client-ng/surirobot/core/gui/
-pyuic5 mainwindow.ui > $2.py

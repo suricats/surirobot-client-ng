@@ -125,6 +125,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.labelDown.adjustSize()
 
     @ehpyqtSlot(str)
+    def set_text_input(self, text):
+        """
+        Change the text in the input box
+
+        Parameters
+        ----------
+        text : str
+            New text
+        """
+        self.labelInput.setText(text)
+        self.labelInput.adjustSize()
+
+    @ehpyqtSlot(str)
     def set_image(self, image_id):
         """
         Change the image of the avatar

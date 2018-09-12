@@ -1847,6 +1847,13 @@
 
         },
         {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "C'est fait ! :)"
+          }
+        },
+        {
           "name": "callScenarios",
           "id": {
             "type": "input",

@@ -9,6 +9,7 @@ from PyQt5.QtCore import QFile, QIODevice, pyqtSignal
 
 from surirobot.core.common import State, Dir, ehpyqtSlot
 from .base import ApiCaller
+from surirobot.core import ui
 
 
 class ConverseApiCaller(ApiCaller):
@@ -19,15 +20,16 @@ class ConverseApiCaller(ApiCaller):
     """
     update_state = pyqtSignal(str, int, dict)
     signal_indicator = pyqtSignal(str, str)
+    signal_ui_input_text = pyqtSignal(str)
 
     def __init__(self, url):
         ApiCaller.__init__(self, url)
+        self.signal_ui_input_text.connect(ui.set_text_input)
         self.local_voice = bool(int(os.environ.get('LOCAL_VOICE', '0')))
         self.logger = logging.getLogger(type(self).__name__)
 
     def __del__(self):
         self.stop()
-
 
     @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
@@ -52,13 +54,14 @@ class ConverseApiCaller(ApiCaller):
         with open(file_path, 'rb') as file:
             # Send request
             if self.local_voice:
-                url = self.url+'/converse/text'
+                url = self.url + '/converse/text'
             else:
-                url = self.url+'/converse/audio'
+                url = self.url + '/converse/audio'
             data = {'language': self.DEFAULT_LANGUAGE_EXT}
             if user_id:
                 data['user_id'] = 'SURI{}'.format(user_id)
-            self.logger.info("Sent to Converse API : File - {} : {}Ko".format(file_path, os.fstat(file.fileno()).st_size / 1000))
+            self.logger.info(
+                "Sent to Converse API : File - {} : {}Ko".format(file_path, os.fstat(file.fileno()).st_size / 1000))
             r = requests.post(url, files={'audio': file}, data=data)
             # Receive response
             if r.status_code != 200:
@@ -79,6 +82,7 @@ class ConverseApiCaller(ApiCaller):
                 if self.local_voice:
                     json_object = r.json()
                     self.logger.info('Full converse response :\n{}'.format(json_object))
+                    self.signal_ui_input_text.emit(json_object.get('input'))
                     intent = json_object.get('intent', 'no-understand')
                     message = json_object.get('message', '.')
                     self.signal_indicator.emit("converse", "green")
@@ -87,6 +91,7 @@ class ConverseApiCaller(ApiCaller):
                 # Audio response
                 else:
                     json_header = json.loads(r.headers['JSON'])
+                    self.signal_ui_input_text.emit(json_header.get('input'))
                     # Intent
                     intent = json_header["intent"]
                     self.logger.info("Intent detected : {}".format(intent))

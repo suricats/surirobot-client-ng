@@ -60,6 +60,7 @@ class Manager(QObject):
     signal_ui_indicator = pyqtSignal(str, str)
     signal_audio_play = pyqtSignal(str, bool)
 
+
     def __new__(cls):
         if cls.__instance__ is None:
             cls.__instance__ = QObject.__new__(cls)
@@ -106,6 +107,7 @@ class Manager(QObject):
             self.signal_audio_play.connect(serv_ap.play)
 
             # OUTPUTS : Connect to interface
+
             self.signal_ui_indicator.connect(ui.change_indicator)
             serv_fr.signal_indicator.connect(ui.change_indicator)
             face_loader.signal_indicator.connect(ui.change_indicator)

@@ -1,6 +1,7 @@
 # HAL-1 v1.2
 
 Client part of the HAL-1 (ex Surirobot) , a multi-users smart assistant.
+Works on Python 3.6
 
 ## Installation under macOS using homebrew
 

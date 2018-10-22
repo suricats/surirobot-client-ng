@@ -1,6 +1,7 @@
 from .base import ApiCaller
 from PyQt5.QtCore import pyqtSignal
 from surirobot.core.common import State, ehpyqtSlot
+from surirobot.devices import AudioRecorder
 import requests
 import logging
 import json
@@ -73,10 +74,10 @@ class VocalAPICaller(ApiCaller):
     def __del__(self):
         self.stop()
 
-    def getAnalysis(API_Key, WavPath):
+    def getAnalysis(BEYONDVERBAL_API_CREDENTIAL, WavPath):
 
         res = requests.post("https://token.beyondverbal.com/token", data={"grant_type": "client_credentials",
-                                                                          "apiKey": API_Key})
+                                                                          "apiKey": BEYONDVERBAL_API_CREDENTIAL})
         token = res.json()['access_token']
         headers={"Authorization": "Bearer "+token}
 
@@ -95,5 +96,5 @@ class VocalAPICaller(ApiCaller):
                               verify=False,
                               headers=headers)
             return r.json()
-        data = getAnalysis(API_Key, "samples/output.wav")
+        data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, "tmp/fc9ea42e-bfa6-41cf-9cb4-ebe493518641.wav")
         print(json.dumps(data, sort_keys=True, indent=4))

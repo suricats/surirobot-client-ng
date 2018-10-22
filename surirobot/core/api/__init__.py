@@ -38,3 +38,11 @@ memory_url = os.environ.get('API_MEMORY_URL')
 if memory_url:
     api_memory = MemoryApiCaller(memory_url)
     api_memory.start()
+
+
+from .emotional import VocalAPICaller
+vocal_url = os.environ.get('BEYOND_API_URL')
+vocal_key = 'BEYONDVERBAL_API_CREDENTIAL'
+if vocal_url:
+    api_vocal = VocalAPICaller(vocal_url)
+    api_vocal.start()

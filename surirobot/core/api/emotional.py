@@ -3,6 +3,7 @@ from PyQt5.QtCore import pyqtSignal
 from surirobot.core.common import State, ehpyqtSlot
 import requests
 import logging
+import json
 
 
 class EmotionalAPICaller(ApiCaller):
@@ -56,3 +57,38 @@ class EmotionalAPICaller(ApiCaller):
                         State.EMOTION_NO, {'emotion': []}
                     )
                 self.signal_indicator.emit("emotion", "green")
+
+
+class VocalAPICaller(ApiCaller):
+
+    received_reply = pyqtSignal(int, dict)
+    signal_indicator = pyqtSignal(str, str)
+
+    def __init__(self, text):
+        ApiCaller.__init__(self, text)
+        self.logger = logging.getLogger(type(self).__name__)
+
+    def __del__(self):
+        self.stop()
+
+    def getAnalysis(API_Key, WavPath):
+
+        res = requests.post("https://token.beyondverbal.com/token", data={"grant_type": "client_credentials",
+                                                                          "apiKey": API_Key})
+        token = res.json()['access_token']
+        headers={"Authorization": "Bearer "+token}
+
+        pp = requests.post("https://apiv4.beyondverbal.com/v4/recording/start",
+                           json={"dataFormat": {"type": "WAV"}},
+                           verify=False,
+                           headers=headers)
+        if pp.status_code != 200:
+            print(pp.status_code, pp.content)
+            return
+        recordingId = pp.json()['recordingId']
+        with open(WavPath,'rb') as wavdata:
+            r = requests.post("https://apiv4.beyondverbal.com/v4/recording/"+recordingId,
+                              data=wavdata,
+                              verify=False,
+                              headers=headers)
+            return r.json()

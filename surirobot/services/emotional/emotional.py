@@ -6,6 +6,7 @@ import cv2
 import uuid
 from surirobot.devices import serv_vc
 from surirobot.core.api.emotional import EmotionalAPICaller
+from surirobot.core.api.emotional import VocalAPICaller
 from surirobot.core.api.exceptions import URLNotDefinedAPIException
 from surirobot.core.common import Dir, ehpyqtSlot
 from surirobot.core import ui

@@ -92,3 +92,5 @@ class VocalAPICaller(ApiCaller):
                               verify=False,
                               headers=headers)
             return r.json()
+        data = getAnalysis(API_Key, "samples/collectif_fr.wav")
+        print(json.dumps(data, sort_keys=True, indent=4))

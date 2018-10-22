@@ -60,7 +60,9 @@ class EmotionalAPICaller(ApiCaller):
 
 
 class VocalAPICaller(ApiCaller):
-
+    """
+        Take a WavFile as parameter and print result
+    """
     received_reply = pyqtSignal(int, dict)
     signal_indicator = pyqtSignal(str, str)
 
@@ -86,11 +88,12 @@ class VocalAPICaller(ApiCaller):
             print(pp.status_code, pp.content)
             return
         recordingId = pp.json()['recordingId']
-        with open(WavPath,'rb') as wavdata:
+
+        with open(WavPath, 'rb') as wavdata:
             r = requests.post("https://apiv4.beyondverbal.com/v4/recording/"+recordingId,
                               data=wavdata,
                               verify=False,
                               headers=headers)
             return r.json()
-        data = getAnalysis(API_Key, "samples/collectif_fr.wav")
+        data = getAnalysis(API_Key, "samples/output.wav")
         print(json.dumps(data, sort_keys=True, indent=4))

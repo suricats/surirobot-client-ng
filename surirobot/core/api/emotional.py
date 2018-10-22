@@ -96,5 +96,5 @@ class VocalAPICaller(ApiCaller):
                               verify=False,
                               headers=headers)
             return r.json()
-        data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, "tmp/fc9ea42e-bfa6-41cf-9cb4-ebe493518641.wav")
+        data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, AudioRecorder.run())
         print(json.dumps(data, sort_keys=True, indent=4))

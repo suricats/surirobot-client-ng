@@ -1,7 +1,6 @@
 from .base import ApiCaller
 from PyQt5.QtCore import pyqtSignal
 from surirobot.core.common import State, ehpyqtSlot
-from surirobot.devices import AudioRecorder
 import requests
 import logging
 import json
@@ -59,27 +58,12 @@ class EmotionalAPICaller(ApiCaller):
                     )
                 self.signal_indicator.emit("emotion", "green")
 
-
-class VocalAPICaller(ApiCaller):
-    """
-        Take a WavFile as parameter and print result
-    """
-    received_reply = pyqtSignal(int, dict)
-    signal_indicator = pyqtSignal(str, str)
-
-    def __init__(self, text):
-        ApiCaller.__init__(self, text)
-        self.logger = logging.getLogger(type(self).__name__)
-
-    def __del__(self):
-        self.stop()
-
-    def getAnalysis(BEYONDVERBAL_API_CREDENTIAL, WavPath):
+    def getAnalysis(BEYONDVERBAL_API_CREDENTIAL, file_path):
 
         res = requests.post("https://token.beyondverbal.com/token", data={"grant_type": "client_credentials",
                                                                           "apiKey": BEYONDVERBAL_API_CREDENTIAL})
         token = res.json()['access_token']
-        headers={"Authorization": "Bearer "+token}
+        headers = {"Authorization": "Bearer "+token}
 
         pp = requests.post("https://apiv4.beyondverbal.com/v4/recording/start",
                            json={"dataFormat": {"type": "WAV"}},
@@ -90,11 +74,11 @@ class VocalAPICaller(ApiCaller):
             return
         recordingId = pp.json()['recordingId']
 
-        with open(WavPath, 'rb') as wavdata:
+        with open(file_path, 'rb') as wavdata:
             r = requests.post("https://apiv4.beyondverbal.com/v4/recording/"+recordingId,
                               data=wavdata,
                               verify=False,
                               headers=headers)
             return r.json()
-        data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, AudioRecorder.run())
+        data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, "sapples/output.wav")
         print(json.dumps(data, sort_keys=True, indent=4))

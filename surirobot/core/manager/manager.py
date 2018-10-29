@@ -60,7 +60,6 @@ class Manager(QObject):
     signal_ui_indicator = pyqtSignal(str, str)
     signal_audio_play = pyqtSignal(str, bool)
 
-
     def __new__(cls):
         if cls.__instance__ is None:
             cls.__instance__ = QObject.__new__(cls)

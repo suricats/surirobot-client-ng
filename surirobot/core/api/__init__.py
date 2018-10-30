@@ -1,5 +1,6 @@
 import os
 from .exceptions import URLNotDefinedAPIException
+from .emotional import EmotionalAPICaller
 
 from .converse import ConverseApiCaller
 converse_url = os.environ.get('API_CONVERSE_URL')
@@ -8,6 +9,14 @@ if converse_url:
     api_converse.start()
 else:
     raise URLNotDefinedAPIException('Converse')
+
+from .emotional import EmotionalAPICaller
+vocal_url = os.environ.get('BEYONDVERBAL_API_URL')
+if vocal_url:
+    api_vocal = EmotionalAPICaller(vocal_url)
+    api_vocal.start()
+else:
+    raise URLNotDefinedAPIException('VOCAL')
 
 from .tts import TtsApiCaller
 tts_url = os.environ.get('API_CONVERSE_URL')
@@ -38,9 +47,3 @@ memory_url = os.environ.get('API_MEMORY_URL')
 if memory_url:
     api_memory = MemoryApiCaller(memory_url)
     api_memory.start()
-
-from .emotional import EmotionalAPICaller
-vocal_url = os.environ.get('BEYONDVERBAL_URL')
-if vocal_url:
-    api_vocal = EmotionalAPICaller(vocal_url)
-    api_vocal.start()

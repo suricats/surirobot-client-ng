@@ -7,7 +7,7 @@ import shutil
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from surirobot.core import ui
-from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt
+from surirobot.core.api import api_converse, api_nlp, api_tts, api_stt, api_vocal
 from surirobot.core.common import State, Dir, ehpyqtSlot
 from surirobot.core.gui.progressbarupdater import progressBarUpdater
 from surirobot.services import serv_fr, face_loader, serv_emo
@@ -97,6 +97,7 @@ class Manager(QObject):
             # OUTPUTS : Connect to services
             self.signal_converse_audio.connect(api_converse.converse_audio)
             self.signal_converse_audio_with_id.connect(api_converse.converse_audio)
+            self.signal_converse_audio.connect(api_vocal.getAnalysis)
             self.signal_nlp_answer_with_id.connect(api_nlp.answer)
             self.signal_nlp_answer.connect(api_nlp.answer)
             self.signal_stt_request.connect(api_stt.recognize)

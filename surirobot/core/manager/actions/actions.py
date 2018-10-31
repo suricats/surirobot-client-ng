@@ -10,7 +10,7 @@ from PyQt5.QtCore import QTimer
 from dateutil import parser
 
 from surirobot.core import ui
-from surirobot.core.api import api_memory
+from surirobot.core.api import api_memory, api_vocal
 from surirobot.services import serv_fr, face_loader, serv_redis
 from .exceptions import ActionException, NotFoundActionException, MissingParametersActionException
 
@@ -26,6 +26,7 @@ class Actions:
         try:
             self.actions["playSound"] = self.play_sound
             self.actions["converse"] = self.converse
+            self.actions["vocal"] = self.converse
             self.actions["converseText"] = self.converse_text
             self.actions["callScenarios"] = self.call_scenarios
             self.actions["encodeText"] = self.encode_text

@@ -4,7 +4,8 @@ from surirobot.core.common import State, ehpyqtSlot
 import requests
 import logging
 import json
-
+from ffmpy import FFmpeg
+import os
 
 class EmotionalAPICaller(ApiCaller):
     """
@@ -59,10 +60,10 @@ class EmotionalAPICaller(ApiCaller):
                 self.signal_indicator.emit("emotion", "green")
 
     @ehpyqtSlot(str)
-    def getAnalysis(BEYONDVERBAL_API_CREDENTIAL, file_path):
+    def getAnalysis(self, file_path):
 
         res = requests.post("https://token.beyondverbal.com/token", data={"grant_type": "client_credentials",
-                                                                          "apiKey": BEYONDVERBAL_API_CREDENTIAL})
+                                                                          "apiKey": os.environ.get('BEYONDVERBAL_API_CREDENTIAL')})
         token = res.json()['access_token']
         headers = {"Authorization": "Bearer "+token}
 
@@ -74,15 +75,21 @@ class EmotionalAPICaller(ApiCaller):
             print(pp.status_code, pp.content)
             return
         recordingId = pp.json()['recordingId']
+        new_file = file_path.split('.')[0] + '-format.wav'
+        ff = FFmpeg(
+            inputs={file_path: None},
+            outputs={new_file: '-acodec pcm_s16le -ac 1 -ar 8000'}
+        )
+        ff.run()
 
-        with open(file_path, 'rb') as wavdata:
+        with open(new_file, 'rb') as wavdata:
             r = requests.post("https://apiv4.beyondverbal.com/v4/recording/"+recordingId,
                               data=wavdata,
                               verify=False,
                               headers=headers)
             return r.json()
-        data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, "samples/output.wav")
-        print(json.dumps(data, sort_keys=True, indent=4))
+        #data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, "samples/output.wav")
+        #print(json.dumps(data, sort_keys=True, indent=4))
 
     def start(self):
         ApiCaller.start(self)

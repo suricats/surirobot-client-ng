@@ -3,7 +3,7 @@
   "groups" : {
     "person-detection" : [3,4,9,10],
     "emotion-detection" : [3000,3006],
-    "special-persons" : [1001,1002,1003],
+    "special-persons" : [1001,1002,1003,1004],
     "converse" : [2005, 2004, 2003, 2002,2001,2000,0,2,1],
     "person-detection-know-out" : [3,9],
     "face-working" : [11,12]
@@ -1402,6 +1402,35 @@
           "text": {
             "type": "input",
             "variable": "TG THOMAS"
+          }
+        }
+      ]
+    },
+    {
+      "id": 1004,
+      "description": "Wait for audio analysis",
+      "templates" : ["base", "computing"],
+      "triggers": [
+        {
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "emotion",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["emotion"]
           }
         }
       ]

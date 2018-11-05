@@ -182,6 +182,23 @@ class Actions:
             raise MissingParametersActionException("speak", 'text')
 
     @staticmethod
+    def emotion(mgr, params):
+        """
+        Call BeyondVerbal API audio endpoint with [filepath] (and [id])
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get("filepath"):
+            #if params.get("id"):
+            #    mgr.signal_nlp_memory.emit("username", serv_fr.idToName(params["id"]), params["id"])
+            #    mgr.signal_converse_audio_with_id.emit(params["filepath"], params["id"])
+            #else:
+            mgr.signal_emotional_audio.emit(params["filepath"])
+        else:
+            raise MissingParametersActionException("emotion", 'id')
+
+    @staticmethod
     def converse(mgr, params):
         """
         Call Converse API audio endpoint with [filepath] (and [id])

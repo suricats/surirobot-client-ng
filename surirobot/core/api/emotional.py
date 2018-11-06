@@ -7,6 +7,7 @@ import json
 from ffmpy import FFmpeg
 import os
 
+
 class EmotionalAPICaller(ApiCaller):
     """
     API class for Emotional API
@@ -88,6 +89,7 @@ class EmotionalAPICaller(ApiCaller):
                               verify=False,
                               headers=headers)
             return r.json()
+
         #data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, "samples/output.wav")
         #print(json.dumps(data, sort_keys=True, indent=4))
 

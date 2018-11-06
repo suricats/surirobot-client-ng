@@ -71,6 +71,8 @@ cd .. && rm -rf dlib
 * Configure .env 
 ```shell
 cp .env.example .env
+
+To create New Key for VoiceAnalysis, please register to http://developers.beyondverbal.com/apiv4/index
 ```
 If you want to use the default environment
 - Fill only the ```REMOTE_DATA_LOGIN```  and ```REMOTE_DATA_PASSWD``` fields

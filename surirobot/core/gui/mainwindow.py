@@ -220,9 +220,7 @@ class Ui_MainWindow(object):
         self.nextCamera.setObjectName("nextCamera")
         self.knowProgressBar = QtWidgets.QProgressBar(self.centralWidget)
         self.knowProgressBar.setGeometry(QtCore.QRect(920, 380, 231, 51))
-
         self.card = QtWidgets.QProgressBar(self.centralWidget)
-
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(138, 226, 52))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -250,12 +248,12 @@ class Ui_MainWindow(object):
         self.nobodyProgressBar.setGeometry(QtCore.QRect(920, 490, 231, 51))
 
         self.card = QtWidgets.QLabel(self.centralWidget)
-        self.card.setGeometry(QtCore.QRect(10, 10, 13, 41))
         self.card.setAlignment(QtCore.Qt.AlignCenter)
         self.card.setWordWrap(True)
         self.card.setObjectName("CardText")
         self.card = QtWidgets.QProgressBar(self.centralWidget)
         self.card.setGeometry(QtCore.QRect(920, 490, 231, 51))
+
         self.cardText = QtWidgets.QLabel(self.centralWidget)
         self.cardText.setGeometry(QtCore.QRect(930, 447, 213, 41))
         self.cardText.setAlignment(QtCore.Qt.AlignCenter)

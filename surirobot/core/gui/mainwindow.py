@@ -249,13 +249,12 @@ class Ui_MainWindow(object):
 
         self.card = QtWidgets.QLabel(self.centralWidget)
         self.card.setAlignment(QtCore.Qt.AlignCenter)
-        self.card.setWordWrap(True)
         self.card.setObjectName("CardText")
-        self.card = QtWidgets.QProgressBar(self.centralWidget)
-        self.card.setGeometry(QtCore.QRect(920, 490, 231, 51))
+        self.card = QtWidgets.QMdiSubWindow(self.centralWidget)
+        self.card.setGeometry(QtCore.QRect(80, 490, 231, 51))
 
         self.cardText = QtWidgets.QLabel(self.centralWidget)
-        self.cardText.setGeometry(QtCore.QRect(930, 447, 213, 41))
+        self.cardText.setGeometry(QtCore.QRect(80, 447, 213, 41))
         self.cardText.setAlignment(QtCore.Qt.AlignCenter)
         self.cardText.setWordWrap(True)
         self.cardText.setObjectName("cardText")

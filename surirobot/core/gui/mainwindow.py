@@ -247,17 +247,26 @@ class Ui_MainWindow(object):
         self.nobodyProgressBar = QtWidgets.QProgressBar(self.centralWidget)
         self.nobodyProgressBar.setGeometry(QtCore.QRect(920, 490, 231, 51))
 
-        self.card = QtWidgets.QLabel(self.centralWidget)
-        self.card.setAlignment(QtCore.Qt.AlignCenter)
-        self.card.setObjectName("CardText")
+
+        #Here the Widget for Loading Images
         self.card = QtWidgets.QMdiSubWindow(self.centralWidget)
         self.card.setGeometry(QtCore.QRect(80, 490, 231, 51))
 
+        #Here the widget for Label
         self.cardText = QtWidgets.QLabel(self.centralWidget)
         self.cardText.setGeometry(QtCore.QRect(80, 447, 213, 41))
         self.cardText.setAlignment(QtCore.Qt.AlignCenter)
         self.cardText.setWordWrap(True)
         self.cardText.setObjectName("cardText")
+
+        #Here my attempt to load images
+        """
+        self.card = QtWidgets.QLabel(self.centralWidget)
+        photo = QPixmap('corpo.jpeg')
+        self.card.setPixmap(photo)
+        self.card.setGeometry(QtCore.QRect(80, 447, 213, 41))
+        self.card.setObjectName("cardText")
+        """
 
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(204, 0, 0))

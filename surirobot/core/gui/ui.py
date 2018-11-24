@@ -68,6 +68,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.activateManualButton.hide()
         self.manualLayoutContainer.hide()
 
+        # Image Viewer
+        # TODO à supprimer pour mettre en place le défilement des photos
+        self.set_imageViewer("./data/chat.png")
+
     @staticmethod
     def load_image(image_path):
         """
@@ -236,3 +240,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #         self.width() / 2 - self.imgWidget.width() / 2,
     #         self.height() / 3 - self.imgWidget.height() / 2
     #     )
+
+    @ehpyqtSlot(str)
+    def set_imageViewer(self, image_path):
+        """
+        Change the image of that see user
+
+        Parameters
+        ----------
+        image_path : str
+            Path to the image
+        """
+
+        image = self.load_image(image_path)  # type: QImage
+        self.imageViewer.setPixmap(QPixmap.fromImage(image).scaled(self.imageViewer.width(), self.imageViewer.height(), Qt.KeepAspectRatio))

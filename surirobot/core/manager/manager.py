@@ -306,7 +306,7 @@ class Manager(QObject):
        If so, the scenario is activated and executes its actions
        """
         try:
-            if not self.freeze:
+             if not self.freeze:
                 for scId in self.scope:
                     sc = self.scenarios[scId]
                     if self.scopeChanged:

@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         self.labelMiddle.setObjectName("labelMiddle")
         self.textLayout.addWidget(self.labelMiddle)
         self.manualLayoutContainer = QtWidgets.QWidget(self.centralWidget)
-        self.manualLayoutContainer.setGeometry(QtCore.QRect(0, 440, 301, 251))
+        self.manualLayoutContainer.setGeometry(QtCore.QRect(0, 440, 301, 311))
         self.manualLayoutContainer.setObjectName("manualLayoutContainer")
         self.manualLayout = QtWidgets.QVBoxLayout(self.manualLayoutContainer)
         self.manualLayout.setContentsMargins(11, 11, 11, 11)
@@ -220,7 +220,6 @@ class Ui_MainWindow(object):
         self.nextCamera.setObjectName("nextCamera")
         self.knowProgressBar = QtWidgets.QProgressBar(self.centralWidget)
         self.knowProgressBar.setGeometry(QtCore.QRect(920, 380, 231, 51))
-        self.card = QtWidgets.QProgressBar(self.centralWidget)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(138, 226, 52))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -246,28 +245,6 @@ class Ui_MainWindow(object):
         self.nobodyProgressText.setObjectName("nobodyProgressText")
         self.nobodyProgressBar = QtWidgets.QProgressBar(self.centralWidget)
         self.nobodyProgressBar.setGeometry(QtCore.QRect(920, 490, 231, 51))
-
-
-        #Here the Widget for Loading Images
-        self.card = QtWidgets.QMdiSubWindow(self.centralWidget)
-        self.card.setGeometry(QtCore.QRect(80, 490, 231, 51))
-
-        #Here the widget for Label
-        self.cardText = QtWidgets.QLabel(self.centralWidget)
-        self.cardText.setGeometry(QtCore.QRect(80, 447, 213, 41))
-        self.cardText.setAlignment(QtCore.Qt.AlignCenter)
-        self.cardText.setWordWrap(True)
-        self.cardText.setObjectName("cardText")
-
-        #Here my attempt to load images
-        """
-        self.card = QtWidgets.QLabel(self.centralWidget)
-        photo = QPixmap('corpo.jpeg')
-        self.card.setPixmap(photo)
-        self.card.setGeometry(QtCore.QRect(80, 447, 213, 41))
-        self.card.setObjectName("cardText")
-        """
-
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(204, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -321,6 +298,13 @@ class Ui_MainWindow(object):
         self.labelDown_4.setAlignment(QtCore.Qt.AlignCenter)
         self.labelDown_4.setWordWrap(True)
         self.labelDown_4.setObjectName("labelDown_4")
+        self.imageViewer = QtWidgets.QLabel(self.centralWidget)
+        self.imageViewer.setGeometry(QtCore.QRect(26, 344, 291, 131))
+        self.imageViewer.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.imageViewer.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.imageViewer.setText("")
+        self.imageViewer.setAlignment(QtCore.Qt.AlignCenter)
+        self.imageViewer.setObjectName("imageViewer")
         MainWindow.setCentralWidget(self.centralWidget)
 
         self.retranslateUi(MainWindow)
@@ -341,5 +325,4 @@ class Ui_MainWindow(object):
         self.nobodyProgressText.setText(_translate("MainWindow", "Attention, vous n\'êtes plus reconnu(e) !"))
         self.unknowProgressText.setText(_translate("MainWindow", "Vérification de la présence d\'une personne inconnue..."))
         self.labelDown_4.setText(_translate("MainWindow", "Ce que j\'ai compris :"))
-        self.cardText.setText(_translate("MainWindow", "Images"))
 

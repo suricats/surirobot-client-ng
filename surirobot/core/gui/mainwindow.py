@@ -220,7 +220,6 @@ class Ui_MainWindow(object):
         self.nextCamera.setObjectName("nextCamera")
         self.knowProgressBar = QtWidgets.QProgressBar(self.centralWidget)
         self.knowProgressBar.setGeometry(QtCore.QRect(920, 380, 231, 51))
-        self.card = QtWidgets.QProgressBar(self.centralWidget)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(138, 226, 52))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -246,27 +245,6 @@ class Ui_MainWindow(object):
         self.nobodyProgressText.setObjectName("nobodyProgressText")
         self.nobodyProgressBar = QtWidgets.QProgressBar(self.centralWidget)
         self.nobodyProgressBar.setGeometry(QtCore.QRect(920, 490, 231, 51))
-
-
-        #Here the Widget for Loading Images
-        self.card = QtWidgets.QMdiSubWindow(self.centralWidget)
-        self.card.setGeometry(QtCore.QRect(80, 490, 231, 51))
-
-        #Here the widget for Label
-        self.cardText = QtWidgets.QLabel(self.centralWidget)
-        self.cardText.setGeometry(QtCore.QRect(80, 447, 213, 41))
-        self.cardText.setAlignment(QtCore.Qt.AlignCenter)
-        self.cardText.setWordWrap(True)
-        self.cardText.setObjectName("cardText")
-
-        #Here my attempt to load images
-        """
-        self.card = QtWidgets.QLabel(self.centralWidget)
-        photo = QPixmap('corpo.jpeg')
-        self.card.setPixmap(photo)
-        self.card.setGeometry(QtCore.QRect(80, 447, 213, 41))
-        self.card.setObjectName("cardText")
-        """
 
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(204, 0, 0))
@@ -341,5 +319,3 @@ class Ui_MainWindow(object):
         self.nobodyProgressText.setText(_translate("MainWindow", "Attention, vous n\'êtes plus reconnu(e) !"))
         self.unknowProgressText.setText(_translate("MainWindow", "Vérification de la présence d\'une personne inconnue..."))
         self.labelDown_4.setText(_translate("MainWindow", "Ce que j\'ai compris :"))
-        self.cardText.setText(_translate("MainWindow", "Images"))
-

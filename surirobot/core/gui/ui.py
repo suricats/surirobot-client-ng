@@ -1,8 +1,9 @@
 import logging
 
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont, QPixmap, QImage, QPalette
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
 
 from surirobot.core.common import State, ehpyqtSlot
 from .mainwindow import Ui_MainWindow
@@ -68,9 +69,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.activateManualButton.hide()
         self.manualLayoutContainer.hide()
 
-        # Image Viewer
-        # TODO à supprimer pour mettre en place le défilement des photos
-        self.set_imageViewer("./data/chat.png")
+        # Show first image for Emotion Analyse
+        self.pic = QLabel(self)
+        self.pic.setGeometry(80, 160, 800, 800)
+        self.pic.setPixmap(QtGui.QPixmap("./data/famine.png"))
+
+        # Show button
+        btn = QPushButton('Button', self)
+        btn.setToolTip('This is a <b>QPushButton</b> widget')
+        btn.resize(btn.sizeHint())
+        btn.clicked.connect(self.fun)
+        btn.move(200, 700)
+
+        self.setGeometry(500, 700, 1000, 800)
+        self.setWindowTitle('Tooltips')
+        self.show()
+
+        # Connect button to image updating
+
+    def fun(self):
+        self.pic.setPixmap(QtGui.QPixmap("./data/chat.png"))
+
+
 
     @staticmethod
     def load_image(image_path):

@@ -8,3 +8,5 @@ test.py
 build/
 dist/
 .idea/
+.vscode/launch.json
+.vscode/settings.json

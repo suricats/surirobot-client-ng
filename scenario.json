@@ -1,13 +1,12 @@
 {
-  "initial": ["converse","emotion-detection","special-persons","face-working","show-images",3,4,10],
+  "initial": ["converse","emotion-detection","special-persons","face-working",3,4,10],
   "groups" : {
     "person-detection" : [3,4,9,10],
     "emotion-detection" : [3000,3006],
     "special-persons" : [1001,1002,1003,1004],
-    "converse" : [2005, 2004, 2003, 2002,2001,2000,0,2,1],
+    "converse" : [4000, 2005, 2004, 2003, 2002,2001,2000,0,2,1],
     "person-detection-know-out" : [3,9],
-    "face-working" : [11,12],
-    "show-images" : [4000]
+    "face-working" : [11,12]
   },
   "templates" :
   {
@@ -2182,12 +2181,12 @@
       "description": "Show image to person",
       "templates": ["base"],
       "triggers": [{
-          "service": "converse",
-          "name": "new",
-          "parameters": {
-            "intent": "show-picture"
-          }
-        }],
+        "service": "converse",
+        "name": "new",
+        "parameters": {
+          "intent": "show-picture"
+        }
+      }],
       "actions": [
         {
           "name": "displayText",

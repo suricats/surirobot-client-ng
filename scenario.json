@@ -4,7 +4,7 @@
     "person-detection" : [3,4,9,10],
     "emotion-detection" : [3000,3006],
     "special-persons" : [1001,1002,1003,1004],
-    "converse" : [2005, 2004, 2003, 2002,2001,2000,0,2,1],
+    "converse" : [4000, 2005, 2004, 2003, 2002,2001,2000,0,2,1],
     "person-detection-know-out" : [3,9],
     "face-working" : [11,12],
     "show-images" : [4000]
@@ -2123,16 +2123,8 @@
       "description": "HAPPY - tell",
       "triggers": [
         {
-          "service": "emotion",
-          "name": "new",
-          "parameters": {
-            "emotion": "happiness"
-          }
-        },
-        {
-          "service": "face",
-          "name": "know",
-          "parameters" : {}
+          "service": "converse",
+          "name": "new"
         }
       ],
       "actions": [
@@ -2197,68 +2189,132 @@
           }
         },
         {
-          "name": "speak",
-          "text": {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 5000
+          }
+        },
+        {
+          "name": "image",
+          "filepath": {
             "type": "service",
-            "name": "storage",
-            "variable": "@displayed_text"
+            "name": "converse",
+            "variable": "imagepath"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 5000
           }
         },
         {
           "name": "displayText",
           "text": {
             "type": "input",
-            "variable": "4 décembre 2018 : VIREMENT SURICATS : +856€\n4 décembre 2018 : CB MIAM-MIAM NOODL : -8,90€\n3 décembre 2018 : CB Spotify : -14,99€\n1 décembre 2018 : CB SUBWAY : -10,50€"
-          },
-          "variables": [{
-            "firstname": {
-              "type": "service",
-              "name": "face",
-              "variable": "firstname"
-            }
-          },
-            {
-              "lastname": {
-                "type": "service",
-                "name": "face",
-                "variable": "lastname"
-              }
-            }
-          ]
-        },
-        {
-          "name": "wait",
-          "time": {
-            "type": "input",
-            "variable": 4000
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "input",
-            "variable": "Que voulez vous faire maintenant ?"
-          }
-        },
-        {
-          "name": "changeSuriface",
-          "image": {
-            "type": "input",
-            "variable": "listening"
-          }
-        },
-        {
-          "name": "wait",
-          "time": {
-            "type": "input",
-            "variable": 5000
+            "variable": "Que t'évoques cette image ?"
           }
         },
         {
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["converse", "person-detection", "emotion-detection"]
+            "variable": [4002]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4001,
+      "description": "Show another image to person",
+      "templates": ["base"],
+      "triggers": [{
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "show-picture"
+          }
+        }],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Une autre image !"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 5000
+          }
+        },
+        {
+          "name": "image",
+          "filepath": {
+            "type": "service",
+            "name": "converse",
+            "variable": "imagepath"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 5000
+          }
+        },
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Que t'évoques cette image ?"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [4002]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4002,
+      "description": "Get avis image",
+      "templates": ["base"],
+      "triggers": [{
+
+          "service": "sound",
+          "name": "new",
+          "parameters": {}
+        }
+      ],
+      "actions": [
+        {
+          "name": "emotion",
+          "filepath": {
+            "type": "service",
+            "name": "sound",
+            "variable": "filepath"
+          },
+          "variables": [{
+            "id": {
+              "type": "service",
+              "name": "face",
+              "variable": "id"
+            }
+          }]
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [4001]
           }
         }
       ]

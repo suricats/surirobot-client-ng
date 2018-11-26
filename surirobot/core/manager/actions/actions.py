@@ -44,6 +44,8 @@ class Actions:
             self.actions["notifications"] = self.retrieve_notifications
             self.actions["ssh"] = self.ssh_action
             self.actions["redis"] = self.redis_publish
+            self.actions["image"] = self.show_image
+            self.actions["emotion"] = self.emotion
             return self.actions
         except AttributeError as e:
             raise NotFoundActionException(e.args[0].split("'")[3])
@@ -194,7 +196,7 @@ class Actions:
             #    mgr.signal_nlp_memory.emit("username", serv_fr.idToName(params["id"]), params["id"])
             #    mgr.signal_converse_audio_with_id.emit(params["filepath"], params["id"])
             #else:
-            mgr.signal_emotional_audio.emit(params["filepath"])
+            mgr.signal_emotional_vocal.emit(params["filepath"], params["id"])
         else:
             raise MissingParametersActionException("emotion", 'id')
 
@@ -394,5 +396,17 @@ class Actions:
         if params.get('channel') and params.get('message'):
             serv_redis.redis.publish(params['channel'], params['message'])
 
+    @staticmethod
+    def show_image(mgr, params):
+        """
+        Display the image
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        #TODO passer le tableau de param
+        ui.set_imageViewer("./data/chat.png")
+        #else:
+        #    raise MissingParametersActionException("Image_path", 'text')
 
 mgr_actions = Actions()

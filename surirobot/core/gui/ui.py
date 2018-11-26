@@ -73,13 +73,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pic = QLabel(self)
         self.pic.setGeometry(80, 160, 800, 800)
         self.pic.setPixmap(QtGui.QPixmap("./data/famine.png"))
-
+        self.pic.hide()
+        
+        self.imageViewer.hide()
+        
         # Show button
         btn = QPushButton('Button', self)
         btn.setToolTip('This is a <b>QPushButton</b> widget')
         btn.resize(btn.sizeHint())
         btn.clicked.connect(self.fun)
         btn.move(200, 700)
+        btn.hide()
 
         self.setGeometry(500, 700, 1000, 800)
         self.setWindowTitle('Tooltips')
@@ -271,6 +275,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         image_path : str
             Path to the image
         """
-
-        image = self.load_image(image_path)  # type: QImage
-        self.imageViewer.setPixmap(QPixmap.fromImage(image).scaled(self.imageViewer.width(), self.imageViewer.height(), Qt.KeepAspectRatio))
+        self.imageViewer.setPixmap(QtGui.QPixmap(image_path))
+        self.imageViewer.show()
+        

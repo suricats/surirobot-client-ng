@@ -94,6 +94,7 @@ class ConverseApiCaller(ApiCaller):
                     self.signal_ui_input_text.emit(json_header.get('input'))
                     # Intent
                     intent = json_header["intent"]
+                    #intent='show-picture'
                     self.logger.info("Intent detected : {}".format(intent))
                     # Message
                     message = json_header["message"]

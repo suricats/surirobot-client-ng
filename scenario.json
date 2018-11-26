@@ -2196,10 +2196,9 @@
         },
         {
           "name": "image",
-          "filepath": {
-            "type": "service",
-            "name": "converse",
-            "variable": "imagepath"
+          "image": {
+            "type": "input",
+            "variable": "chat"
           }
         },
         {
@@ -2220,7 +2219,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4002]
+            "variable": [4002,"person-detection"]
           }
         }
       ]
@@ -2248,22 +2247,21 @@
           "name": "wait",
           "time" : {
             "type": "input",
-            "variable": 5000
+            "variable": 3000
           }
         },
         {
           "name": "image",
-          "filepath": {
-            "type": "service",
-            "name": "converse",
-            "variable": "imagepath"
+          "image": {
+            "type": "input",
+            "variable": "famine"
           }
         },
         {
           "name": "wait",
           "time" : {
             "type": "input",
-            "variable": 5000
+            "variable": 3000
           }
         },
         {
@@ -2277,7 +2275,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4002]
+            "variable": [4002,"person-detection"]
           }
         }
       ]
@@ -2287,7 +2285,6 @@
       "description": "Get avis image",
       "templates": ["base"],
       "triggers": [{
-
           "service": "sound",
           "name": "new",
           "parameters": {}
@@ -2301,19 +2298,17 @@
             "name": "sound",
             "variable": "filepath"
           },
-          "variables": [{
-            "id": {
-              "type": "service",
-              "name": "face",
-              "variable": "id"
-            }
-          }]
+          "id": {
+            "type": "service",
+            "name": "face",
+            "variable": "id"
+          }
         },
         {
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4001]
+            "variable": [4001, "person-detection"]
           }
         }
       ]

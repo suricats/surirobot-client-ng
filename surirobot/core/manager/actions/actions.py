@@ -196,7 +196,7 @@ class Actions:
             #    mgr.signal_nlp_memory.emit("username", serv_fr.idToName(params["id"]), params["id"])
             #    mgr.signal_converse_audio_with_id.emit(params["filepath"], params["id"])
             #else:
-            mgr.signal_emotional_vocal.emit(params["filepath"], params["id"])
+            mgr.signal_emotional_vocal.emit(params["filepath"], int(params["id"]))
         else:
             raise MissingParametersActionException("emotion", 'id')
 
@@ -405,8 +405,9 @@ class Actions:
         :type mgr: Manager
         """
         #TODO passer le tableau de param
-        ui.set_imageViewer("./data/chat.png")
-        #else:
-        #    raise MissingParametersActionException("Image_path", 'text')
+        if params.get('image'):
+            ui.set_imageViewer("./data/{}.png".format(params['image']))
+        else:
+            raise MissingParametersActionException("Image_path", 'text')
 
 mgr_actions = Actions()

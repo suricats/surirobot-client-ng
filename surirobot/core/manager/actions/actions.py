@@ -46,6 +46,7 @@ class Actions:
             self.actions["redis"] = self.redis_publish
             self.actions["image"] = self.show_image
             self.actions["emotion"] = self.emotion
+            self.actions["store_results"] = self.store
             return self.actions
         except AttributeError as e:
             raise NotFoundActionException(e.args[0].split("'")[3])
@@ -83,6 +84,22 @@ class Actions:
             mgr.services["storage"].update(output_list)
         else:
             raise MissingParametersActionException("store", 'list')
+
+        @staticmethod
+        def store_results(mgr, params):
+            """
+            Store a list of variables in the storage service
+            The output variable name is the name of the key in [list] dictionnary
+            The input variable is taken using the parameter encoder
+
+            :param params: dict
+            :type mgr: Manager
+            """
+            if params.get("list"):
+                output_list = mgr.retrieve_data(params["list"])
+                mgr.services["storage"].update(output_list)
+            else:
+                raise MissingParametersActionException("store", 'list')
 
     @staticmethod
     def add_picture_with_user(mgr, params):

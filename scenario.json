@@ -2201,16 +2201,6 @@
             "variable": "chat"
           }
         },
-         {
-          "name": "store_results",
-          "list": {
-            "firstname" : {
-              "type" : "service",
-              "name": "converse",
-              "variable": "store"
-            }
-          }
-        },
         {
           "name": "wait",
           "time" : {
@@ -2237,6 +2227,16 @@
           "id": {
             "type": "input",
             "variable": [4002,"person-detection"]
+          }
+        },
+        {
+          "name": "store",
+          "list": {
+            "lastname" : {
+              "type" : "service",
+              "name": "converse",
+              "variable": "filepath"
+            }
           }
         }
       ]

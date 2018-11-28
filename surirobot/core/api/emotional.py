@@ -93,6 +93,8 @@ class EmotionalAPICaller(ApiCaller):
                               headers=headers)
                # parsed = json.loads(r.json())
                 print (json.dumps(r.json(), indent=4, sort_keys=True))
+                with open('output.file', 'w') as f:
+                    f.write(r.json())
                 return r.json()
 
         #data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, "samples/output.wav")

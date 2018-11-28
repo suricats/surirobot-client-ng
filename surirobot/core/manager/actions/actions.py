@@ -46,6 +46,7 @@ class Actions:
             self.actions["redis"] = self.redis_publish
             self.actions["image"] = self.show_image
             self.actions["emotion"] = self.emotion
+            self.actions["conditionEquals"] = self.condition_equals
             return self.actions
         except AttributeError as e:
             raise NotFoundActionException(e.args[0].split("'")[3])
@@ -196,13 +197,10 @@ class Actions:
         :type mgr: Manager
         """
         if params.get("filepath") and params.get("id"):
-            #if params.get("id"):
-            #    mgr.signal_nlp_memory.emit("username", serv_fr.idToName(params["id"]), params["id"])
-            #    mgr.signal_converse_audio_with_id.emit(params["filepath"], params["id"])
-            #else:
             mgr.signal_emotional_vocal.emit(params["filepath"], int(params["id"]))
         else:
-            raise MissingParametersActionException("emotion", 'id')
+            mgr.signal_emotional_vocal.emit(params["filepath"])
+           # raise MissingParametersActionException("emotion", 'id')
 
     @staticmethod
     def converse(mgr, params):
@@ -409,18 +407,26 @@ class Actions:
         :type mgr: Manager
         """
         
-        images_list = ["chat", "famine", "horreur"]
-        if params.get('image'):
-            ui.set_imageViewer("./data/{}.png".format(params['image']))
+        #images_list = ["chat", "famine", "horreur"]
+        if params.get('image-id'):
+            ui.set_imageViewer("./data/images/{}".format(params['image-id']))
             # Store the next image in special variable 'image-id'
             if "@image-id" in mgr.services["storage"] :
-                if images_list.index(params['image']) + 1 < len(images_list):
-                    mgr.services["storage"]["@image-id"] = images_list[images_list.index(params['image']) + 1]
+                if mgr.images_list.index(params['image-id']) + 1 < len(mgr.images_list):
+                    mgr.services["storage"]["@image-id"] = mgr.images_list[mgr.images_list.index(params['image-id']) + 1]
                 else:
                     mgr.services["storage"]["@image-id"] = "end"
             else:
-                mgr.services["storage"].update({"@image-id" : images_list[images_list.index(params['image']) + 1]})
+                mgr.services["storage"].update({"@image-id" : mgr.images_list[mgr.images_list.index(params['image-id']) + 1]})
         else:
             raise MissingParametersActionException("Image_path", 'text')
+
+    @staticmethod
+    def condition_equals(mgr, params):
+        #If this is the end !
+        if params.get('image-id') == params.get('test'):
+            mgr.change_current_scenario(params.get('scenario')[0])
+           
+
 
 mgr_actions = Actions()

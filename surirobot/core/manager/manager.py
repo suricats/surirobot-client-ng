@@ -73,6 +73,7 @@ class Manager(QObject):
         self.triggers = {}
         self.actions = {}
         self.services = {}
+        self.images_list = []
         # Generate services
         for service in self.services_list:
             self.services[service] = {}
@@ -135,6 +136,12 @@ class Manager(QObject):
         else:
             raise InitialisationManagerException("scenario_file_path")
 
+        image_path = os.environ.get("IMAGE_PATH")
+        if image_path:
+            self.load_list_image(image_path)
+        else:
+            raise InitialisationManagerException("image_path")
+
         # Connect to progress bars
         try:
             self.know_updater = progressBarUpdater(bar=ui.knowProgressBar, timer=serv_fr.knownTimer, text=ui.knowProgressText)
@@ -180,6 +187,17 @@ class Manager(QObject):
                 self.logger.debug('Scope : {}'.format(self.scope))
         except Exception as e:
             raise BadEncodingScenarioFileException() from e
+
+    def load_list_image(self, image_path):
+        """
+        Load image list to show
+
+        Parameters
+        ----------
+         image_path : str
+            The path of the image.
+        """
+        self.images_list = os.listdir(image_path)
 
     @ehpyqtSlot(str, int, dict)
     def update(self, name, state, data):
@@ -417,3 +435,7 @@ class Manager(QObject):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     self.logger.error('{} occurred while deleting temporary files.\n{}'.format(type(e).__name__, e))
+    
+    def change_current_scenario(self, group_id):
+        self.scope = self.groups[group_id]
+        self.check_scope()

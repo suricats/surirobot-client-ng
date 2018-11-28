@@ -60,10 +60,12 @@ class EmotionalAPICaller(ApiCaller):
                     )
                 self.signal_indicator.emit("emotion", "green")
 
+    @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
-    def save_results(self, r):
-        with open('data.json', 'w') as outfile:
-            json.dump(r.json(), outfile)
+    def save_results(self, r, user_id=None):
+        if user_id is not None:
+            with open('data{}.json'.format(user_id), 'w') as outfile:
+                json.dump(r.json(), outfile)
 
     @ehpyqtSlot(str, int)
     @ehpyqtSlot(str)
@@ -98,7 +100,7 @@ class EmotionalAPICaller(ApiCaller):
                               headers=headers)
                # parsed = json.loads(r.json())
                 print (json.dumps(r.json(), indent=4, sort_keys=True))
-                self.save_results(r)
+                self.save_results(r, user_id)
                 return r.json()
 
         #data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, "samples/output.wav")

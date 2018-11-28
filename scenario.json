@@ -2219,22 +2219,16 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4002,"person-detection"]
+            "variable": [4002]
           }
         }
       ]
     },
     {
       "id": 4001,
-      "description": "Show another image to person",
+      "description": "Show another image to person - 1",
       "templates": ["base"],
-      "triggers": [{
-          "service": "converse",
-          "name": "new",
-          "parameters": {
-            "intent": "show-picture"
-          }
-        }],
+      "triggers": [],
       "actions": [
         {
           "name": "displayText",
@@ -2253,9 +2247,17 @@
         {
           "name": "image",
           "image": {
-            "type": "input",
-            "variable": "famine"
-          }
+            "type": "service",
+            "name": "storage",
+            "variable": "@image-id"
+          },
+          "variables":[{
+            "image-id": {
+              "type": "service",
+              "name": "storage",
+              "variable": "image-id"
+            }
+          }]
         },
         {
           "name": "wait",
@@ -2275,7 +2277,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4002,"person-detection"]
+            "variable": [4002,3]
           }
         }
       ]
@@ -2308,7 +2310,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4001, "person-detection"]
+            "variable": [4001,3]
           }
         }
       ]

@@ -305,9 +305,6 @@ class Ui_MainWindow(object):
         self.labelDown_4.setAlignment(QtCore.Qt.AlignCenter)
         self.labelDown_4.setWordWrap(True)
         self.labelDown_4.setObjectName("labelDown_4")
-        self.pushButton = QtWidgets.QPushButton(self.centralWidget)
-        self.pushButton.setGeometry(QtCore.QRect(460, 690, 91, 32))
-        self.pushButton.setObjectName("pushButton")
         MainWindow.setCentralWidget(self.centralWidget)
 
         self.retranslateUi(MainWindow)
@@ -328,5 +325,4 @@ class Ui_MainWindow(object):
         self.nobodyProgressText.setText(_translate("MainWindow", "Attention, vous n\'êtes plus reconnu(e) !"))
         self.unknowProgressText.setText(_translate("MainWindow", "Vérification de la présence d\'une personne inconnue..."))
         self.labelDown_4.setText(_translate("MainWindow", "Ce que j\'ai compris :"))
-        self.pushButton.setText(_translate("MainWindow", "Next"))
 

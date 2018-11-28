@@ -183,6 +183,10 @@ class Actions:
         else:
             raise MissingParametersActionException("speak", 'text')
 
+    #def change_image(mgr, params):
+        
+
+
     @staticmethod
     def emotion(mgr, params):
         """
@@ -191,7 +195,7 @@ class Actions:
         :param params: dict
         :type mgr: Manager
         """
-        if params.get("filepath"):
+        if params.get("filepath") and params.get("id"):
             #if params.get("id"):
             #    mgr.signal_nlp_memory.emit("username", serv_fr.idToName(params["id"]), params["id"])
             #    mgr.signal_converse_audio_with_id.emit(params["filepath"], params["id"])
@@ -404,9 +408,18 @@ class Actions:
         :param params: dict
         :type mgr: Manager
         """
-        #TODO passer le tableau de param
+        
+        images_list = ["chat", "famine", "horreur"]
         if params.get('image'):
             ui.set_imageViewer("./data/{}.png".format(params['image']))
+            # Store the next image in special variable 'image-id'
+            if "@image-id" in mgr.services["storage"] :
+                if images_list.index(params['image']) + 1 < len(images_list):
+                    mgr.services["storage"]["@image-id"] = images_list[images_list.index(params['image']) + 1]
+                else:
+                    mgr.services["storage"]["@image-id"] = "end"
+            else:
+                mgr.services["storage"].update({"@image-id" : images_list[images_list.index(params['image']) + 1]})
         else:
             raise MissingParametersActionException("Image_path", 'text')
 

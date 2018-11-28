@@ -85,21 +85,21 @@ class Actions:
         else:
             raise MissingParametersActionException("store", 'list')
 
-        @staticmethod
-        def store_results(mgr, params):
-            """
-            Store a list of variables in the storage service
-            The output variable name is the name of the key in [list] dictionnary
-            The input variable is taken using the parameter encoder
+    @staticmethod
+    def store_results(mgr, params):
+        """
+        Store a list of variables in the storage service
+        The output variable name is the name of the key in [list] dictionnary
+        The input variable is taken using the parameter encoder
 
             :param params: dict
             :type mgr: Manager
-            """
-            if params.get("list"):
+        """
+        if params.get("list"):
                 output_list = mgr.retrieve_data(params["list"])
                 mgr.services["storage"].update(output_list)
-            else:
-                raise MissingParametersActionException("store", 'list')
+        else:
+            raise MissingParametersActionException("store", 'list')
 
     @staticmethod
     def add_picture_with_user(mgr, params):

@@ -2223,20 +2223,20 @@
           }
         },
         {
-          "name": "callScenarios",
-          "id": {
-            "type": "input",
-            "variable": [4002,"person-detection"]
-          }
-        },
-        {
-          "name": "store",
+          "name": "store_results",
           "list": {
             "lastname" : {
               "type" : "service",
               "name": "converse",
               "variable": "filepath"
             }
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [4002,"person-detection"]
           }
         }
       ]

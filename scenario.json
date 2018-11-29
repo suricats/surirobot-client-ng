@@ -2188,6 +2188,14 @@
           }
         },
         {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
           "name": "wait",
           "time" : {
             "type": "input",
@@ -2216,6 +2224,14 @@
           }
         },
         {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
           "name": "callScenarios",
           "id": {
             "type": "input",
@@ -2235,6 +2251,14 @@
           "text": {
             "type": "input",
             "variable": "Une autre image !"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
           }
         },
         {
@@ -2271,6 +2295,14 @@
           "text": {
             "type": "input",
             "variable": "Que t'évoques cette image ?"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
           }
         },
         {

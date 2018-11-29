@@ -52,7 +52,8 @@ class Manager(QObject):
     signal_tts_request = pyqtSignal(str)
     signal_converse_audio_with_id = pyqtSignal(str, int)
     signal_converse_audio = pyqtSignal(str)
-    signal_emotional_vocal = pyqtSignal(str, int)
+    signal_emotional_vocal_with_id = pyqtSignal(str, str, int)
+    signal_emotional_vocal = pyqtSignal(str)
     signal_nlp_memory = pyqtSignal(str, str, int)
     signal_nlp_answer_with_id = pyqtSignal(str, int)
     signal_nlp_answer = pyqtSignal(str)
@@ -101,6 +102,7 @@ class Manager(QObject):
             self.signal_converse_audio_with_id.connect(api_converse.converse_audio)
             self.signal_converse_audio.connect(api_vocal.getAnalysis)
             self.signal_emotional_vocal.connect(api_vocal.getAnalysis)
+            self.signal_emotional_vocal_with_id.connect(api_vocal.getAnalysis)
             self.signal_nlp_answer_with_id.connect(api_nlp.answer)
             self.signal_nlp_answer.connect(api_nlp.answer)
             self.signal_stt_request.connect(api_stt.recognize)
@@ -197,7 +199,10 @@ class Manager(QObject):
          image_path : str
             The path of the image.
         """
-        self.images_list = os.listdir(image_path)
+        for file in os.listdir(image_path):
+            if file.endswith(".jpg") or file.endswith(".png"):
+                self.logger.debug('Image List add : {}'.format((os.path.join(image_path, file))))
+                self.images_list.append(file)
 
     @ehpyqtSlot(str, int, dict)
     def update(self, name, state, data):

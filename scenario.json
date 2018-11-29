@@ -2332,6 +2332,11 @@
             "name": "sound",
             "variable": "filepath"
           },
+          "image-id": {
+            "type": "service",
+            "name": "storage",
+            "variable": "image-id"
+          },
           "id": {
             "type": "service",
             "name": "face",

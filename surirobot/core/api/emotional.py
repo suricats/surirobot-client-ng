@@ -60,16 +60,14 @@ class EmotionalAPICaller(ApiCaller):
                     )
                 self.signal_indicator.emit("emotion", "green")
 
-    @ehpyqtSlot(str, int)
-    @ehpyqtSlot(str)
-    def save_results(self, r, user_id=None):
+    def save_results(self, r, image_id, user_id=None):
         if user_id is not None:
-            with open('data{}.json'.format(user_id), 'w') as outfile:
+            with open('{}-emotion-{}.json'.format(user_id, image_id), 'w') as outfile:
                 json.dump(r.json(), outfile)
 
-    @ehpyqtSlot(str, int)
+    @ehpyqtSlot(str, str, int)
     @ehpyqtSlot(str)
-    def getAnalysis(self, file_path, user_id=None):
+    def getAnalysis(self, file_path, image_id=None, user_id=None):
 
         res = requests.post("https://token.beyondverbal.com/token", data={"grant_type": "client_credentials",
                                                                           "apiKey": os.environ.get('BEYONDVERBAL_API_CREDENTIAL')})
@@ -100,7 +98,7 @@ class EmotionalAPICaller(ApiCaller):
                               headers=headers)
                # parsed = json.loads(r.json())
                 print (json.dumps(r.json(), indent=4, sort_keys=True))
-                self.save_results(r, user_id)
+                self.save_results(r, image_id, user_id)
                 return r.json()
 
         #data = getAnalysis(BEYONDVERBAL_API_CREDENTIAL, "samples/output.wav")

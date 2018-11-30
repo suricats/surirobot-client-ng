@@ -2170,7 +2170,7 @@
     },
     {
       "id": 4000,
-      "description": "Show image to person",
+      "description": "Start images showing",
       "templates": ["base"],
       "triggers": [{
         "service": "converse",
@@ -2181,69 +2181,24 @@
       }],
       "actions": [
         {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Prépare toi ! Je vais te montrer 3 images !"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 5000
-          }
-        },
-        {
-          "name": "image",
-          "image": {
-            "type": "input",
-            "variable": "chat"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 5000
-          }
-        },
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Que t'évoques cette image ?"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 5000
-          }
-        },
-        {
-          "name": "store_results",
-          "list": {
-            "lastname" : {
-              "type" : "service",
-              "name": "converse",
-              "variable": "filepath"
-            }
+          "name": "startPictures",
+          "store": {
+            "type": "service",
+            "variable": "image-id"
           }
         },
         {
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4002,"person-detection"]
+            "variable": [4001,"person-detection"]
           }
         }
       ]
     },
     {
       "id": 4001,
-      "description": "Show another image to person",
+      "description": "Show image to person",
       "templates": ["base"],
       "triggers": [{
           "service": "converse",
@@ -2257,7 +2212,7 @@
           "name": "displayText",
           "text": {
             "type": "input",
-            "variable": "Une autre image !"
+            "variable": "Prepare toi je vais te montrer une image !"
           }
         },
         {
@@ -2270,8 +2225,9 @@
         {
           "name": "image",
           "image": {
-            "type": "input",
-            "variable": "famine"
+            "type": "service",
+            "name": "storage",
+            "variable": "image-id"
           }
         },
         {
@@ -2322,10 +2278,23 @@
           }
         },
         {
-          "name": "callScenarios",
+          "name": "callScenariosIfEquals",
+          "var1" : {
+            "type": "input",
+            "variable": "end"
+          },
+          "var2": {
+            "type": "service",
+            "name": "storage",
+            "variable": "image-id"
+          },
           "id": {
             "type": "input",
             "variable": [4001, "person-detection"]
+          },
+          "else-id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }
         }
       ]

@@ -47,6 +47,10 @@ class Actions:
             self.actions["image"] = self.show_image
             self.actions["emotion"] = self.emotion
             self.actions["conditionEquals"] = self.condition_equals
+            self.actions["callScenariosIfEquals"] = self.call_scenarios_if_equals
+            self.actions["startPictures"] = self.photo_emotion_start
+            self.actions["incrementPictures"] = self.photo_emotion_incrementer
+            self.actions["store_results"] = self.store
             return self.actions
         except AttributeError as e:
             raise NotFoundActionException(e.args[0].split("'")[3])
@@ -82,6 +86,22 @@ class Actions:
         if params.get("list"):
             output_list = mgr.retrieve_data(params["list"])
             mgr.services["storage"].update(output_list)
+        else:
+            raise MissingParametersActionException("store", 'list')
+
+    @staticmethod
+    def store_results(mgr, params):
+        """
+        Store a list of variables in the storage service
+        The output variable name is the name of the key in [list] dictionnary
+        The input variable is taken using the parameter encoder
+
+            :param params: dict
+            :type mgr: Manager
+        """
+        if params.get("list"):
+                output_list = mgr.retrieve_data(params["list"])
+                mgr.services["storage"].update(output_list)
         else:
             raise MissingParametersActionException("store", 'list')
 
@@ -316,10 +336,53 @@ class Actions:
         mgr.scopeChanged = True
 
     @staticmethod
+    def call_scenarios_if_equals(mgr, params):
+        """
+        Change the script tree if [var1] is equals to [var2] with all scenario's or group's id in [id] list
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get('var1') is not None and params.get('var2') is not None and params.get('else_id'):
+            if params['var1'] == params['var2']:
+                mgr_actions.call_scenarios(mgr,params)
+            else:
+                params['id']=params['else_id']
+                mgr_actions.call_scenarios(mgr,params)
+        else:
+            raise MissingParametersActionException("callScenarioIfEquals", ['var1','var2'])
+
+    @staticmethod
+    def photo_emotion_start(mgr, params):
+        """
+        Special MeetUp
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get('store'):
+            mgr.meetup_current_index = 0
+            mgr.services["storage"][params['store']] = mgr.meetup_images_list[mgr.meetup_current_index]
+        else:
+            raise MissingParametersActionException('photoEmotionIncrementer','store')
+
+    @staticmethod
+    def photo_emotion_incrementer(mgr, params):
+        """
+        Special MeetUp
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get('store'):
+            mgr.meetup_current_index = mgr.meetup_current_index % len(mgr.meetup_images_list)
+            mgr.services["storage"][params['store']] = mgr.meetup_images_list[mgr.meetup_current_index]
+        else:
+            raise MissingParametersActionException('photoEmotionIncrementer','store')
+    @staticmethod
     def give_sensor_data(mgr, params):
         """
         Store [type] sensor information in storage.[output]
-
         :param params: dict
         :type mgr: Manager
         """

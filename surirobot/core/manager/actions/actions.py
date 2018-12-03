@@ -215,7 +215,7 @@ class Actions:
         :type mgr: Manager
         """
         if params.get("filepath") and params.get("id") :
-            mgr.signal_emotional_vocal_with_id.emit(params["filepath"], int(mgr.services["storage"]["@image-id"]), int(params["id"]))
+            mgr.signal_emotional_vocal_with_id.emit(params["filepath"], mgr.meetup_images_list[int(mgr.services["storage"]["@image-id"])], int(params["id"]))
         else:
             mgr.signal_emotional_vocal.emit(params["filepath"])
            # raise MissingParametersActionException("emotion", 'id')

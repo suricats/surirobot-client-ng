@@ -52,7 +52,7 @@ class Manager(QObject):
     signal_tts_request = pyqtSignal(str)
     signal_converse_audio_with_id = pyqtSignal(str, int)
     signal_converse_audio = pyqtSignal(str)
-    signal_emotional_vocal_with_id = pyqtSignal(str, int, int)
+    signal_emotional_vocal_with_id = pyqtSignal(str, str, int)
     signal_emotional_vocal = pyqtSignal(str)
     signal_nlp_memory = pyqtSignal(str, str, int)
     signal_nlp_answer_with_id = pyqtSignal(str, int)

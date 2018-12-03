@@ -44,9 +44,11 @@ class Actions:
             self.actions["notifications"] = self.retrieve_notifications
             self.actions["ssh"] = self.ssh_action
             self.actions["redis"] = self.redis_publish
-            self.actions["image"] = self.show_image
+            self.actions["startImage"] = self.show_image_start
+            self.actions["nextImage"] = self.show_image_next
             self.actions["emotion"] = self.emotion
-            self.actions["conditionEquals"] = self.condition_equals
+            self.actions["callScenariosIfEquals"] = self.call_scenarios_if_equals
+            self.actions["store_results"] = self.store
             return self.actions
         except AttributeError as e:
             raise NotFoundActionException(e.args[0].split("'")[3])
@@ -82,6 +84,22 @@ class Actions:
         if params.get("list"):
             output_list = mgr.retrieve_data(params["list"])
             mgr.services["storage"].update(output_list)
+        else:
+            raise MissingParametersActionException("store", 'list')
+
+    @staticmethod
+    def store_results(mgr, params):
+        """
+        Store a list of variables in the storage service
+        The output variable name is the name of the key in [list] dictionnary
+        The input variable is taken using the parameter encoder
+
+            :param params: dict
+            :type mgr: Manager
+        """
+        if params.get("list"):
+                output_list = mgr.retrieve_data(params["list"])
+                mgr.services["storage"].update(output_list)
         else:
             raise MissingParametersActionException("store", 'list')
 
@@ -197,7 +215,7 @@ class Actions:
         :type mgr: Manager
         """
         if params.get("filepath") and params.get("id") :
-            mgr.signal_emotional_vocal_with_id.emit(params["filepath"], mgr.services["storage"]["@image-id"], int(params["id"]))
+            mgr.signal_emotional_vocal_with_id.emit(params["filepath"], int(mgr.services["storage"]["@image-id"]), int(params["id"]))
         else:
             mgr.signal_emotional_vocal.emit(params["filepath"])
            # raise MissingParametersActionException("emotion", 'id')
@@ -316,10 +334,26 @@ class Actions:
         mgr.scopeChanged = True
 
     @staticmethod
+    def call_scenarios_if_equals(mgr, params):
+        """
+        Change the script tree if [var1] is equals to [var2] with all scenario's or group's id in [id] list
+
+        :param params: dict
+        :type mgr: Manager
+        """
+        if params.get('var1') is not None and params.get('var2') is not None and params.get('else-id'):
+            if params['var1'] == params['var2']:
+                params['id']=params['else-id']
+                mgr_actions.call_scenarios(mgr,params)
+            else:
+                mgr_actions.call_scenarios(mgr,params)
+        else:
+            raise MissingParametersActionException("callScenarioIfEquals", ['var1','var2'])
+
+    @staticmethod
     def give_sensor_data(mgr, params):
         """
         Store [type] sensor information in storage.[output]
-
         :param params: dict
         :type mgr: Manager
         """
@@ -399,34 +433,45 @@ class Actions:
             serv_redis.redis.publish(params['channel'], params['message'])
 
     @staticmethod
-    def show_image(mgr, params):
+    def show_image_start(mgr, params):
         """
-        Display the image
+        Show the image
 
         :param params: dict
         :type mgr: Manager
         """
-        
-        #images_list = ["chat", "famine", "horreur"]
-        if params.get('image-id'):
-            ui.set_imageViewer("./data/images/{}".format(params['image-id']))
-            # Store the next image in special variable 'image-id'
-            if "@image-id" in mgr.services["storage"] :
-                if mgr.images_list.index(params['image-id']) + 1 < len(mgr.images_list):
-                    mgr.services["storage"]["@image-id"] = mgr.images_list[mgr.images_list.index(params['image-id']) + 1]
-                else:
-                    mgr.services["storage"]["@image-id"] = "end"
-            else:
-                mgr.services["storage"].update({"@image-id" : mgr.images_list[mgr.images_list.index(params['image-id']) + 1]})
-        else:
-            raise MissingParametersActionException("Image_path", 'text')
 
+        if params.get('image-id'):
+            ui.set_imageViewer("./data/images/{}".format(mgr.meetup_images_list[int(params.get('image-id'))]))
+            mgr.services["storage"]["@image-id"] = int(params.get('image-id'))
+
+            # Store the next image in special variable 'image-id-next'
+            mgr.services["storage"]["@image-id-next"] = int(params.get('image-id')) + 1
+
+            logger.debug("actions.py - show_image_start =========== ")
+        else:
+            raise MissingParametersActionException("Show_image_start", 'image-id')
+    
     @staticmethod
-    def condition_equals(mgr, params):
-        #If this is the end !
-        if params.get('image-id') == params.get('test'):
-            mgr.change_current_scenario(params.get('scenario')[0])
-           
+    def show_image_next(mgr, params):
+        """
+        Show the next image
+
+        :param params: dict
+        :type mgr: Manager
+        """
+
+        if params.get('image-id'):
+            ui.set_imageViewer("./data/images/{}".format(mgr.meetup_images_list[int(params.get('image-id'))]))
+            
+            mgr.services["storage"]["@image-id"] = int(params.get('image-id'))
+
+            if  (int(params.get('image-id')) + 1) < len(mgr.meetup_images_list):
+                mgr.services["storage"]["@image-id-next"] = int(params.get('image-id')) + 1
+            else: 
+                mgr.services["storage"]["@image-id-next"] = 'end'
+        else:
+            raise MissingParametersActionException("Show_image_next", 'image-id')
 
 
 mgr_actions = Actions()

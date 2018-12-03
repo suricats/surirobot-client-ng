@@ -52,7 +52,7 @@ class Manager(QObject):
     signal_tts_request = pyqtSignal(str)
     signal_converse_audio_with_id = pyqtSignal(str, int)
     signal_converse_audio = pyqtSignal(str)
-    signal_emotional_vocal_with_id = pyqtSignal(str, str, int)
+    signal_emotional_vocal_with_id = pyqtSignal(str, int, int)
     signal_emotional_vocal = pyqtSignal(str)
     signal_nlp_memory = pyqtSignal(str, str, int)
     signal_nlp_answer_with_id = pyqtSignal(str, int)
@@ -62,6 +62,8 @@ class Manager(QObject):
     signal_ui_indicator = pyqtSignal(str, str)
     signal_audio_play = pyqtSignal(str, bool)
 
+
+
     def __new__(cls):
         if cls.__instance__ is None:
             cls.__instance__ = QObject.__new__(cls)
@@ -70,11 +72,15 @@ class Manager(QObject):
     def __init__(self):
 
         QObject.__init__(self)
+        # Special MeetUp emotions
+        self.meetup_image_current_index = 0
+        self.meetup_images_list = []
+
         self.local_voice = bool(int(os.environ.get('LOCAL_VOICE', False)))
         self.triggers = {}
         self.actions = {}
         self.services = {}
-        self.images_list = []
+    
         # Generate services
         for service in self.services_list:
             self.services[service] = {}
@@ -202,7 +208,7 @@ class Manager(QObject):
         for file in os.listdir(image_path):
             if file.endswith(".jpg") or file.endswith(".png"):
                 self.logger.debug('Image List add : {}'.format((os.path.join(image_path, file))))
-                self.images_list.append(file)
+                self.meetup_images_list.append(file)
 
     @ehpyqtSlot(str, int, dict)
     def update(self, name, state, data):

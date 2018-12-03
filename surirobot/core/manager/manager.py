@@ -52,7 +52,8 @@ class Manager(QObject):
     signal_tts_request = pyqtSignal(str)
     signal_converse_audio_with_id = pyqtSignal(str, int)
     signal_converse_audio = pyqtSignal(str)
-    signal_emotional_vocal = pyqtSignal(str, int)
+    signal_emotional_vocal_with_id = pyqtSignal(str, str, int)
+    signal_emotional_vocal = pyqtSignal(str)
     signal_nlp_memory = pyqtSignal(str, str, int)
     signal_nlp_answer_with_id = pyqtSignal(str, int)
     signal_nlp_answer = pyqtSignal(str)
@@ -73,6 +74,7 @@ class Manager(QObject):
         self.triggers = {}
         self.actions = {}
         self.services = {}
+        self.images_list = []
         # Generate services
         for service in self.services_list:
             self.services[service] = {}
@@ -100,6 +102,7 @@ class Manager(QObject):
             self.signal_converse_audio_with_id.connect(api_converse.converse_audio)
             self.signal_converse_audio.connect(api_vocal.getAnalysis)
             self.signal_emotional_vocal.connect(api_vocal.getAnalysis)
+            self.signal_emotional_vocal_with_id.connect(api_vocal.getAnalysis)
             self.signal_nlp_answer_with_id.connect(api_nlp.answer)
             self.signal_nlp_answer.connect(api_nlp.answer)
             self.signal_stt_request.connect(api_stt.recognize)
@@ -134,6 +137,12 @@ class Manager(QObject):
             self.load_scenario_file(scenario_file_path)
         else:
             raise InitialisationManagerException("scenario_file_path")
+
+        image_path = os.environ.get("IMAGE_PATH")
+        if image_path:
+            self.load_list_image(image_path)
+        else:
+            raise InitialisationManagerException("image_path")
 
         # Connect to progress bars
         try:
@@ -180,6 +189,20 @@ class Manager(QObject):
                 self.logger.debug('Scope : {}'.format(self.scope))
         except Exception as e:
             raise BadEncodingScenarioFileException() from e
+
+    def load_list_image(self, image_path):
+        """
+        Load image list to show
+
+        Parameters
+        ----------
+         image_path : str
+            The path of the image.
+        """
+        for file in os.listdir(image_path):
+            if file.endswith(".jpg") or file.endswith(".png"):
+                self.logger.debug('Image List add : {}'.format((os.path.join(image_path, file))))
+                self.images_list.append(file)
 
     @ehpyqtSlot(str, int, dict)
     def update(self, name, state, data):
@@ -417,3 +440,7 @@ class Manager(QObject):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     self.logger.error('{} occurred while deleting temporary files.\n{}'.format(type(e).__name__, e))
+    
+    def change_current_scenario(self, group_id):
+        self.scope = self.groups[group_id]
+        self.check_scope()

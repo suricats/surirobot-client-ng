@@ -2184,28 +2184,36 @@
           "name": "displayText",
           "text": {
             "type": "input",
-            "variable": "Prépare toi ! Je vais te montrer 3 images !"
+            "variable": "Prépare toi ! Je vais te montrer des images !"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
           }
         },
         {
           "name": "wait",
           "time" : {
             "type": "input",
-            "variable": 5000
+            "variable": 2000
           }
         },
         {
           "name": "image",
-          "image": {
+          "image-id": {
             "type": "input",
-            "variable": "chat"
+            "variable": "baumgartner.jpg"
           }
         },
         {
           "name": "wait",
           "time" : {
             "type": "input",
-            "variable": 5000
+            "variable": 1000
           }
         },
         {
@@ -2213,6 +2221,14 @@
           "text": {
             "type": "input",
             "variable": "Que t'évoques cette image ?"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
           }
         },
         {
@@ -2238,15 +2254,23 @@
           }
         },
         {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
           "name": "wait",
           "time" : {
             "type": "input",
-            "variable": 3000
+            "variable": 1000
           }
         },
         {
           "name": "image",
-          "image": {
+          "image-id": {
             "type": "service",
             "name": "storage",
             "variable": "@image-id"
@@ -2263,7 +2287,7 @@
           "name": "wait",
           "time" : {
             "type": "input",
-            "variable": 3000
+            "variable": 1000
           }
         },
         {
@@ -2274,10 +2298,18 @@
           }
         },
         {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4002,3]
+            "variable": [4002]
           }
         }
       ]
@@ -2300,6 +2332,11 @@
             "name": "sound",
             "variable": "filepath"
           },
+          "image-id": {
+            "type": "service",
+            "name": "storage",
+            "variable": "image-id"
+          },
           "id": {
             "type": "service",
             "name": "face",
@@ -2310,7 +2347,38 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4001,3]
+            "variable": [4003]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4003,
+      "description": "Check if another image to show",
+      "templates": [],
+      "triggers": [],
+      "actions": [
+        {
+          "name" : "conditionEquals",
+          "image-id" : {
+            "type" : "service",
+            "name": "storage",
+            "variable": "@image-id"
+          },
+          "test": {
+            "type": "input",
+            "variable": "end"
+          },
+          "scenario" : {
+            "type": "input",
+            "variable": ["person-detection"]
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [4001]
           }
         }
       ]

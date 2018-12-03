@@ -2123,7 +2123,8 @@
       "triggers": [
         {
           "service": "converse",
-          "name": "new"
+          "name": "new",
+          "parameters": {}
         }
       ],
       "actions": [
@@ -2188,6 +2189,13 @@
           }
         },
         {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
           "name": "speak",
           "text": {
             "type": "service",
@@ -2196,24 +2204,10 @@
           }
         },
         {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 2000
-          }
-        },
-        {
-          "name": "image",
+          "name": "startImage",
           "image-id": {
             "type": "input",
-            "variable": "baumgartner.jpg"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
+            "variable": "0"
           }
         },
         {
@@ -2242,54 +2236,10 @@
     },
     {
       "id": 4001,
-      "description": "Show image to person",
+      "description": "Show image another to person",
       "templates": ["base"],
       "triggers": [],
       "actions": [
-        {
-          "name": "displayText",
-          "text": {
-            "type": "input",
-            "variable": "Prepare toi je vais te montrer une image !"
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@displayed_text"
-          }
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
-        {
-          "name": "image",
-          "image-id": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@image-id"
-          },
-          "variables":[{
-            "image-id": {
-              "type": "service",
-              "name": "storage",
-              "variable": "image-id"
-            }
-          }]
-        },
-        {
-          "name": "wait",
-          "time" : {
-            "type": "input",
-            "variable": 1000
-          }
-        },
         {
           "name": "displayText",
           "text": {
@@ -2306,10 +2256,25 @@
           }
         },
         {
+          "name": "nextImage",
+          "image-id": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@image-id-next"
+          },
+          "variables":[{
+            "image-id-next": {
+              "type": "service",
+              "name": "storage",
+              "variable": "image-id-next"
+            }
+          }]
+        },
+        {
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": [4002]
+            "variable": [4002,"person-detection"]
           }
         }
       ]
@@ -2352,39 +2317,8 @@
           "var2": {
             "type": "service",
             "name": "storage",
-            "variable": "image-id"
+            "variable": "@image-id-next"
           },
-          "id": {
-            "type": "input",
-            "variable": [4003]
-          }
-        }
-      ]
-    },
-    {
-      "id": 4003,
-      "description": "Check if another image to show",
-      "templates": [],
-      "triggers": [],
-      "actions": [
-        {
-          "name" : "conditionEquals",
-          "image-id" : {
-            "type" : "service",
-            "name": "storage",
-            "variable": "@image-id"
-          },
-          "test": {
-            "type": "input",
-            "variable": "end"
-          },
-          "scenario" : {
-            "type": "input",
-            "variable": ["person-detection"]
-          }
-        },
-        {
-          "name": "callScenarios",
           "id": {
             "type": "input",
             "variable": [4001, "person-detection"]

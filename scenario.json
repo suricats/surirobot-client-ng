@@ -436,7 +436,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["special-persons",5,9,3]
+            "variable": [5]
           }
         }
       ]
@@ -453,6 +453,13 @@
         }
       ],
       "actions": [
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [6]
+          }
+        },
         {
           "name": "converse",
           "filepath": {

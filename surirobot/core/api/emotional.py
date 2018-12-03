@@ -82,7 +82,7 @@ class EmotionalAPICaller(ApiCaller):
             self.logger.error('HTTP {} error occurred.'.format(pp.status_code))
             self.signal_indicator.emit("emotion", "red")
             return
-        else : 
+        else:
             recordingId = pp.json()['recordingId']
             new_file = file_path.split('.')[0] + '-format.wav'
             ff = FFmpeg(

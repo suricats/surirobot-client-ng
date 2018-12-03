@@ -207,33 +207,6 @@
           }
         },
         {
-          "name": "wait",
-          "time": {
-            "type" : "input",
-            "variable": 2000
-          }
-        },
-        {
-          "name": "notifications"
-        },
-        {
-          "name": "displayText",
-          "text":
-          {
-            "type": "service",
-            "name": "storage",
-            "variable": "@notifications"
-          }
-        },
-        {
-          "name": "speak",
-          "text": {
-            "type": "service",
-            "name": "storage",
-            "variable": "@displayed_text"
-          }
-        },
-        {
           "name": "callScenarios",
           "id": {
             "type": "input",
@@ -377,7 +350,7 @@
           "name": "encodeText",
           "text": {
             "type": "input",
-            "variable": "Bonjour {@firstname} {@lastname}. Voici vos notifications :"
+            "variable": "Bonjour {@firstname} {@lastname} !"
           },
           "variables": [{
             "firstname": {

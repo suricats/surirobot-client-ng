@@ -62,7 +62,7 @@ class EmotionalAPICaller(ApiCaller):
 
     def save_results(self, r, image_id, user_id=None):
         if user_id is not None:
-            with open('{}-emotion-{}.json'.format(user_id, image_id), 'w') as outfile:
+            with open(self.TMP_DIR + '{}-emotion-{}.json'.format(user_id, image_id), 'w') as outfile:
                 json.dump(r.json(), outfile)
 
     @ehpyqtSlot(str, str, int)

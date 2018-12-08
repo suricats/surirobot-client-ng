@@ -138,6 +138,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         self.labelMiddle.setText(text)
         self.labelMiddle.adjustSize()
+        #self.labelMiddle.setAlignment(Qt.AlignCenter)
 
     @ehpyqtSlot(str)
     def set_text_down(self, text):

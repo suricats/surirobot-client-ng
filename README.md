@@ -49,7 +49,8 @@ sudo apt-get install -y --fix-missing \
     software-properties-common \
     zip \
     libasound2-dev \
-    sshpass
+    sshpass \
+    ffmpy
 ```
 
 Install required python3 modules: `pip3 install -r requirements.txt`

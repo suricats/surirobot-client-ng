@@ -4,9 +4,10 @@
     "person-detection" : [3,4,9,10],
     "emotion-detection" : [3000,3006],
     "special-persons" : [1001,1002,1003,1004],
-    "converse" : [4000, 2005, 2004, 2003, 2002,2001,2000,0,2,1],
+    "converse" : [4000,5000, 2005, 2004, 2003, 2002,2001,2000,0,2,1],
     "person-detection-know-out" : [3,9],
-    "face-working" : [11,12]
+    "face-working" : [11,12],
+    "menu" : [5000]
   },
   "templates" :
   {
@@ -210,7 +211,7 @@
           "name": "callScenarios",
           "id": {
             "type": "input",
-            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+            "variable": ["converse","special-persons","person-detection","emotion-detection",5000]
           }
         }
       ]
@@ -2206,6 +2207,13 @@
           }
         },
         {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
           "name": "callScenarios",
           "id": {
             "type": "input",
@@ -2304,6 +2312,112 @@
             "variable": [4001, "person-detection"]
           },
           "else-id": {
+            "type": "input",
+            "variable": [4003]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4003,
+      "description": "End images showing",
+      "templates": ["base"],
+      "triggers": [],
+      "actions": [
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "J'espère que ces images ne t'ont pas trop choquées ! Merci !"
+          }
+        },
+        {
+          "name": "wait",
+          "time" : {
+            "type": "input",
+            "variable": 1000
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": [5001]
+          }
+        }
+      ]
+    },
+    {
+      "id": 5000,
+      "description": "Show menu",
+      "templates": ["base"],
+      "triggers": [
+        {
+          "service": "converse",
+          "name": "new",
+          "parameters": {
+            "intent": "menu"
+          }
+        }
+      ],
+      "actions": [
+
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Que souhaites-tu faire maintenant ?\nJe peux :\n1 - Te montrer des images et dis moi ce que tu ressens ! (montre moi des images)\n2 - Donner le cours d'une crypto monnaie ?\n3 - Une blague\n4 - Donner la météo (Quel temps fait-il à Paris ?)\n5 - Donner des nouvelles (Quelles sont les nouvelles ?)"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
+            "type": "input",
+            "variable": ["converse","special-persons","person-detection","emotion-detection"]
+          }
+        }
+      ]
+    },{
+      "id": 5001,
+      "description": "Show menu",
+      "templates": ["base"],
+      "triggers": [],
+      "actions": [
+
+        {
+          "name": "displayText",
+          "text": {
+            "type": "input",
+            "variable": "Que souhaites-tu faire maintenant ?\nJe peux :\n1 - Te montrer des images et dis moi ce que tu ressens ! (montre moi des images)\n2 - Donner le cours d'une crypto monnaie ?\n3 - Une blague\n4 - Donner la météo (Quel temps fait-il à Paris ?)\n5 - Donner des nouvelles (Quelles sont les nouvelles ?)"
+          }
+        },
+        {
+          "name": "speak",
+          "text": {
+            "type": "service",
+            "name": "storage",
+            "variable": "@displayed_text"
+          }
+        },
+        {
+          "name": "callScenarios",
+          "id": {
             "type": "input",
             "variable": ["converse","special-persons","person-detection","emotion-detection"]
           }

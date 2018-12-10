@@ -98,6 +98,13 @@ pip install -r requirements.txt
 python start.py
 ```
 
+## TESTS UNITAIRES
+
+* Utilisation de Unittest pour les tests unitaires
+* Dans le répertoire tests/ concerné:
+```shell
+python test_audio.py
+```
 
 ## TODO
 WIP

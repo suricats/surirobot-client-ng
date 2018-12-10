@@ -100,10 +100,10 @@ python start.py
 
 ## TESTS UNITAIRES
 
-* Utilisation de Unittest pour les tests unitaires
-* Dans le répertoire tests/ concerné:
+* Utilisation de Unittest pour les tests unitaires concernant les émotions:
+* Dans le répertoire surirobot/core/api/tests/emotion/:
 ```shell
-python test_audio.py
+python test_emotionalAPICaller.py
 ```
 
 ## TODO

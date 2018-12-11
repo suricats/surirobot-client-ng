@@ -48,7 +48,7 @@ class Manager(QObject):
     """
     __instance__ = None
     # Signals
-    services_list = ["face", "emotion", "converse", "sound", "storage", "keyboard", "redis"]
+    services_list = ["face", "emotion", "converse", "sound", "storage", "keyboard", "redis", "voice"]
     signal_tts_request = pyqtSignal(str)
     signal_converse_audio_with_id = pyqtSignal(str, int)
     signal_converse_audio = pyqtSignal(str)
@@ -60,6 +60,7 @@ class Manager(QObject):
     signal_ui_suriface = pyqtSignal(str)
     signal_ui_indicator = pyqtSignal(str, str)
     signal_audio_play = pyqtSignal(str, bool)
+    signal_vocal = pyqtSignal(str, int)
 
 
 
@@ -104,7 +105,7 @@ class Manager(QObject):
             self.signal_converse_audio.connect(api_converse.converse_audio)
             self.signal_converse_audio_with_id.connect(api_converse.converse_audio)
             self.signal_converse_audio.connect(api_vocal.getAnalysis)
-            self.signal_emotional_vocal.connect(api_vocal.getAnalysis)
+            self.signal_vocal.connect(api_vocal.getAnalysis)
             self.signal_nlp_answer_with_id.connect(api_nlp.answer)
             self.signal_nlp_answer.connect(api_nlp.answer)
             self.signal_stt_request.connect(api_stt.recognize)

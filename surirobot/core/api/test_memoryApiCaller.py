@@ -3,7 +3,8 @@ from unittest import TestCase
 
 class TestMemoryApiCaller(TestCase):
     def test_get_encodings(self):
-        self.setUp()
+        self.user_id = True
+        self.assertEqual(True, True, msg="Hello")
 
     def test_get_notifications(self):
         self.setUp()

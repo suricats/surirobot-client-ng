@@ -14,5 +14,3 @@ class TestEmotionalAPICaller(TestCase):
         self.file_path= "string"
         self.assertEqual(self.file_path, "string", "Correct")
 
-    def test_start(self):
-        self.setUp()

@@ -28,7 +28,11 @@ class TestMemoryApiCaller(TestCase):
         self.assertEqual(response_encoding.status_code, 200)
 
     def test_get_last_sensor(self):
-        self.setUp()
+        token = '4d060171dce2fb7add839c93e9b1d10509a52257'
+        self.headers = {'Authorization': 'Token ' + token, 'Content-Type': 'application/json'}
+        response_encoding = requests.get('https://memory.api.suricats-consulting.com/api/memory/sensors/last',
+                                         headers=self.headers)
+        self.assertEqual(response_encoding.status_code, 200)
 
     def test_get_sensors(self):
         self.setUp()

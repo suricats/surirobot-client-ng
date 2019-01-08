@@ -1,13 +1,14 @@
 from unittest import TestCase
+import requests
 
 
 class TestEmotionalAPICaller(TestCase):
     def test_analyse(self):
-        self.file_path = "str"
-        self.integer_file_path = 123
-        self.assertEqual(self.file_path, "str", "Correct file path")
-        self.assertNotEqual(self.integer_file_path, "str", "Wrong file path")
-        self.assertTrue(self.file_path)
+
+        self.headers = {'Authorization': 'Token ', 'Content-Type': 'application/json'}
+        response_analysis = requests.get('https://portal.azure.com/microsoft/analyse/',
+                                         headers=self.headers)
+        self.assertEqual(response_analysis.status_code, 200)
 
     def test_getAnalysis(self):
         self.file_path= "string"

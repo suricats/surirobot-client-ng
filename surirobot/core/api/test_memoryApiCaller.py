@@ -49,6 +49,3 @@ class TestMemoryApiCaller(TestCase):
                                          json=data,
                                          headers=self.headers)
         self.assertEqual(response_add_user.status_code, 200)
-
-    def test_add_encoding(self):
-        self.setUp()

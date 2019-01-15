@@ -1,6 +1,6 @@
 from unittest import TestCase
 import requests
-
+import os
 
 class TestEmotionalAPICaller(TestCase):
     def test_analyse(self):
@@ -11,6 +11,8 @@ class TestEmotionalAPICaller(TestCase):
         self.assertEqual(response_analysis.status_code, 200)
 
     def test_getAnalysis(self):
-        self.file_path= "string"
-        self.assertEqual(self.file_path, "string", "Correct")
+        res = requests.post("https://token.beyondverbal.com/token", data={"grant_type": "client_credentials",
+                                                                          "apiKey": '76918380-3268-40be-8dc6-fba59804dd76'})
+        self.assertEqual(res.status_code, 200)
+
 

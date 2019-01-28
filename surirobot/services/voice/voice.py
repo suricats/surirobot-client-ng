@@ -18,7 +18,7 @@ class VoiceRecognition(QThread):
     def __init__(self):
         QThread.__init__(self)
 
-        voice_url = os.environ.get('BEYONDVERBAL_API_URL')
+        voice_url = os.environ.get('API_EMO_URL')
         if voice_url:
             self.api_voice = EmotionalAPICaller(voice_url)
             self.api_voice.start()

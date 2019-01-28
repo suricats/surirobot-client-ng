@@ -300,7 +300,7 @@ class Manager(QObject):
         for trigger in sc["triggers"]:
             func = self.triggers[trigger["service"]][trigger["name"]]
             if func:
-                # self.logger.debug("Trigger of {}: {}".format(sc['id'], trigger))
+                self.logger.debug("Trigger of {}: {}".format(sc['id'], trigger))
                 active = func(self, trigger)
             if not active:
                 break

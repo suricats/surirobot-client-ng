@@ -171,6 +171,7 @@ class Triggers:
         intent_condition = False
         if mgr.services.get("converse"):
             # Check new/available condition
+
             new_parameter = params["parameters"].get("new")
             if new_parameter is None or new_parameter:
                 if mgr.services["converse"]["state"] == State.CONVERSE_NEW:

@@ -11,7 +11,7 @@ else:
     raise URLNotDefinedAPIException('Converse')
 
 from .emotional import EmotionalAPICaller
-vocal_url = os.environ.get('BEYONDVERBAL_API_URL')
+vocal_url = os.environ.get('API_EMO_URL')
 if vocal_url:
     api_vocal = EmotionalAPICaller(vocal_url)
     api_vocal.start()

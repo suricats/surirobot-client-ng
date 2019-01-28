@@ -2123,7 +2123,8 @@
       "triggers": [
         {
           "service": "converse",
-          "name": "new"
+          "name": "new",
+          "parameters": {}
         }
       ],
       "actions": [
